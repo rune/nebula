@@ -22,14 +22,13 @@
 	/* Main */
 	.main { display: grid; grid-template-columns: 1fr 312px; min-height: 0; }
 	.stage { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: var(--bg-canvas); }
-	.frame { position: relative; width: 1010px; height: 568px; border-radius: 12px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06); }
-	.wallpaper { position: absolute; inset: 0; background:
-		radial-gradient(520px 420px at 14% 20%, rgba(104,40,255,0.95), transparent 70%),
-		radial-gradient(460px 380px at 88% 12%, rgba(178,46,255,0.85), transparent 70%),
-		radial-gradient(640px 420px at 55% 105%, rgba(42,15,110,1), transparent 70%), #07050d; }
-	.shot { position: absolute; left: 90px; top: 50px; width: 830px; height: 468px; border-radius: 13px; overflow: hidden; background: #f7f7f9; box-shadow: 0 26px 60px rgba(0,0,0,0.55); transform-origin: 70% 62%; }
+	.frame { position: relative; width: 840px; height: 546px; border-radius: 10px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06); }
+	.wallpaper { position: absolute; inset: 0; background: radial-gradient(620px 340px at 78% 6%, #ff8a3d 0%, rgba(255,138,61,0) 62%), radial-gradient(520px 380px at 6% 96%, #e04a2a 0%, rgba(224,74,42,0) 62%), radial-gradient(700px 420px at 92% 92%, #b0263f 0%, rgba(176,38,63,0) 60%), linear-gradient(165deg, #0c1a38 0%, #1c1f45 38%, #5a1a2c 72%, #8a2c16 100%); }
+	.shot { position: absolute; left: 97px; top: 58px; width: 646px; height: 424px; border-radius: 11px; overflow: hidden; background: #f7f7f9; box-shadow: 0 22px 50px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(0,0,0,0.4); }
 	/* A light SaaS app inside the recording, zoomed by the camera */
-	.app { position: absolute; inset: 0; transform: scale(1.32) translate(-70px, -40px); transform-origin: 0 0; display: grid; grid-template-columns: 170px 1fr; font-family: system-ui; color: #1b1b23; }
+	.winbar { position: absolute; left: 0; right: 0; top: 0; height: 30px; background: #ececf0; border-bottom: 1px solid #dedee5; display: flex; align-items: center; gap: 7px; padding-left: 12px; z-index: 2; }
+	.winbar i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+	.app { position: absolute; inset: 30px 0 0 0; display: grid; grid-template-columns: 170px 1fr; font-family: system-ui; color: #1b1b23; }
 	.app .side { background: #f0f0f4; border-right: 1px solid #e3e3ea; padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; }
 	.app .side div { height: 10px; border-radius: 4px; background: #dcdce5; }
 	.app .side div.on { background: #cbbcff; }
@@ -41,13 +40,13 @@
 	.app .row { display: flex; gap: 10px; align-items: center; }
 	.app .cta { height: 32px; padding: 0 16px; border-radius: 8px; background: #1b1b23; color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; }
 	.caret { width: 1.5px; height: 15px; background: #8C28FF; margin-left: 2px; }
-	.cursor { position: absolute; left: 610px; top: 330px; width: 26px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
-	.ripple { position: absolute; left: 592px; top: 312px; width: 40px; height: 40px; border-radius: 50%; border: 2.5px solid rgba(176,137,240,0.9); background: rgba(176,137,240,0.18); }
+	.cursor { position: absolute; left: 425px; top: 272px; width: 26px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
+	.ripple { position: absolute; left: 407px; top: 254px; width: 40px; height: 40px; border-radius: 50%; border: 2.5px solid rgba(176,137,240,0.9); background: rgba(176,137,240,0.18); }
 	.keycaps { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: flex; gap: 6px; }
 	.keycaps span { min-width: 34px; height: 34px; padding: 0 10px; border-radius: 8px; background: rgba(22,20,30,0.94); border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 3px 0 rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
 	.chip { position: absolute; left: 14px; top: 14px; font-size: 11px; font-weight: 700; padding: 5px 9px; border-radius: 7px; background: rgba(8,8,12,0.72); border: 1px solid rgba(255,255,255,0.1); color: var(--lavender); backdrop-filter: blur(10px); }
 
-	.transport { display: flex; align-items: center; gap: 22px; width: 1010px; }
+	.transport { display: flex; align-items: center; gap: 22px; width: 840px; }
 	.transport .time { font-size: 13px; font-weight: 650; color: var(--text-1); font-variant-numeric: tabular-nums; }
 	.transport .time em { font-style: normal; color: var(--text-3); }
 	.transport .play { width: 38px; height: 38px; border-radius: 50%; background: var(--text-1); color: #000; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
@@ -133,6 +132,7 @@
 			<div class="frame">
 				<div class="wallpaper"></div>
 				<div class="shot">
+					<div class="winbar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
 					<div class="app">
 						<div class="side"><div style="width:60%;height:14px;background:#1b1b23;margin-bottom:10px"></div><div class="on"></div><div></div><div></div><div style="width:70%"></div><div></div></div>
 						<div class="body">
@@ -146,7 +146,7 @@
 				<div class="ripple"></div>
 				<svg class="cursor" viewBox="0 0 17 24"><path d="M4 3v16.5l3.8-3.6 2.6 5.7 2.7-1.2-2.6-5.6 5.1-.2z" fill="#fff" stroke="#000" stroke-width="1.25" stroke-linejoin="round"/></svg>
 				<div class="keycaps"><span>⌘</span><span>↩</span></div>
-				<div class="chip">Zoom 1.8× · Field</div>
+				<div class="chip">Window · as on screen</div>
 			</div>
 			<div class="transport">
 				<div class="pill">Full quality</div>
@@ -159,7 +159,7 @@
 				<div class="time">0:18.2 <em>/ 0:34.6</em></div>
 				<div class="sp"></div>
 				<div class="pill">1×</div>
-				<div class="pill">16:9</div>
+				<div class="pill">Auto</div>
 			</div>
 		</div>
 
@@ -172,29 +172,23 @@
 				<div><svg class="icon" viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg></div>
 			</div>
 			<div class="section">
-				<h4>Background</h4>
-				<div class="seg"><div class="on">Wallpaper</div><div>Gradient</div><div>Color</div><div>Image</div></div>
+				<h4>Background <span style="text-transform:none;letter-spacing:0;font-weight:600">Your desktop</span></h4>
+				<div class="seg"><div class="on">Desktop</div><div>macOS</div><div>Color</div><div>Image</div></div>
 				<div class="swatches">
-					<div class="on" style="background: radial-gradient(circle at 20% 25%, #6828FF, transparent 60%), radial-gradient(circle at 85% 20%, #B22EFF, transparent 55%), #07050d"></div>
-					<div style="background: radial-gradient(circle at 15% 85%, #8C28FF, transparent 60%), radial-gradient(circle at 85% 80%, #FF5FA2, transparent 55%), #0c0614"></div>
-					<div style="background: radial-gradient(circle at 20% 25%, #1E5BFF, transparent 60%), radial-gradient(circle at 80% 75%, #7A3CFF, transparent 55%), #04080f"></div>
-					<div style="background: radial-gradient(circle at 15% 85%, #FF6A3D, transparent 60%), radial-gradient(circle at 85% 20%, #B22EFF, transparent 55%), #0d0605"></div>
-					<div style="background: radial-gradient(circle at 25% 30%, #B089F0, transparent 60%), radial-gradient(circle at 80% 80%, #6E6A85, transparent 55%), #121018"></div>
-					<div style="background: radial-gradient(circle at 50% 50%, #8C28FF, transparent 45%), #020204"></div>
-					<div style="background: radial-gradient(circle at 20% 80%, #1FAA6B, transparent 60%), radial-gradient(circle at 85% 25%, #3E7BFA, transparent 55%), #050b08"></div>
-					<div style="background: radial-gradient(circle at 10% 10%, #FFB547, transparent 55%), radial-gradient(circle at 90% 30%, #FF4F7A, transparent 55%), radial-gradient(circle at 50% 95%, #7B2CFF, transparent 55%), #120708"></div>
+					<div class="on" style="background: radial-gradient(circle at 80% 8%, #ff8a3d, transparent 55%), radial-gradient(circle at 6% 95%, #e04a2a, transparent 55%), linear-gradient(165deg, #0c1a38, #5a1a2c 70%, #8a2c16)"></div><div class="" style="background: linear-gradient(160deg, #1b3b6f, #3f7cc4 55%, #9ac3ea)"></div><div class="" style="background: linear-gradient(170deg, #2b1c3d, #7a3f6e 50%, #f0a37a)"></div><div class="" style="background: linear-gradient(180deg, #0e2a2a, #1f6a5f 60%, #b6d9a7)"></div><div class="" style="background: linear-gradient(160deg, #111, #333 60%, #555)"></div><div class="" style="background: linear-gradient(170deg, #3a2a1c, #b07a3f 55%, #f3d7a1)"></div><div class="" style="background: linear-gradient(170deg, #050a1f, #20306b 60%, #6b7fd6)"></div><div class="" style="background: linear-gradient(170deg, #2d0f12, #8f2a2f 55%, #ff9b6a)"></div>
 				</div>
 			</div>
 			<div class="section">
 				<h4>Frame</h4>
-				<div class="slider"><div class="row">Padding<b>7%</b></div><div class="track"><i style="width:34%"></i><b style="left:34%"></b></div></div>
-				<div class="slider"><div class="row">Corner radius<b>18</b></div><div class="track"><i style="width:45%"></i><b style="left:45%"></b></div></div>
+				<div class="seg"><div class="on">As on screen</div><div>Fit with padding</div></div>
+				<div class="slider"><div class="row">Scale<b>100%</b></div><div class="track"><i style="width:100%"></i><b style="left:100%"></b></div></div>
+				<div class="slider"><div class="row">Corner radius<b>12</b></div><div class="track"><i style="width:30%"></i><b style="left:30%"></b></div></div>
 				<div class="slider"><div class="row">Shadow<b>55%</b></div><div class="track"><i style="width:55%"></i><b style="left:55%"></b></div></div>
-				<div class="toggle-row">Inset border<div class="toggle off"></div></div>
+				<div class="slider"><div class="row">Background blur<b>0%</b></div><div class="track"><i style="width:0%"></i><b style="left:0%"></b></div></div>
 			</div>
 			<div class="section">
 				<h4>Aspect ratio</h4>
-				<div class="chips"><div>Auto</div><div class="on">16:9</div><div>9:16</div><div>1:1</div><div>4:3</div><div>4:5</div></div>
+				<div class="chips"><div class="on">Auto · screen</div><div>16:9</div><div>9:16</div><div>1:1</div><div>4:3</div><div>4:5</div></div>
 			</div>
 		</div>
 	</div>
