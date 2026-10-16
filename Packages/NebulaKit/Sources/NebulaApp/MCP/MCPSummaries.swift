@@ -61,6 +61,16 @@ struct ProjectSummary: Encodable {
 	var outputDuration: Double
 	var resolution: String
 	var playhead: Double
+	struct ClipInfo: Encodable {
+		var index: Int
+		/// Where the clip plays in the edited video.
+		var start, end: Double
+		/// Which part of the recording it plays.
+		var sourceStart, sourceEnd: Double
+		var rate: Double
+	}
+
+	var clips: [ClipInfo]
 	var items: [Item]
 	var style: [String: String]
 	var captions: Int
@@ -77,6 +87,9 @@ struct ProjectSummary: Encodable {
 		canUndo = store.canUndo
 		captions = p.captions?.segments.count ?? 0
 
+		clips = p.clips.map {
+			ClipInfo(index: $0.index, start: rounded($0.outputStart), end: rounded($0.outputEnd), sourceStart: rounded($0.source.start), sourceEnd: rounded($0.source.end), rate: $0.rate)
+		}
 		var items: [Item] = []
 		for zoom in p.zooms {
 			let target: String = switch zoom.target {

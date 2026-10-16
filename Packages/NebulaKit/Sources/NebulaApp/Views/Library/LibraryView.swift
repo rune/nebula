@@ -27,6 +27,7 @@ public struct LibraryView: View {
 			.background(Theme.window)
 		}
 		.background(Theme.surface1)
+		.ignoresSafeArea(.container, edges: .top)
 		.frame(minWidth: 900, minHeight: 600)
 		.environment(\.colorScheme, .dark)
 		.background(WindowAccessor { window in
@@ -196,7 +197,7 @@ private struct SidebarRow: View {
 			Image(systemName: symbol).font(.system(size: 12.5)).frame(width: 16)
 			Text(title).font(.nebula(13, 650))
 			Spacer()
-			if let count { Text("\(count)").font(.nebula(11.5, 600)).foregroundStyle(Theme.text3) }
+			if let count { Text(verbatim: "\(count)").font(.nebula(11.5, 600)).foregroundStyle(Theme.text3) }
 		}
 		.foregroundStyle(selected ? Theme.text1 : Theme.text2)
 		.padding(.horizontal, 10)
@@ -261,7 +262,7 @@ private struct ProjectCard: View {
 			.frame(height: 170)
 			VStack(alignment: .leading, spacing: 4) {
 				Text(entry.name).font(.nebula(13.5, 700)).foregroundStyle(Theme.text1).lineLimit(1)
-				Text("\(Format.relative.localizedString(for: entry.modifiedAt, relativeTo: Date())) · \(entry.width) × \(entry.height)")
+				Text(verbatim: "\(Format.relative.localizedString(for: entry.modifiedAt, relativeTo: Date())) · \(entry.width) × \(entry.height)")
 					.font(.nebula(12, 550)).foregroundStyle(Theme.text3)
 			}
 			.padding(14)

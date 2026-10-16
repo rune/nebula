@@ -312,7 +312,7 @@ private struct SourceMenu: View {
 		} else {
 			BarMenu(caption: "Display", title: recorder.displays.first { $0.id == recorder.displayID }?.name ?? "Display") {
 				ForEach(recorder.displays) { display in
-					Button("\(display.name) — \(Int(display.frame.width)) × \(Int(display.frame.height))") {
+					Button(String("\(display.name) — \(Int(display.frame.width)) × \(Int(display.frame.height))")) {
 						recorder.displayID = display.id
 						if recorder.mode == .area { recorder.area = nil }
 					}
@@ -396,7 +396,7 @@ private struct SelectionOverlay: View {
 						.offset(x: rect.minX, y: rect.minY)
 						.allowsHitTesting(false)
 					if choosing {
-						Text("\(Int(rect.width)) × \(Int(rect.height))")
+						Text(verbatim: "\(Int(rect.width)) × \(Int(rect.height))")
 							.font(.nebula(12, 700))
 							.monospacedDigit()
 							.foregroundStyle(Theme.text1)

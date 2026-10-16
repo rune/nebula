@@ -59,6 +59,9 @@ public final class NebulaAppDelegate: NSObject, NSApplicationDelegate {
 		let app = AppModel.shared
 		app.launch()
 		panels = RecorderPanels(app: app)
+		#if DEBUG
+		DebugSnapshots.install()
+		#endif
 		hotKey = GlobalHotKey(keyCode: UInt32(kVK_Return), modifiers: UInt32(cmdKey | optionKey)) {
 			if app.recorder.isRecording {
 				Task { await app.recorder.finish() }
@@ -139,8 +142,10 @@ struct NebulaCommands: Commands {
 			.disabled(app.activeStore == nil || app.activeStore?.isPolishing == true)
 			Divider()
 			Button("Add Zoom") { app.activeStore?.addZoom() }
-			Button("Cut at Playhead") { app.activeStore?.cutAtPlayhead() }
-			Button("Speed Up Section") { app.activeStore?.addSpeed() }
+			Button("Split Clip at Playhead") { app.activeStore?.splitAtPlayhead() }
+			Button("Toggle 2× Speed on Clip") { app.activeStore?.addSpeed() }
+			Button("Delete Clip") { if let store = app.activeStore, let clip = store.selectedClip { store.deleteClip(clip) } }
+				.disabled(app.activeStore?.selectedClip == nil)
 			Button("Blur an Area") { app.activeStore?.addMask() }
 			Button("Add Text") { app.activeStore?.addText() }
 			Button("Add Arrow") { app.activeStore?.addArrow() }

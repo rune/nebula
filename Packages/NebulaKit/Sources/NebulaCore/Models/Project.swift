@@ -12,6 +12,9 @@ public struct Project: Codable, Hashable, Sendable {
 
 	public var cuts: [CutItem]
 	public var speeds: [SpeedItem]
+	/// Extra clip boundaries (source seconds) made by splitting. Cuts and speed changes are
+	/// boundaries already. Optional so older project files still decode.
+	public var splits: [Double]?
 	public var zooms: [ZoomItem]
 	public var masks: [MaskItem]
 	public var annotations: [AnnotationItem]

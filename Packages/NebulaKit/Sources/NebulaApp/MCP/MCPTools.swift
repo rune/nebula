@@ -25,7 +25,7 @@ enum MCPTools {
 	static func all(controller: MCPController) -> [MCPTool] {
 		let tools: [MCPTool] = [
 			status, listProjects, openProject, importFile, getProject, getActivity, getFrame, previewFrame, seek,
-			polish, addZoom, addCut, addSpeed, addMask, addText, addArrow, setVolume, updateItem, removeItems,
+			polish, editClip, addZoom, addCut, addSpeed, addMask, addText, addArrow, setVolume, updateItem, removeItems,
 			setStyle, listPresets, applyPreset, savePreset, captions, audio, export, listSources,
 			startRecording, pauseRecording, stopRecording, undo, redo,
 		]
@@ -273,6 +273,58 @@ enum MCPTools {
 			let cut = CutItem(range: try range(args, in: store))
 			store.apply("Cut a section", source: .assistant) { $0.cuts.append(cut) }
 			return .json(EditResult(summary: "Added \(cut.id)", project: ProjectSummary(store)))
+		}
+	}
+
+	static let editClip = MCPTool(
+		name: "edit_clip", title: "Edit clips",
+		description: "Edits the video track like a video editor. get_project lists the clips (index, where they play, which part of the recording, rate). action split: cut the clip at source time 'at' in two. delete: remove clip 'clip' and close the gap. speed: play clip 'clip' at 'rate'. trim: move the 'edge' (start/end) of clip 'clip' to source time 'to'; trimming outward brings back removed material up to the neighbouring clip.",
+		inputSchema: JSONSchema.object([
+			"project": projectArg,
+			"action": JSONSchema.string(nil, enum: ["split", "delete", "speed", "trim"]),
+			"clip": JSONSchema.number("Clip index from get_project", minimum: 0, maximum: nil),
+			"at": JSONSchema.number("Source seconds (split)", minimum: 0, maximum: nil),
+			"rate": JSONSchema.number("0.25–16 (speed)", minimum: 0.25, maximum: 16),
+			"edge": JSONSchema.string(nil, enum: ["start", "end"]),
+			"to": JSONSchema.number("Source seconds (trim)", minimum: 0, maximum: nil),
+		], required: ["action"])
+	) { args in
+		try await MainActor.run {
+			let store = try store(args)
+			let clips = store.project.clips
+			func clip() throws -> Clip {
+				guard let index = args["clip"]?.doubleValue.map({ Int($0) }), clips.indices.contains(index) else {
+					throw ToolError("Pass 'clip', an index from 0 to \(clips.count - 1).")
+				}
+				return clips[index]
+			}
+			let summary: String
+			switch args["action"]?.stringValue {
+			case "split":
+				guard let time = args["at"]?.doubleValue else { throw ToolError("Pass 'at' in source seconds.") }
+				var next = store.project
+				guard next.split(atSource: time) else { throw ToolError("Nothing to split at \(time)s (it's cut or already a clip edge).") }
+				store.apply("Split", source: .assistant) { $0 = next }
+				summary = "Split at \(time)s"
+			case "delete":
+				let target = try clip()
+				store.apply("Delete clip", source: .assistant) { $0.deleteClip(target) }
+				summary = "Deleted clip \(target.index)"
+			case "speed":
+				let target = try clip()
+				let rate = (args["rate"]?.doubleValue ?? 2).clamped(to: SpeedItem.rateRange)
+				store.apply("Clip speed \(rate)×", source: .assistant) { $0.setRate(rate, for: target) }
+				summary = "Clip \(target.index) plays at \(rate)×"
+			case "trim":
+				let target = try clip()
+				guard let to = args["to"]?.doubleValue else { throw ToolError("Pass 'to' in source seconds.") }
+				let edge: Project.ClipEdge = args["edge"]?.stringValue == "start" ? .start : .end
+				store.apply("Trim clip", source: .assistant) { $0.trim(target, edge: edge, toSource: to) }
+				summary = "Trimmed clip \(target.index)"
+			default:
+				throw ToolError("action must be split, delete, speed or trim.")
+			}
+			return .json(EditResult(summary: summary, project: ProjectSummary(store)))
 		}
 	}
 

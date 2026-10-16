@@ -33,6 +33,7 @@ public struct EditorWindow: View {
 		}
 		.frame(minWidth: 1080, minHeight: 700)
 		.background(Theme.window)
+		.ignoresSafeArea(.container, edges: .top)
 		.task {
 			do {
 				store = try app.store(for: url)
@@ -48,6 +49,13 @@ public struct EditorWindow: View {
 			window.backgroundColor = NSColor(Theme.window)
 			window.tabbingMode = .disallowed
 			window.setFrameAutosaveName("Editor")
+			// An empty unified toolbar makes the title bar 52 pt tall, so the traffic lights sit
+			// centred in Nebula's own bar, which is drawn underneath.
+			if window.toolbar == nil {
+				let toolbar = NSToolbar(identifier: "editor")
+				window.toolbar = toolbar
+				window.toolbarStyle = .unified
+			}
 			EditorWindowTracker.shared.track(window, url: url, app: app)
 		})
 		.onDisappear { app.close(url) }
@@ -125,7 +133,7 @@ private struct EditorTitleBar: View {
 
 	var body: some View {
 		HStack(spacing: 12) {
-			Color.clear.frame(width: 64)
+			Color.clear.frame(width: 70)
 			Button("Library") { app.openLibraryWindow?() }
 				.buttonStyle(.plain)
 				.font(.nebula(13, 600))
@@ -430,19 +438,21 @@ private struct EditorKeyHandler: NSViewRepresentable {
 			guard flags.isEmpty || flags == .shift else { return false }
 			switch event.keyCode {
 			case 49: store.preview.togglePlay() // space
-			case 51, 117: store.delete(store.selection) // delete, forward delete
+			case 51, 117: // delete, forward delete
+				if let clip = store.selectedClip, store.selection.isEmpty { store.deleteClip(clip) } else { store.delete(store.selection) }
 			case 123: store.preview.step(frames: flags == .shift ? -60 : -1) // left
 			case 124: store.preview.step(frames: flags == .shift ? 60 : 1) // right
 			case 115: store.preview.seek(to: 0) // home
 			case 119: store.preview.seek(to: store.preview.duration) // end
 			case 53: // escape
-				guard !store.selection.isEmpty else { return false }
+				guard !store.selection.isEmpty || store.selectedClipTime != nil else { return false }
 				store.selection = []
+				store.selectClip(nil)
 			default:
 				guard flags.isEmpty, let key = event.charactersIgnoringModifiers?.lowercased() else { return false }
 				switch key {
 				case "z": store.addZoom()
-				case "c": store.cutAtPlayhead()
+				case "c", "b": store.splitAtPlayhead()
 				case "s": store.addSpeed()
 				case "m": store.addMask()
 				case "t": store.addText()

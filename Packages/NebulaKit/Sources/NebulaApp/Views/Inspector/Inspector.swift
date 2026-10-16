@@ -25,7 +25,9 @@ struct Inspector: View {
 
 	var body: some View {
 		VStack(spacing: 0) {
-			if store.selection.isEmpty {
+			if store.selection.isEmpty, let clip = store.selectedClip {
+				ClipInspector(store: store, clip: clip)
+			} else if store.selection.isEmpty {
 				tabBar
 				Hairline()
 				ScrollView {

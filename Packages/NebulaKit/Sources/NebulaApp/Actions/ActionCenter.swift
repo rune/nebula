@@ -53,8 +53,11 @@ public enum ActionCenter {
 			AppAction(id: "redo", title: store.redoLabel.map { "Redo \($0)" } ?? "Redo", group: .edit, symbol: "arrow.uturn.forward", shortcut: "⇧⌘Z", keywords: [], isEnabled: store.canRedo) { store.redo() },
 			AppAction(id: "delete", title: "Delete selection", group: .edit, symbol: "trash", shortcut: "⌫", keywords: ["remove"], isEnabled: !store.selection.isEmpty) { store.delete(store.selection) },
 			AppAction(id: "zoom", title: "Add zoom at playhead", group: .timeline, symbol: "plus.magnifyingglass", shortcut: "Z", keywords: ["camera"], isEnabled: has) { store.addZoom() },
-			AppAction(id: "cut", title: "Cut at playhead", group: .timeline, symbol: "scissors", shortcut: "C", keywords: ["trim", "remove", "split"], isEnabled: has) { store.cutAtPlayhead() },
-			AppAction(id: "speed", title: "Speed up section", group: .timeline, symbol: "gauge.with.dots.needle.67percent", shortcut: "S", keywords: ["fast"], isEnabled: has) { store.addSpeed() },
+			AppAction(id: "split", title: "Split clip at playhead", group: .timeline, symbol: "scissors", shortcut: "C", keywords: ["cut", "blade", "razor", "trim"], isEnabled: has) { store.splitAtPlayhead() },
+			AppAction(id: "delete-clip", title: "Delete clip", group: .timeline, symbol: "rectangle.badge.minus", shortcut: "⌫", keywords: ["ripple", "remove", "cut"], isEnabled: store.selectedClip != nil) {
+				if let clip = store.selectedClip { store.deleteClip(clip) }
+			},
+			AppAction(id: "speed", title: "Toggle 2× speed on clip", group: .timeline, symbol: "gauge.with.dots.needle.67percent", shortcut: "S", keywords: ["fast", "speed"], isEnabled: has) { store.addSpeed() },
 			AppAction(id: "mask", title: "Blur an area", group: .timeline, symbol: "eye.slash", shortcut: "M", keywords: ["mask", "hide", "private", "pixelate"], isEnabled: has) { store.addMask() },
 			AppAction(id: "text", title: "Add text", group: .timeline, symbol: "textformat", shortcut: "T", keywords: ["label", "annotation"], isEnabled: has) { store.addText() },
 			AppAction(id: "arrow", title: "Add arrow", group: .timeline, symbol: "arrow.up.right", shortcut: "A", keywords: ["annotation", "point"], isEnabled: has) { store.addArrow() },

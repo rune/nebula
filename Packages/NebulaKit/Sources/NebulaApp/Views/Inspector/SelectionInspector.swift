@@ -321,7 +321,7 @@ private struct AnnotationSettings: View {
 			InspectorSection(title: "Text") {
 				NebulaTextField(placeholder: "Label", text: $text)
 					.onAppear { text = label.text }
-					.onChange(of: text) { value in updateText("Edit text") { $0.text = value } }
+					.onChange(of: text) { _, value in updateText("Edit text") { $0.text = value } }
 				NebulaSlider("Size", value: Binding(get: { label.fontSize }, set: { v in updateText("Text size") { $0.fontSize = v } }), in: 0.02...0.12) { String(format: "%.0f", $0 * 1000) }
 				InspectorToggle("Bold", isOn: Binding(get: { label.bold }, set: { v in updateText("Bold") { $0.bold = v } }))
 				InspectorToggle("Background", isOn: Binding(

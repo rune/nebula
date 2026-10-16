@@ -24,7 +24,11 @@ public final class ProjectStore: Identifiable {
 	public private(set) var input: InputTrack
 	public let preview = PreviewEngine()
 
-	public var selection: Set<ItemID> = []
+	public var selection: Set<ItemID> = [] {
+		didSet { if !selection.isEmpty { selectedClipTime = nil } }
+	}
+	/// A source time inside the selected clip. Clips are derived, so they're found by time.
+	public var selectedClipTime: Double?
 	public private(set) var lastSaved: Date?
 	public private(set) var saveError: String?
 	public private(set) var micWaveform: Waveform?
@@ -292,10 +296,10 @@ public final class ProjectStore: Identifiable {
 		selection = [zoom.id]
 	}
 
+	/// Speeds up the selected clip, or the clip under the playhead, to 2×.
 	public func addSpeed() {
-		let item = SpeedItem(range: rangeAtPlayhead(length: 3), rate: 2)
-		apply("Add speed change") { $0.speeds.append(item) }
-		selection = [item.id]
+		guard let clip = selectedClip ?? project.clip(atSource: playheadSourceTime) else { return }
+		setRate(clip.rate == 1 ? 2 : 1, for: clip)
 	}
 
 	public func addMask() {
@@ -316,12 +320,49 @@ public final class ProjectStore: Identifiable {
 		selection = [item.id]
 	}
 
-	/// Cuts a small section at the playhead, or splits the cut/speed under it.
-	public func cutAtPlayhead(length: Double = 1) {
-		let range = rangeAtPlayhead(length: length)
-		let cut = CutItem(range: range)
-		apply("Cut") { $0.cuts.append(cut) }
-		selection = [cut.id]
+	// MARK: - Clips
+
+	public var selectedClip: Clip? {
+		selectedClipTime.flatMap { project.clip(atSource: $0) }
+	}
+
+	public func selectClip(_ clip: Clip?) {
+		guard let clip else {
+			selectedClipTime = nil
+			return
+		}
+		selection = []
+		selectedClipTime = clip.source.start + min(0.01, clip.source.duration / 2)
+	}
+
+	/// Splits the clip under the playhead (like a blade tool).
+	public func splitAtPlayhead() {
+		let time = playheadSourceTime
+		apply("Split") { $0.split(atSource: time) }
+	}
+
+	/// Removes a clip and closes the gap.
+	public func deleteClip(_ clip: Clip) {
+		apply("Delete clip") { $0.deleteClip(clip) }
+		selectedClipTime = nil
+	}
+
+	public func setRate(_ rate: Double, for clip: Clip, coalescing: String? = nil) {
+		apply("Speed \(rate == rate.rounded() ? "\(Int(rate))" : String(format: "%.2g", rate))×", coalescing: coalescing) { $0.setRate(rate, for: clip) }
+	}
+
+	/// Trims a clip edge during a drag. `base` is the project when the drag began, so each step
+	/// replaces the last one instead of adding to it.
+	public func trim(_ clip: Clip, edge: Project.ClipEdge, toSource time: Double, base: Project) {
+		apply("Trim clip", coalescing: "trim-\(clip.index)") { project in
+			project = base
+			project.trim(clip, edge: edge, toSource: time)
+		}
+	}
+
+	/// Brings back material removed between two clips.
+	public func restore(_ range: TimeRange) {
+		apply("Restore") { $0.restore(range) }
 	}
 
 	public func applyPreset(_ preset: StylePreset) {
