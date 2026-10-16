@@ -122,6 +122,29 @@ struct RenderTests {
 		#expect(frame.width == 1280)
 	}
 
+	/// AVPlayer shows nothing for an invalid video composition, while export and frame grabs
+	/// still work, so check validity across speed changes whose rounding can leave a gap.
+	@Test func previewCompositionIsValidForPlayback() async throws {
+		let video = try await makeTestVideo(seconds: 4)
+		defer { try? FileManager.default.removeItem(at: video) }
+		for (index, rate) in [1.5, 3, 7, 0.75].enumerated() {
+			var project = testProject(duration: 4)
+			let offset = Double(index) * 0.137
+			project.cuts = [CutItem(range: TimeRange(start: 0.31 + offset, end: 0.77 + offset))]
+			project.speeds = [
+				SpeedItem(range: TimeRange(start: 0.9 + offset, end: 1.63 + offset), rate: rate),
+				SpeedItem(range: TimeRange(start: 2.093 + offset, end: 3.861), rate: 3),
+			]
+			let scene = RenderScene(project: project, input: .empty, bundleURL: nil)
+			let playable = try await CompositionBuilder.build(scene: scene, media: .init(video: video), renderSize: CGSize(width: 640, height: 360), quality: .preview)
+			let duration = try await playable.asset.load(.duration)
+			let covered = playable.videoComposition.instructions.map(\.timeRange.end).max() ?? .zero
+			#expect(covered >= duration, "instructions end at \(covered.seconds)s, composition at \(duration.seconds)s (rate \(rate))")
+			let valid = try await playable.videoComposition.isValid(for: playable.asset, timeRange: CMTimeRange(start: .zero, duration: duration), validationDelegate: nil)
+			#expect(valid, "rate \(rate)")
+		}
+	}
+
 	@Test func exportsGIF() async throws {
 		let video = try await makeTestVideo(seconds: 1)
 		defer { try? FileManager.default.removeItem(at: video) }

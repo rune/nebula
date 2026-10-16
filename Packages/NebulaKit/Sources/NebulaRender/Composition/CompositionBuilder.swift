@@ -125,8 +125,11 @@ public enum CompositionBuilder {
 		}
 		mix.inputParameters = parameters
 
+		// The instruction must cover the composition exactly: AVPlayer silently refuses to
+		// render a composition with even a sub-millisecond uncovered tail (speed changes can
+		// leave one through rounding), while export and frame grabs don't mind.
 		let instruction = SceneInstruction(
-			timeRange: CMTimeRange(start: .zero, duration: cursor),
+			timeRange: CMTimeRange(start: .zero, duration: CMTimeMaximum(cursor, composition.duration)),
 			scene: scene,
 			quality: quality,
 			videoTrackID: videoTrack.trackID
