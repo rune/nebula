@@ -47,6 +47,50 @@ public final class AppModel {
 	/// Called once from the app delegate after launch.
 	public func launch() {
 		mcp.applySettings()
+		Task { await recoverInterruptedRecordings() }
+	}
+
+	/// Recordings are written as fragmented movies, so a crash or power loss leaves a playable
+	/// file without a project. Rebuild those projects; drop bundles with nothing in them.
+	private func recoverInterruptedRecordings() async {
+		let urls = (try? FileManager.default.contentsOfDirectory(at: library.rootURL, includingPropertiesForKeys: nil)) ?? []
+		var recovered = 0
+		for url in urls where url.pathExtension == ProjectBundle.fileExtension {
+			let bundle = ProjectBundle(url: url)
+			guard !FileManager.default.fileExists(atPath: bundle.projectURL.path) else { continue }
+			let video = url.appending(path: ProjectBundle.videoFileName)
+			let microphone = url.appending(path: ProjectBundle.microphoneFileName)
+			let size = (try? video.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+			let media = size > 0 ? try? await MediaProbe.mediaInfo(
+				video: video,
+				videoFileName: ProjectBundle.videoFileName,
+				microphone: FileManager.default.fileExists(atPath: microphone.path) ? microphone : nil,
+				microphoneFileName: ProjectBundle.microphoneFileName
+			) : nil
+			guard let media, media.duration > 0.5 else {
+				try? FileManager.default.trashItem(at: url, resultingItemURL: nil)
+				Self.logger.info("Removed empty recording \(url.lastPathComponent, privacy: .public)")
+				continue
+			}
+			var project = Project(name: bundle.name, media: media)
+			if let preset = presets.preset(id: settings.defaultPresetID) { preset.apply(to: &project) }
+			if project.style.background == Background.desktop,
+			   !FileManager.default.fileExists(atPath: bundle.mediaURL.appending(path: ProjectBundle.desktopFileName).path) {
+				project.style.background = Style().background
+			}
+			do {
+				if !FileManager.default.fileExists(atPath: bundle.inputURL.path) { try bundle.write(InputTrack.empty) }
+				try bundle.write(project)
+				try? await Thumbnailer.writeThumbnail(video: video, to: bundle.thumbnailURL, at: min(1, media.duration / 2))
+				recovered += 1
+			} catch {
+				Self.logger.error("Couldn't recover \(url.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
+			}
+		}
+		if recovered > 0 {
+			toasts.show(recovered == 1 ? "Recovered an interrupted recording" : "Recovered \(recovered) interrupted recordings", detail: "They're in your library")
+		}
+		refreshLibrary()
 	}
 
 	// MARK: Library

@@ -100,6 +100,10 @@ struct LookInspector: View {
 			}
 		}
 		.onAppear { backgroundTab = tab(for: style.background) }
+		.onDebugCommand { command in
+			if command.hasPrefix("bg:"), let value = BackgroundTab(rawValue: String(command.dropFirst(3))) { backgroundTab = value }
+			if command == "crop" { showCrop = true }
+		}
 		.sheet(isPresented: $showCrop) { CropEditor(store: store) }
 	}
 
@@ -125,7 +129,7 @@ struct LookInspector: View {
 	@ViewBuilder private var desktopChoices: some View {
 		VStack(alignment: .leading, spacing: 10) {
 			if hasDesktop {
-				WallpaperTile(url: desktopFile, selected: selectedImagePath == Background.desktopPath, height: 120) {
+				WallpaperTile(url: desktopFile, selected: selectedImagePath == Background.desktopPath, large: true) {
 					store.apply("Use desktop background") { $0.style.background = .desktop }
 				}
 				Text("The wallpaper that was on screen while you recorded.")
@@ -138,7 +142,7 @@ struct LookInspector: View {
 			let current = WallpaperCatalog.currentDesktops()
 			if !current.isEmpty {
 				SectionHeader("Current wallpaper")
-				LazyVGrid(columns: [GridItem(.adaptive(minimum: 60), spacing: 8)], spacing: 8) {
+				LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
 					ForEach(current, id: \.self) { url in
 						WallpaperTile(url: url, selected: selectedImagePath == url.path) { setImage(url) }
 					}
@@ -179,7 +183,7 @@ struct LookInspector: View {
 	private var imageChoice: some View {
 		VStack(alignment: .leading, spacing: 10) {
 			if let path = selectedImagePath, path != Background.desktopPath {
-				WallpaperTile(url: resolve(path), selected: true, height: 120) {}
+				WallpaperTile(url: resolve(path), selected: true, large: true) {}
 			}
 			Button {
 				let panel = NSOpenPanel()
@@ -247,20 +251,25 @@ private struct SwatchTile: View {
 	}
 }
 
+/// A wallpaper thumbnail at a fixed 16:10 shape: the picture fills it and is clipped, so tiles
+/// line up whatever the source image's proportions.
 struct WallpaperTile: View {
 	let url: URL
 	let selected: Bool
-	var height: CGFloat = 46
+	var large = false
+	var help: String?
 	let action: () -> Void
 
 	var body: some View {
-		AsyncFileImage(url: url, maxPixel: height > 60 ? 600 : 240)
-			.frame(height: height)
+		Color.clear
+			.aspectRatio(16.0 / 10.0, contentMode: .fit)
 			.frame(maxWidth: .infinity)
-			.clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-			.overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(selected ? Theme.lavender : Theme.hairlineStrong, lineWidth: selected ? 2 : 1))
+			.overlay { AsyncFileImage(url: url, maxPixel: large ? 600 : 240, contentMode: .fill) }
+			.clipShape(RoundedRectangle(cornerRadius: large ? 10 : 7, style: .continuous))
+			.overlay(RoundedRectangle(cornerRadius: large ? 10 : 7, style: .continuous).strokeBorder(selected ? Theme.lavender : Theme.hairlineStrong, lineWidth: selected ? 2 : 1))
 			.contentShape(Rectangle())
 			.onTapGesture(perform: action)
+			.help(help ?? "")
 	}
 }
 
@@ -270,16 +279,11 @@ private struct WallpaperGrid: View {
 	@State private var wallpapers: [WallpaperCatalog.Wallpaper] = []
 
 	var body: some View {
-		LazyVGrid(columns: [GridItem(.adaptive(minimum: 60), spacing: 8)], spacing: 8) {
+		LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
 			ForEach(wallpapers) { wallpaper in
-				AsyncFileImage(url: wallpaper.thumbnail, maxPixel: 240)
-					.frame(height: 46)
-					.frame(maxWidth: .infinity)
-					.clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-					.overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(selectedPath == wallpaper.image.path ? Theme.lavender : Theme.hairlineStrong, lineWidth: selectedPath == wallpaper.image.path ? 2 : 1))
-					.contentShape(Rectangle())
-					.onTapGesture { onSelect(wallpaper.image) }
-					.help(wallpaper.name)
+				WallpaperTile(url: wallpaper.thumbnail, selected: selectedPath == wallpaper.image.path, help: wallpaper.name) {
+					onSelect(wallpaper.image)
+				}
 			}
 		}
 		.task { wallpapers = await Task.detached { WallpaperCatalog.all() }.value }

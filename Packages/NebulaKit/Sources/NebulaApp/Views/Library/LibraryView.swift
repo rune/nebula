@@ -7,6 +7,7 @@ import SwiftUI
 public struct LibraryView: View {
 	@Environment(AppModel.self) private var app
 	@Environment(\.openWindow) private var openWindow
+	@Environment(\.openSettings) private var openSettings
 	@State private var filter: Filter = .all
 	@State private var query = ""
 	@State private var dropTargeted = false
@@ -40,6 +41,9 @@ public struct LibraryView: View {
 			app.openEditorWindow = { url in openWindow(id: "editor", value: url) }
 			app.openLibraryWindow = { openWindow(id: "library") }
 			app.refreshLibrary()
+		}
+		.onDebugCommand { command in
+			if command == "settings" { openSettings() }
 		}
 		.dropDestination(for: URL.self) { urls, _ in
 			for url in urls { Task { await app.importFile(url) } }
@@ -237,9 +241,12 @@ private struct ProjectCard: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 0) {
 			ZStack(alignment: .bottomTrailing) {
-				AsyncFileImage(url: entry.bundle.thumbnailURL, maxPixel: 800)
-					.frame(height: 170)
+				// A fixed-shape frame: the thumbnail fills it and is clipped, so every card in the
+				// grid is the same size whatever the recording's shape.
+				Color.clear
 					.frame(maxWidth: .infinity)
+					.frame(height: 170)
+					.overlay { AsyncFileImage(url: entry.bundle.thumbnailURL, maxPixel: 800) }
 					.clipped()
 				if hovering {
 					Image(systemName: "play.fill")
@@ -348,7 +355,10 @@ private struct MCPStatusCard: View {
 					NSPasteboard.general.setString(app.mcp.setupCommand, forType: .string)
 					copied = true
 				}
-				.buttonStyle(NebulaButtonStyle(.ghost, height: 24))
+				.buttonStyle(.plain)
+				.font(.nebula(11.5, 700))
+				.foregroundStyle(copied ? Theme.success : Theme.lavender)
+				.padding(.top, 2)
 				.help(app.mcp.setupCommand)
 			}
 		}

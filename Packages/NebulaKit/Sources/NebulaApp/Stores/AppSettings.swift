@@ -1,4 +1,5 @@
 import Foundation
+import NebulaCapture
 import NebulaCore
 import NebulaPolish
 import Observation
@@ -27,7 +28,8 @@ public final class AppSettings {
 	public var countdown: Int { didSet { defaults.set(countdown, forKey: "countdown") } }
 	public var hideDesktopIcons: Bool { didSet { defaults.set(hideDesktopIcons, forKey: "hideDesktopIcons") } }
 	public var systemAudio: Bool { didSet { defaults.set(systemAudio, forKey: "systemAudio") } }
-	public var microphoneID: String? { didSet { defaults.set(microphoneID, forKey: "microphoneID") } }
+	/// nil = no microphone. Stored as "" so "none" survives relaunch (a missing key means "not chosen yet").
+	public var microphoneID: String? { didSet { defaults.set(microphoneID ?? "", forKey: "microphoneID") } }
 	public var frameRate: Int { didSet { defaults.set(frameRate, forKey: "frameRate") } }
 	public var speakerNotes: Bool { didSet { defaults.set(speakerNotes, forKey: "speakerNotes") } }
 	public var notesText: String { didSet { defaults.set(notesText, forKey: "notesText") } }
@@ -42,7 +44,12 @@ public final class AppSettings {
 		countdown = defaults.object(forKey: "countdown") as? Int ?? 3
 		hideDesktopIcons = defaults.object(forKey: "hideDesktopIcons") as? Bool ?? true
 		systemAudio = defaults.object(forKey: "systemAudio") as? Bool ?? true
-		microphoneID = defaults.string(forKey: "microphoneID")
+		if let stored = defaults.string(forKey: "microphoneID") {
+			microphoneID = stored.isEmpty ? nil : stored
+		} else {
+			// First run: record the system's default microphone.
+			microphoneID = CaptureSources.defaultMicrophone?.id
+		}
 		frameRate = defaults.object(forKey: "frameRate") as? Int ?? 60
 		speakerNotes = defaults.object(forKey: "speakerNotes") as? Bool ?? false
 		notesText = defaults.string(forKey: "notesText") ?? ""

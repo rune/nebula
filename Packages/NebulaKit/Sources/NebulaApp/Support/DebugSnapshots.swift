@@ -21,6 +21,8 @@ enum DebugSnapshots {
 	static func capture(to folder: URL) {
 		try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 		try? playerReport().write(to: folder.appending(path: "players.txt"), atomically: true, encoding: .utf8)
+		let windows = NSApp.windows.map { "\(type(of: $0)) title=\"\($0.title)\" visible=\($0.isVisible) key=\($0.isKeyWindow) onScreen=\($0.occlusionState.contains(.visible)) frame=\($0.frame)" }
+		try? (["active=\(NSApp.isActive)"] + windows).joined(separator: "\n").write(to: folder.appending(path: "windows.txt"), atomically: true, encoding: .utf8)
 		for (index, window) in NSApp.windows.enumerated() where window.isVisible {
 			guard let view = window.contentView?.superview ?? window.contentView else { continue }
 			let bounds = view.bounds

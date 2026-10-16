@@ -132,7 +132,10 @@ public struct SegmentedPicker<Value: Hashable>: View {
 				let selected = value == selection
 				Text(title)
 					.font(.nebula(12, 650))
+					.lineLimit(1)
+					.minimumScaleFactor(0.75)
 					.foregroundStyle(selected ? Theme.text1 : Theme.text3)
+					.padding(.horizontal, 3)
 					.frame(maxWidth: .infinity)
 					.padding(.vertical, 6)
 					.background {

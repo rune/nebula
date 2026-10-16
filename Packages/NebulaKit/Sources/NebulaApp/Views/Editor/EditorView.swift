@@ -192,6 +192,10 @@ private struct EditorTitleBar: View {
 		.frame(height: 52)
 		.background(Theme.window)
 		.overlay(alignment: .bottom) { Hairline() }
+		.onDebugCommand { command in
+			if command == "popover:polish" { showPolish = true }
+			if command == "close-popover" { showPolish = false }
+		}
 	}
 
 	private func commitRename() {

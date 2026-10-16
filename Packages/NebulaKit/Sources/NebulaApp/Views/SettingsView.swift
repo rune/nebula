@@ -46,7 +46,7 @@ public struct SettingsView: View {
 				Spacer()
 			}
 			.padding(12)
-			.padding(.top, 28)
+			.padding(.top, 40)
 			.frame(width: 180)
 			.background(Theme.surface1)
 			Rectangle().fill(Theme.hairline).frame(width: 1)
@@ -60,14 +60,21 @@ public struct SettingsView: View {
 					}
 				}
 				.padding(26)
+				.padding(.top, 14)
 				.frame(maxWidth: .infinity, alignment: .leading)
 			}
 			.background(Theme.window)
 		}
 		.frame(width: 680, height: 500)
+		.onDebugCommand { command in
+			if command.hasPrefix("settings:"), let value = Tab(rawValue: String(command.dropFirst(9)).capitalized) { tab = value }
+		}
 		.environment(\.colorScheme, .dark)
+		.ignoresSafeArea(.container, edges: .top)
 		.background(WindowAccessor { window in
 			window.titlebarAppearsTransparent = true
+			window.titleVisibility = .hidden
+			window.styleMask.insert(.fullSizeContentView)
 			window.backgroundColor = NSColor(Theme.window)
 		})
 	}

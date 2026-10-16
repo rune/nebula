@@ -52,6 +52,12 @@ public final class RecorderController {
 	@ObservationIgnored private var countdownTask: Task<Void, Never>?
 	@ObservationIgnored weak var app: AppModel?
 	@ObservationIgnored private var finishContinuation: CheckedContinuation<ProjectBundle?, Never>?
+	/// Capture is starting (after the countdown, before the first frame).
+	@ObservationIgnored private var starting = false
+	/// Stop was pressed while starting; finish as soon as capture is running.
+	@ObservationIgnored private var stopRequested = false
+	/// Cancel was pressed while starting; throw the recording away once it's running.
+	@ObservationIgnored private var discardRequested = false
 	private static let logger = Logger(subsystem: "app.nebula", category: "recorder")
 
 	public var isRecording: Bool { phase == .recording || phase == .paused }
@@ -69,10 +75,23 @@ public final class RecorderController {
 		guard phase == .idle else { return }
 		errorMessage = nil
 		phase = .choosing
-		Task { await refreshSources() }
+		Task {
+			await refreshSources()
+			await askForMicrophoneIfNeeded()
+		}
+	}
+
+	/// Asks for microphone access while the bar is up, not after the countdown.
+	private func askForMicrophoneIfNeeded() async {
+		guard let settings = app?.settings, settings.microphoneID != nil, Permissions.microphone == .notDetermined else { return }
+		if !(await Permissions.requestMicrophone()) { settings.microphoneID = nil }
 	}
 
 	public func cancelPicker() {
+		if starting {
+			discardRequested = true
+			return
+		}
 		countdownTask?.cancel()
 		if phase == .choosing || { if case .countdown = phase { return true } else { return false } }() {
 			phase = .idle
@@ -129,10 +148,14 @@ public final class RecorderController {
 
 	private func beginCapture(source: RecordingSource) async {
 		guard let app else { return }
+		starting = true
+		stopRequested = false
+		discardRequested = false
+		defer { starting = false }
 		do {
-			if let mic = app.settings.microphoneID, Permissions.microphone != .granted {
-				if !(await Permissions.requestMicrophone()) { app.settings.microphoneID = nil }
-				_ = mic
+			if app.settings.microphoneID != nil, Permissions.microphone != .granted {
+				// Normally asked when the bar opened; denied or missing means no microphone.
+				if Permissions.microphone == .notDetermined, await Permissions.requestMicrophone() {} else { app.settings.microphoneID = nil }
 			}
 			let bundle = try app.library.newBundle()
 			self.bundle = bundle
@@ -152,6 +175,13 @@ public final class RecorderController {
 			elapsed = 0
 			ticker = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
 				MainActor.assumeIsolated { self?.elapsed = self?.recorder.elapsed ?? 0 }
+			}
+			if discardRequested {
+				discardRequested = false
+				Task { await self.discard() }
+			} else if stopRequested {
+				stopRequested = false
+				Task { await self.finish() }
 			}
 		} catch {
 			errorMessage = error.localizedDescription
@@ -193,6 +223,14 @@ public final class RecorderController {
 	/// Stops, builds the project and opens it in the editor.
 	@discardableResult
 	public func finish() async -> ProjectBundle? {
+		if starting {
+			stopRequested = true
+			return await waitForFinish()
+		}
+		if case .countdown = phase {
+			cancelPicker()
+			return nil
+		}
 		guard isRecording, let bundle else { return nil }
 		phase = .finishing
 		ticker?.invalidate()

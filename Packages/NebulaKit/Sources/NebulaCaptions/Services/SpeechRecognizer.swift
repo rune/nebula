@@ -61,7 +61,7 @@ enum SpeechRecognizer {
 		}
 
 		let expected = Self.folder(for: model, in: modelsFolder)
-		if folder.standardizedFileURL != expected.standardizedFileURL {
+		if folder.standardizedFileURL.path != expected.standardizedFileURL.path {
 			Log.captions.warning("Model landed in \(folder.path(percentEncoded: false), privacy: .public), expected \(expected.path(percentEncoded: false), privacy: .public)")
 		}
 		let missing = requiredBundles.filter { name in

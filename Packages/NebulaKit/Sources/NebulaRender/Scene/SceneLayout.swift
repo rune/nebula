@@ -67,13 +67,15 @@ public struct SceneLayout: Sendable {
 				size.height = size.width / cropAspect
 			}
 		}
-		content = CGRect(
+		let fills = size.width >= canvas.width - 2 && size.height >= canvas.height - 2
+		// A recording that fills the frame covers it exactly, so no background sliver shows.
+		content = fills ? CGRect(origin: .zero, size: canvas) : CGRect(
 			x: ((canvas.width - size.width) / 2).rounded(),
 			y: ((canvas.height - size.height) / 2).rounded(),
 			width: size.width.rounded(),
 			height: size.height.rounded()
 		)
-		fillsCanvas = content.width >= canvas.width - 2 && content.height >= canvas.height - 2
+		fillsCanvas = fills
 		cornerRadius = fillsCanvas ? 0 : CGFloat(project.style.cornerRadius.clamped(to: 0...0.1)) * shortSide
 	}
 

@@ -96,21 +96,22 @@ public final class Compositor: Sendable {
 		let panY = velocity.dy * Double(layout.magnification(for: camera) * layout.videoSize.height)
 		let panLength = hypot(panX, panY) * shutter
 		var image = video
-		// Subtle on purpose: enough to smooth fast moves, never enough to smear text.
-		if panLength > 2 {
+		// Subtle on purpose: slow pans (following the cursor) stay sharp; only fast moves get a
+		// little smoothing, never enough to smear text.
+		if panLength > 6 {
 			image = image.clampedToExtent()
 				.applyingFilter("CIMotionBlur", parameters: [
-					kCIInputRadiusKey: min(panLength / 3, 16),
+					kCIInputRadiusKey: min((panLength - 6) / 4, 8),
 					kCIInputAngleKey: atan2(panY, -panX),
 				])
 				.cropped(to: video.extent)
 		}
 		let zoomAmount = abs(velocity.dLogScale) * Double(layout.content.width) * shutter * 0.12
-		if zoomAmount > 1.5 {
+		if zoomAmount > 3 {
 			image = image.clampedToExtent()
 				.applyingFilter("CIZoomBlur", parameters: [
 					kCIInputCenterKey: CIVector(x: layout.content.midX, y: layout.content.midY),
-					"inputAmount": min(zoomAmount, 8),
+					"inputAmount": min((zoomAmount - 3) * 0.6, 5),
 				])
 				.cropped(to: video.extent)
 		}
@@ -118,7 +119,7 @@ public final class Compositor: Sendable {
 	}
 
 	private func applyMask(_ mask: MaskItem, to video: CIImage, layout: SceneLayout, camera: CameraState) -> CIImage {
-		let rect = layout.canvasRect(for: mask.rect, camera: camera).intersection(layout.content)
+		let rect = layout.canvasRect(for: mask.rect, camera: camera).intersection(layout.content).integral
 		guard rect.width > 1, rect.height > 1 else { return video }
 		let radius = CGFloat(mask.cornerRadius.clamped(to: 0...0.5)) * min(rect.width, rect.height)
 		let effect: CIImage
@@ -134,7 +135,9 @@ public final class Compositor: Sendable {
 			return video
 		}
 		let shape = roundedRect(rect, radius: radius, color: .white)
-		return effect.cropped(to: rect).applyingFilter("CIBlendWithAlphaMask", parameters: [
+		// The effect reaches a few pixels past the mask so its anti-aliased edge never blends
+		// with transparency (which let the background show through as a fringe).
+		return effect.cropped(to: rect.insetBy(dx: -3, dy: -3)).applyingFilter("CIBlendWithAlphaMask", parameters: [
 			kCIInputBackgroundImageKey: video,
 			kCIInputMaskImageKey: shape,
 		]).cropped(to: video.extent)

@@ -28,7 +28,7 @@ struct ClipInspector: View {
 					.padding(.bottom, 22)
 
 					InspectorSection(title: "Speed") {
-						ChipPicker(selection: Binding(get: { clip.rate }, set: { store.setRate($0, for: clip) }), options: [0.5, 1, 1.5, 2, 3, 4, 8].map { ($0, Format.rate($0)) })
+						RateChips(rate: clip.rate) { store.setRate($0, for: clip) }
 						NebulaSlider("Rate", value: Binding(
 							// Log scale: equal steps from 0.25× to 16×.
 							get: { log2(clip.rate) },

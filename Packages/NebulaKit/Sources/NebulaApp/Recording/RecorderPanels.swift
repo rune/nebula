@@ -17,6 +17,8 @@ final class RecorderPanels {
 	private var control: NSPanel?
 	private var notes: NSPanel?
 	private var hiddenWindows: [NSWindow] = []
+	private var barResize: NSObjectProtocol?
+	private var placingBar = false
 
 	init(app: AppModel) {
 		self.app = app
@@ -68,18 +70,26 @@ final class RecorderPanels {
 
 	// MARK: App windows
 
+	/// Makes Nebula's own windows invisible while choosing and recording. They are only faded,
+	/// not ordered out: SwiftUI treats an ordered-out window as closed and tears its view down.
 	private func hideAppWindows() {
-		for window in NSApp.windows where window.isVisible && !(window is NSPanel) && window.styleMask.contains(.titled) {
+		for window in NSApp.windows where window.isVisible && !(window is NSPanel) && window.styleMask.contains(.titled) && window.alphaValue > 0 {
 			hiddenWindows.append(window)
-			window.orderOut(nil)
+			window.alphaValue = 0
+			window.ignoresMouseEvents = true
 		}
 	}
 
 	private func restoreWindows() {
-		for window in hiddenWindows where app.recorder.phase == .idle {
-			window.orderFront(nil)
+		for window in hiddenWindows {
+			window.alphaValue = 1
+			window.ignoresMouseEvents = false
 		}
 		hiddenWindows.removeAll()
+		// A finished recording opens its editor; bring Nebula forward so it's in front.
+		if app.recorder.phase == .idle, app.activeStoreURL != nil {
+			NSApp.activate()
+		}
 	}
 
 	// MARK: Panels
@@ -97,10 +107,20 @@ final class RecorderPanels {
 		return panel
 	}
 
-	private func host<V: View>(_ view: V) -> NSHostingView<some View> {
+	/// `sizesToContent` panels take their size from the SwiftUI content (bar, pill); the others
+	/// are given a frame (overlay, countdown).
+	private func host<V: View>(_ view: V, sizesToContent: Bool = false) -> NSHostingView<some View> {
 		let hosting = NSHostingView(rootView: view.environment(app).environment(\.colorScheme, .dark))
-		hosting.sizingOptions = []
+		hosting.sizingOptions = sizesToContent ? [.intrinsicContentSize] : []
 		return hosting
+	}
+
+	/// Centres a panel horizontally near the bottom of the target screen, at its real size.
+	private func placeAtBottom(_ panel: NSPanel, margin: CGFloat) {
+		panel.contentView?.layoutSubtreeIfNeeded()
+		let size = panel.contentView?.fittingSize ?? panel.frame.size
+		let frame = targetScreen.visibleFrame
+		panel.setFrame(NSRect(x: (frame.midX - size.width / 2).rounded(), y: frame.minY + margin, width: size.width, height: size.height), display: true)
 	}
 
 	private var targetScreen: NSScreen {
@@ -124,12 +144,19 @@ final class RecorderPanels {
 	private func showBar() {
 		let panel = bar ?? makePanel(level: .popUpMenu)
 		if bar == nil {
-			panel.contentView = host(RecorderBar())
+			panel.contentView = host(RecorderBar(), sizesToContent: true)
 			bar = panel
+			// Keep the bar centred when its content changes size (source names, errors).
+			barResize = NotificationCenter.default.addObserver(forName: NSWindow.didResizeNotification, object: panel, queue: .main) { [weak self] _ in
+				MainActor.assumeIsolated {
+					guard let self, let bar = self.bar, !self.placingBar else { return }
+					self.placingBar = true
+					self.placeAtBottom(bar, margin: 36)
+					self.placingBar = false
+				}
+			}
 		}
-		let size = NSSize(width: 760, height: 76)
-		let frame = targetScreen.visibleFrame
-		panel.setFrame(NSRect(x: frame.midX - size.width / 2, y: frame.minY + 36, width: size.width, height: size.height), display: true)
+		placeAtBottom(panel, margin: 36)
 		panel.orderFrontRegardless()
 		panel.makeKey()
 	}
@@ -159,12 +186,10 @@ final class RecorderPanels {
 	private func showControl() {
 		let panel = control ?? makePanel(level: .popUpMenu)
 		if control == nil {
-			panel.contentView = host(RecordingControl())
+			panel.contentView = host(RecordingControl(), sizesToContent: true)
 			panel.isMovableByWindowBackground = true
 			control = panel
-			let size = NSSize(width: 330, height: 60)
-			let frame = targetScreen.visibleFrame
-			panel.setFrame(NSRect(x: frame.midX - size.width / 2, y: frame.minY + 30, width: size.width, height: size.height), display: true)
+			placeAtBottom(panel, margin: 30)
 		}
 		panel.orderFrontRegardless()
 	}
@@ -191,53 +216,64 @@ private struct RecorderBar: View {
 	var body: some View {
 		let recorder = app.recorder
 		@Bindable var settings = app.settings
-		HStack(spacing: 10) {
-			IconButton("xmark", help: "Cancel (Esc)") { recorder.cancelPicker() }
-				.keyboardShortcut(.cancelAction)
-			HStack(spacing: 2) {
-				ForEach(RecorderController.Mode.allCases, id: \.self) { mode in
-					ModeButton(mode: mode, selected: recorder.mode == mode) { recorder.mode = mode }
-				}
-			}
-			.padding(3)
-			.background(RoundedRectangle(cornerRadius: 11, style: .continuous).fill(Theme.surface2))
-			Divider().frame(height: 34).overlay(Theme.hairline)
-			SourceMenu()
-			MicrophoneMenu()
-			IconButton(settings.systemAudio ? "speaker.wave.2.fill" : "speaker.slash", help: settings.systemAudio ? "Recording system audio" : "System audio off", isOn: settings.systemAudio) {
-				settings.systemAudio.toggle()
-			}
-			IconButton("ellipsis", help: "Options") { showOptions.toggle() }
-				.popover(isPresented: $showOptions, arrowEdge: .top) { RecordingOptionsView().environment(app) }
-			Spacer(minLength: 0)
-			Button {
-				recorder.start()
-			} label: {
-				HStack(spacing: 9) {
-					Circle().fill(.white).frame(width: 12, height: 12)
-					Text("Record")
-					Text("↩").font(.nebula(11, 700)).opacity(0.7)
-				}
-			}
-			.buttonStyle(NebulaButtonStyle(.primary, height: 44))
-			.keyboardShortcut(.defaultAction)
-			.disabled(recorder.source == nil)
-		}
-		.padding(.horizontal, 12)
-		.frame(height: 66)
-		.background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Theme.surface1))
-		.overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Theme.hairlineStrong))
-		.overlay(alignment: .top) {
+		VStack(spacing: 8) {
 			if let error = recorder.errorMessage {
 				Text(error)
 					.font(.nebula(12, 650))
 					.foregroundStyle(Color(hex: 0xFF8FA3))
-					.padding(.horizontal, 12).padding(.vertical, 6)
-					.background(Capsule().fill(Theme.surface2))
-					.offset(y: -34)
+					.padding(.horizontal, 12)
+					.padding(.vertical, 6)
+					.background(Capsule().fill(Theme.surface1))
+					.overlay(Capsule().strokeBorder(Theme.hairlineStrong))
 			}
+			HStack(spacing: 8) {
+				BarIconButton(symbol: "xmark", help: "Cancel (Esc)") { recorder.cancelPicker() }
+					.keyboardShortcut(.cancelAction)
+				HStack(spacing: 2) {
+					ForEach(RecorderController.Mode.allCases, id: \.self) { mode in
+						ModeButton(mode: mode, selected: recorder.mode == mode) { recorder.mode = mode }
+					}
+				}
+				.padding(3)
+				.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.surface2))
+				Rectangle().fill(Theme.hairline).frame(width: 1, height: 34).padding(.horizontal, 2)
+				SourceMenu()
+				MicrophoneMenu()
+				BarIconButton(
+					symbol: settings.systemAudio ? "speaker.wave.2.fill" : "speaker.slash",
+					help: settings.systemAudio ? "Recording system audio (click to turn off)" : "System audio off (click to turn on)",
+					isOn: settings.systemAudio
+				) {
+					settings.systemAudio.toggle()
+				}
+				BarIconButton(symbol: "ellipsis", help: "Recording options") { showOptions.toggle() }
+					.popover(isPresented: $showOptions, arrowEdge: .top) { RecordingOptionsView().environment(app) }
+				Rectangle().fill(Theme.hairline).frame(width: 1, height: 34).padding(.horizontal, 2)
+				Button {
+					recorder.start()
+				} label: {
+					HStack(spacing: 9) {
+						Circle().fill(.white).frame(width: 12, height: 12)
+						Text("Record").fixedSize()
+						Text("⌥⌘↩").font(.nebula(11, 700)).opacity(0.65).fixedSize()
+					}
+					.padding(.horizontal, 4)
+				}
+				.buttonStyle(NebulaButtonStyle(.primary, height: 52))
+				.keyboardShortcut(.defaultAction)
+				.disabled(recorder.source == nil)
+				.fixedSize()
+			}
+			.padding(8)
+			.background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(Theme.surface1))
+			.overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(Theme.hairlineStrong))
 		}
+		.fixedSize()
 		.padding(5)
+		.onDebugCommand { command in
+			if command == "popover:options" { showOptions = true }
+			if command == "close-popover" { showOptions = false }
+		}
 	}
 }
 
@@ -262,6 +298,30 @@ private struct ModeButton: View {
 	}
 }
 
+/// A square icon button the same height as the rest of the bar.
+private struct BarIconButton: View {
+	let symbol: String
+	let help: String
+	var isOn = false
+	let action: () -> Void
+	@State private var hovering = false
+
+	var body: some View {
+		Button(action: action) {
+			Image(systemName: symbol)
+				.font(.system(size: 15, weight: .medium))
+				.foregroundStyle(isOn ? Theme.lavender : hovering ? Theme.text1 : Theme.text2)
+				.frame(width: 52, height: 52)
+				.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(isOn ? Theme.violetSoft : hovering ? Theme.surface3 : Theme.surface2))
+				.overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(isOn ? Theme.violetLine.opacity(0.6) : Theme.hairline))
+				.contentShape(Rectangle())
+		}
+		.buttonStyle(.plain)
+		.help(help)
+		.onHover { hovering = $0 }
+	}
+}
+
 /// Labelled two-line menu used for the display/window and microphone choices.
 private struct BarMenu<Content: View>: View {
 	let caption: String
@@ -280,9 +340,9 @@ private struct BarMenu<Content: View>: View {
 				}
 			}
 			.padding(.horizontal, 12)
-			.frame(width: 170, height: 46, alignment: .leading)
-			.background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Theme.surface2))
-			.overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Theme.hairline))
+			.frame(width: 176, height: 52, alignment: .leading)
+			.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.surface2))
+			.overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.hairline))
 			.contentShape(Rectangle())
 		}
 		.menuStyle(.button)
@@ -540,30 +600,25 @@ private struct RecordingControl: View {
 					.font(.nebula(14, 700))
 					.monospacedDigit()
 					.foregroundStyle(Theme.text1)
-					.frame(width: 64, alignment: .leading)
+					.frame(minWidth: 44, alignment: .leading)
+					.fixedSize()
 			}
-			.padding(.leading, 12)
+			.padding(.leading, 14)
 			IconButton(recorder.phase == .paused ? "play.fill" : "pause.fill", help: recorder.phase == .paused ? "Resume" : "Pause") { recorder.togglePause() }
 				.disabled(!recorder.isRecording)
 			IconButton("arrow.counterclockwise", help: "Restart") { Task { await recorder.restart() } }
 				.disabled(!recorder.isRecording)
-			IconButton("trash", help: "Discard") {
-				if confirmDiscard {
+			if confirmDiscard {
+				Button("Discard?") {
 					confirmDiscard = false
 					Task { await recorder.discard() }
-				} else {
-					confirmDiscard = true
 				}
+				.buttonStyle(NebulaButtonStyle(.destructive, height: 30))
+				.fixedSize()
+			} else {
+				IconButton("trash", help: "Discard") { confirmDiscard = true }
+					.disabled(!recorder.isRecording)
 			}
-			.overlay(alignment: .top) {
-				if confirmDiscard {
-					Text("Click again to discard")
-						.font(.nebula(11, 650)).foregroundStyle(Color(hex: 0xFF8FA3))
-						.fixedSize()
-						.offset(y: -22)
-				}
-			}
-			.disabled(!recorder.isRecording && recorder.phase != .finishing)
 			Button {
 				if case .countdown = recorder.phase {
 					recorder.cancelPicker()
@@ -577,10 +632,12 @@ private struct RecordingControl: View {
 				}
 			}
 			.buttonStyle(NebulaButtonStyle(.primary, height: 34))
+			.fixedSize()
 			.disabled(recorder.phase == .finishing)
-			.padding(.trailing, 6)
+			.padding(.trailing, 8)
 		}
 		.frame(height: 50)
+		.fixedSize()
 		.background(Capsule().fill(Theme.surface1))
 		.overlay(Capsule().strokeBorder(Theme.hairlineStrong))
 		.padding(5)
@@ -598,7 +655,7 @@ private struct RecordingControl: View {
 
 	private func label(_ recorder: RecorderController) -> String {
 		switch recorder.phase {
-		case .countdown(let value): value > 0 ? "in \(value)…" : "Starting…"
+		case .countdown: "0:00"
 		case .finishing: "Saving…"
 		default: Format.time(recorder.elapsed, tenths: false)
 		}

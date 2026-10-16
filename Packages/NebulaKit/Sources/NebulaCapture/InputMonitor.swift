@@ -64,7 +64,9 @@ final class InputMonitor: @unchecked Sendable {
 
 		let poll = DispatchSource.makeTimerSource(queue: DispatchQueue(label: "app.nebula.capture.cursor", qos: .userInteractive))
 		poll.schedule(deadline: .now(), repeating: .milliseconds(8), leeway: .milliseconds(1))
-		poll.setEventHandler { [weak self] in self?.sampleCursorPosition() }
+		// @Sendable: a closure written in a @MainActor method is otherwise main-actor isolated,
+		// and Swift 6 traps when it runs on this queue.
+		poll.setEventHandler { @Sendable [weak self] in self?.sampleCursorPosition() }
 		poll.resume()
 		pollTimer = poll
 	}

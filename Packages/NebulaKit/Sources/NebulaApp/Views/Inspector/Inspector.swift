@@ -48,6 +48,9 @@ struct Inspector: View {
 			}
 		}
 		.frame(width: 300)
+		.onDebugCommand { command in
+			if command.hasPrefix("tab:"), let value = Tab(rawValue: String(command.dropFirst(4))) { tab = value }
+		}
 		.background(RoundedRectangle(cornerRadius: Theme.radiusL, style: .continuous).fill(Theme.surface1))
 		.overlay(RoundedRectangle(cornerRadius: Theme.radiusL, style: .continuous).strokeBorder(Theme.hairline))
 		.clipShape(RoundedRectangle(cornerRadius: Theme.radiusL, style: .continuous))

@@ -61,6 +61,7 @@ public final class NebulaAppDelegate: NSObject, NSApplicationDelegate {
 		panels = RecorderPanels(app: app)
 		#if DEBUG
 		DebugSnapshots.install()
+		DebugCommands.install()
 		#endif
 		hotKey = GlobalHotKey(keyCode: UInt32(kVK_Return), modifiers: UInt32(cmdKey | optionKey)) {
 			if app.recorder.isRecording {

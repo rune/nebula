@@ -16,16 +16,22 @@ struct TimelineView: View {
 		static let ruler: CGFloat = 26
 		static let video: CGFloat = 48
 		static let lane: CGFloat = 28
+		static let block: CGFloat = 24
+		static let blockGap: CGFloat = 3
 		static let audio: CGFloat = 40
 		static let spacing: CGFloat = 6
 	}
 
 	var body: some View {
+		let zoomRows = Stack(store.project.zooms.map { ($0.id, $0.range) }, map: store.timeMap)
+		let overlayRows = Stack(store.project.masks.map { ($0.id, $0.range) } + store.project.annotations.map { ($0.id, $0.range) }, map: store.timeMap)
 		VStack(spacing: 0) {
 			toolbar
 			Hairline()
+			// Tracks scroll vertically when stacked overlays make them taller than the panel.
+			ScrollView(.vertical) {
 			HStack(alignment: .top, spacing: 0) {
-				labels
+				labels(zoomHeight: zoomRows.height, overlayHeight: overlayRows.height)
 				Rectangle().fill(Theme.hairline).frame(width: 1)
 				GeometryReader { proxy in
 					let duration = max(store.timeMap.outputDuration, 0.1)
@@ -35,8 +41,8 @@ struct TimelineView: View {
 							VStack(alignment: .leading, spacing: Row.spacing) {
 								RulerView(store: store, duration: duration, pps: pps).frame(height: Row.ruler)
 								ClipTrack(store: store, pps: pps, height: Row.video).frame(height: Row.video)
-								zoomTrack(pps: pps).frame(height: Row.lane)
-								overlayTrack(pps: pps).frame(height: Row.lane)
+								zoomTrack(pps: pps, rows: zoomRows).frame(height: zoomRows.height)
+								overlayTrack(pps: pps, rows: overlayRows).frame(height: overlayRows.height)
 								captionTrack(pps: pps).frame(height: Row.lane)
 								audioTrack(pps: pps).frame(height: Row.audio)
 							}
@@ -56,8 +62,16 @@ struct TimelineView: View {
 					}
 					.onEnded { _ in pinchStart = nil })
 			}
+			.frame(height: contentHeight(zoom: zoomRows.height, overlays: overlayRows.height))
+			}
+			.scrollIndicators(.automatic)
 		}
 		.background(Theme.window)
+	}
+
+	/// Height of all tracks plus padding, so the horizontal scroller inside gets a real height.
+	private func contentHeight(zoom: CGFloat, overlays: CGFloat) -> CGFloat {
+		Row.ruler + Row.video + zoom + overlays + Row.lane + Row.audio + Row.spacing * 5 + 16
 	}
 
 	// MARK: Toolbar
@@ -101,12 +115,12 @@ struct TimelineView: View {
 		.frame(height: 44)
 	}
 
-	private var labels: some View {
+	private func labels(zoomHeight: CGFloat, overlayHeight: CGFloat) -> some View {
 		VStack(alignment: .leading, spacing: Row.spacing) {
 			Color.clear.frame(height: Row.ruler)
 			TrackLabel(title: "Video", symbol: "film").frame(height: Row.video)
-			TrackLabel(title: "Zoom", symbol: "plus.magnifyingglass").frame(height: Row.lane)
-			TrackLabel(title: "Overlays", symbol: "square.on.square.dashed").frame(height: Row.lane)
+			TrackLabel(title: "Zoom", symbol: "plus.magnifyingglass").frame(height: zoomHeight)
+			TrackLabel(title: "Overlays", symbol: "square.on.square.dashed").frame(height: overlayHeight)
 			TrackLabel(title: "Captions", symbol: "captions.bubble").frame(height: Row.lane)
 			TrackLabel(title: "Audio", symbol: "waveform").frame(height: Row.audio)
 		}
@@ -117,22 +131,51 @@ struct TimelineView: View {
 
 	// MARK: Tracks
 
-	private func zoomTrack(pps: Double) -> some View {
+	private func zoomTrack(pps: Double, rows: Stack) -> some View {
 		TrackLane(store: store, pps: pps) {
 			ForEach(store.project.zooms) { zoom in
-				TimelineBlock(store: store, id: zoom.id, range: zoom.range, pps: pps, tint: Theme.trackZoom, label: "\(Format.rate(zoom.scale)) · \(zoom.target.title)", symbol: zoom.source == .polish ? "sparkles" : nil)
+				TimelineBlock(store: store, id: zoom.id, range: zoom.range, pps: pps, tint: Theme.trackZoom, label: "\(Format.rate(zoom.scale)) · \(zoom.target.title)", symbol: zoom.source == .polish ? "sparkles" : nil, height: Row.block, y: rows.y(zoom.id))
 			}
 		}
 	}
 
-	private func overlayTrack(pps: Double) -> some View {
+	private func overlayTrack(pps: Double, rows: Stack) -> some View {
 		TrackLane(store: store, pps: pps) {
 			ForEach(store.project.masks) { mask in
-				TimelineBlock(store: store, id: mask.id, range: mask.range, pps: pps, tint: Theme.trackMask, label: mask.kind.title, symbol: "eye.slash")
+				TimelineBlock(store: store, id: mask.id, range: mask.range, pps: pps, tint: Theme.trackMask, label: mask.kind.title, symbol: "eye.slash", height: Row.block, y: rows.y(mask.id))
 			}
 			ForEach(store.project.annotations) { note in
-				TimelineBlock(store: store, id: note.id, range: note.range, pps: pps, tint: Theme.trackNote, label: note.kind.title, symbol: note.kind.symbol)
+				TimelineBlock(store: store, id: note.id, range: note.range, pps: pps, tint: Theme.trackNote, label: note.kind.title, symbol: note.kind.symbol, height: Row.block, y: rows.y(note.id))
 			}
+		}
+	}
+
+	/// Puts overlapping items on separate rows so none draws over another.
+	struct Stack {
+		private var rows: [ItemID: Int] = [:]
+		private(set) var count = 1
+
+		init(_ items: [(ItemID, TimeRange)], map: TimeMap) {
+			var rowEnds: [Double] = []
+			let placed = items.compactMap { id, range in map.outputRange(forSource: range).map { (id, $0) } }
+				.sorted { $0.1.start < $1.1.start }
+			for (id, range) in placed {
+				if let row = rowEnds.firstIndex(where: { $0 <= range.start + 0.001 }) {
+					rows[id] = row
+					rowEnds[row] = range.end
+				} else {
+					rows[id] = rowEnds.count
+					rowEnds.append(range.end)
+				}
+			}
+			count = max(1, rowEnds.count)
+		}
+
+		var height: CGFloat { max(Row.lane, CGFloat(count) * (Row.block + Row.blockGap) + Row.blockGap) }
+
+		func y(_ id: ItemID) -> CGFloat {
+			let row = CGFloat(rows[id] ?? 0)
+			return count == 1 ? (Row.lane - Row.block) / 2 : Row.blockGap + row * (Row.block + Row.blockGap)
 		}
 	}
 
@@ -151,7 +194,7 @@ struct TimelineView: View {
 							.background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Theme.surface2))
 							.overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(Theme.hairlineStrong))
 							.clipped()
-							.offset(x: out.start * pps + 1)
+							.offset(x: out.start * pps + 1, y: 2)
 							.onTapGesture { store.preview.seek(to: out.start) }
 					}
 				}
@@ -162,16 +205,16 @@ struct TimelineView: View {
 	private func audioTrack(pps: Double) -> some View {
 		let waveform = store.micWaveform ?? store.systemWaveform
 		return TrackLane(store: store, pps: pps) {
-			ZStack(alignment: .leading) {
+			ZStack(alignment: .topLeading) {
 				ForEach(store.project.clips) { clip in
 					WaveformShape(waveform: waveform, source: clip.source)
 						.fill(Theme.text3.opacity(0.75))
-						.frame(width: max(clip.outputDuration * pps - 2, 1))
+						.frame(width: max(clip.outputDuration * pps - 2, 1), height: Row.audio)
 						.offset(x: clip.outputStart * pps + 1)
 						.allowsHitTesting(false)
 				}
 				ForEach(store.project.audio.volumes) { volume in
-					TimelineBlock(store: store, id: volume.id, range: volume.range, pps: pps, tint: Theme.lavender, label: volume.gain == 0 ? "Muted" : "Volume \(Format.percent(volume.gain))", symbol: volume.gain == 0 ? "speaker.slash" : "speaker.wave.2", height: 22)
+					TimelineBlock(store: store, id: volume.id, range: volume.range, pps: pps, tint: Theme.lavender, label: volume.gain == 0 ? "Muted" : "Volume \(Format.percent(volume.gain))", symbol: volume.gain == 0 ? "speaker.slash" : "speaker.wave.2", height: 22, y: (Row.audio - 22) / 2)
 				}
 			}
 		}
@@ -425,7 +468,7 @@ private struct TrackLane<Content: View>: View {
 	@ViewBuilder let content: Content
 
 	var body: some View {
-		ZStack(alignment: .leading) {
+		ZStack(alignment: .topLeading) {
 			RoundedRectangle(cornerRadius: 7, style: .continuous)
 				.fill(Theme.surface1)
 				.contentShape(Rectangle())
@@ -507,7 +550,8 @@ private struct TimelineBlock: View {
 	let tint: Color
 	let label: String
 	var symbol: String?
-	var height: CGFloat?
+	var height: CGFloat = 24
+	var y: CGFloat = 2
 	@State private var dragStart: (source: TimeRange, output: TimeRange)?
 
 	private enum Edge { case start, end, both }
@@ -528,16 +572,14 @@ private struct TimelineBlock: View {
 		.font(.nebula(11.5, 650))
 		.foregroundStyle(tint == Theme.trackNote ? Theme.text1 : selected ? .white : Color.white.opacity(0.88))
 		.padding(.horizontal, 8)
-		.frame(width: width, alignment: .leading)
-		.frame(maxHeight: height ?? .infinity)
-		.padding(.vertical, height == nil ? 2 : 0)
+		.frame(width: width, height: height, alignment: .leading)
 		.background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(tint.opacity(selected ? 0.42 : 0.24)))
 		.overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(selected ? Theme.lavender : tint.opacity(0.5), lineWidth: selected ? 1.5 : 1))
 		.clipped()
 		.contentShape(Rectangle())
 		.overlay(alignment: .leading) { edgeHandle(.start, output: output) }
 		.overlay(alignment: .trailing) { edgeHandle(.end, output: output) }
-		.offset(x: output.start * pps + 1)
+		.offset(x: output.start * pps + 1, y: y)
 		.gesture(drag(.both, output: output))
 		.onTapGesture { select() }
 		.contextMenu {

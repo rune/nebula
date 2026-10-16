@@ -234,7 +234,7 @@ private struct SpeedSettings: View {
 
 	var body: some View {
 		InspectorSection(title: "Speed") {
-			ChipPicker(selection: Binding(get: { speed.rate }, set: { set($0) }), options: [0.5, 1.5, 2, 3, 4, 8].map { ($0, Format.rate($0)) })
+			RateChips(rate: speed.rate) { set($0) }
 			NebulaSlider("Rate", value: Binding(
 				// Log scale: equal steps for 0.25× … 16×.
 				get: { log2(speed.rate) },

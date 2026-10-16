@@ -42,6 +42,9 @@ public final class ExportController {
 	public func export(_ store: ProjectStore, settings: ExportSettings? = nil, to destination: URL? = nil) async throws -> URL {
 		let settings = settings ?? store.project.export
 		let url = destination ?? defaultDestination(for: store, settings: settings)
+		// The writer can't create folders or overwrite; the save panel already confirmed a replace.
+		try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+		if FileManager.default.fileExists(atPath: url.path) { try FileManager.default.removeItem(at: url) }
 		job = Job(projectName: store.project.name, progress: 0, format: settings.format)
 		defer { job = nil }
 		let scene = store.makeScene()

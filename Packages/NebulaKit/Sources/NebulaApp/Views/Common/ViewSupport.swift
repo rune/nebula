@@ -105,6 +105,32 @@ struct MenuChip<Content: View>: View {
 	}
 }
 
+/// Playback-rate choices in one row of equal-width chips.
+struct RateChips: View {
+	let rate: Double
+	var options: [Double] = [0.5, 1, 1.5, 2, 3, 4, 8]
+	let onSelect: (Double) -> Void
+
+	var body: some View {
+		HStack(spacing: 4) {
+			ForEach(options, id: \.self) { option in
+				let selected = abs(option - rate) < 0.001
+				Text(Format.rate(option))
+					.font(.nebula(11.5, 650))
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.foregroundStyle(selected ? .white : Theme.text2)
+					.frame(maxWidth: .infinity)
+					.frame(height: 28)
+					.background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(selected ? Theme.violetSoft : .clear))
+					.overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).strokeBorder(selected ? Theme.violetLine : Theme.hairlineStrong))
+					.contentShape(Rectangle())
+					.onTapGesture { onSelect(option) }
+			}
+		}
+	}
+}
+
 /// Text field styled for dark surfaces.
 struct NebulaTextField: View {
 	let placeholder: String
