@@ -96,20 +96,21 @@ public final class Compositor: Sendable {
 		let panY = velocity.dy * Double(layout.magnification(for: camera) * layout.videoSize.height)
 		let panLength = hypot(panX, panY) * shutter
 		var image = video
-		if panLength > 1.5 {
+		// Subtle on purpose: enough to smooth fast moves, never enough to smear text.
+		if panLength > 2 {
 			image = image.clampedToExtent()
 				.applyingFilter("CIMotionBlur", parameters: [
-					kCIInputRadiusKey: min(panLength / 2, 48),
+					kCIInputRadiusKey: min(panLength / 3, 16),
 					kCIInputAngleKey: atan2(panY, -panX),
 				])
 				.cropped(to: video.extent)
 		}
-		let zoomAmount = abs(velocity.dLogScale) * Double(layout.content.width) * shutter * 0.5
+		let zoomAmount = abs(velocity.dLogScale) * Double(layout.content.width) * shutter * 0.12
 		if zoomAmount > 1.5 {
 			image = image.clampedToExtent()
 				.applyingFilter("CIZoomBlur", parameters: [
 					kCIInputCenterKey: CIVector(x: layout.content.midX, y: layout.content.midY),
-					"inputAmount": min(zoomAmount, 40),
+					"inputAmount": min(zoomAmount, 8),
 				])
 				.cropped(to: video.extent)
 		}
