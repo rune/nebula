@@ -41,13 +41,7 @@ struct ClipInspector: View {
 					}
 
 					InspectorSection(title: "Edit") {
-						Button {
-							store.splitAtPlayhead()
-						} label: {
-							Label("Split at playhead", systemImage: "scissors").frame(maxWidth: .infinity)
-						}
-						.buttonStyle(NebulaButtonStyle(.secondary, height: 32))
-						.disabled(!(store.playheadSourceTime > clip.source.start + 0.05 && store.playheadSourceTime < clip.source.end - 0.05))
+						SplitButton(store: store, clip: clip, styled: true)
 						Text("Drag either edge of the clip on the timeline to trim it. Dragging outward brings back what was trimmed.")
 							.font(.nebula(11.5, 550)).foregroundStyle(Theme.text3)
 							.fixedSize(horizontal: false, vertical: true)

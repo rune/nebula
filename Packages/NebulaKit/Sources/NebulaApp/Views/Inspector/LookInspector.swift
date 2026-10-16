@@ -11,6 +11,7 @@ struct LookInspector: View {
 	@Environment(AppModel.self) private var app
 	@State private var backgroundTab: BackgroundTab = .desktop
 	@State private var showCrop = false
+	@State private var currentDesktops: [URL] = []
 
 	enum BackgroundTab: String, CaseIterable {
 		case desktop = "Desktop"
@@ -99,7 +100,10 @@ struct LookInspector: View {
 				.buttonStyle(NebulaButtonStyle(.ghost, height: 28))
 			}
 		}
-		.onAppear { backgroundTab = tab(for: style.background) }
+		.onAppear {
+			backgroundTab = tab(for: style.background)
+			currentDesktops = WallpaperCatalog.currentDesktops()
+		}
 		.onDebugCommand { command in
 			if command.hasPrefix("bg:"), let value = BackgroundTab(rawValue: String(command.dropFirst(3))) { backgroundTab = value }
 			if command == "crop" { showCrop = true }
@@ -139,7 +143,7 @@ struct LookInspector: View {
 					.font(.nebula(11.5, 550)).foregroundStyle(Theme.text3)
 					.fixedSize(horizontal: false, vertical: true)
 			}
-			let current = WallpaperCatalog.currentDesktops()
+			let current = currentDesktops
 			if !current.isEmpty {
 				SectionHeader("Current wallpaper")
 				LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {

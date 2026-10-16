@@ -47,7 +47,10 @@ public final class ProjectStore: Identifiable {
 
 	@ObservationIgnored private var history = EditHistory()
 	@ObservationIgnored private var saveTask: Task<Void, Never>?
-	@ObservationIgnored private var sceneTask: Task<Void, Never>?
+	@ObservationIgnored private var sceneBuildInFlight = false
+	@ObservationIgnored private var sceneDirty = false
+	/// The last scene built, so the next edit can reuse its camera and cursor paths.
+	@ObservationIgnored private var lastScene: RenderScene?
 	@ObservationIgnored private var frameActivity: ActivitySeries?
 	private static let logger = Logger(subsystem: "app.nebula", category: "project")
 
@@ -110,23 +113,33 @@ public final class ProjectStore: Identifiable {
 	}
 
 	public func makeScene() -> RenderScene {
-		RenderScene(project: project, input: input, bundleURL: bundle.url)
+		RenderScene(project: project, input: input, bundleURL: bundle.url, reusing: lastScene)
 	}
 
+	/// Rebuilds the preview scene. Builds never overlap: edits arriving during a build (a drag
+	/// sends dozens a second) collapse into one more build of the latest state.
 	private func refreshPreview() {
-		sceneTask?.cancel()
-		let project = project
-		let input = input
-		let bundleURL = bundle.url
-		let media = media
-		let canvas = SceneLayout.canvasSize(for: project, shortSide: previewShortSide)
-		sceneTask = Task { [weak self] in
-			// Camera and cursor paths take a few milliseconds; keep them off the main thread.
-			let scene = await Task.detached(priority: .userInitiated) {
-				RenderScene(project: project, input: input, bundleURL: bundleURL)
-			}.value
-			guard !Task.isCancelled, let self else { return }
-			self.preview.update(scene: scene, media: media, canvas: canvas)
+		sceneDirty = true
+		guard !sceneBuildInFlight else { return }
+		sceneBuildInFlight = true
+		Task { [weak self] in
+			while let self, self.sceneDirty {
+				self.sceneDirty = false
+				let project = self.project
+				let input = self.input
+				let bundleURL = self.bundle.url
+				let media = self.media
+				let canvas = SceneLayout.canvasSize(for: project, shortSide: self.previewShortSide)
+				let previous = self.lastScene
+				// Camera and cursor paths are the costly part; keep them off the main thread, and
+				// reuse them when the edit didn't touch them.
+				let scene = await Task.detached(priority: .userInitiated) {
+					RenderScene(project: project, input: input, bundleURL: bundleURL, reusing: previous)
+				}.value
+				self.lastScene = scene
+				self.preview.update(scene: scene, media: media, canvas: canvas)
+			}
+			self?.sceneBuildInFlight = false
 		}
 	}
 

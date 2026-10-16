@@ -145,6 +145,17 @@ struct RenderTests {
 		}
 	}
 
+	@Test func sceneReusesPathsOnlyWhenTheyCannotHaveChanged() {
+		var project = testProject(duration: 10)
+		let first = RenderScene(project: project, input: .empty, bundleURL: nil)
+		project.style.padding = 0.1
+		let styled = RenderScene(project: project, input: .empty, bundleURL: nil, reusing: first)
+		#expect(styled.camera.state(atOutput: 5) == first.camera.state(atOutput: 5))
+		project.zooms = [ZoomItem(range: TimeRange(start: 2, end: 8), target: .point(NormPoint(x: 0.3, y: 0.3)), scale: 2)]
+		let zoomed = RenderScene(project: project, input: .empty, bundleURL: nil, reusing: styled)
+		#expect(zoomed.camera.state(atOutput: 5).scale > 1.5, "a zoom edit must rebuild the camera path")
+	}
+
 	@Test func exportsGIF() async throws {
 		let video = try await makeTestVideo(seconds: 1)
 		defer { try? FileManager.default.removeItem(at: video) }

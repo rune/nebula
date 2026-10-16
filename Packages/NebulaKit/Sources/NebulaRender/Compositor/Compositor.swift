@@ -31,14 +31,19 @@ public final class Compositor: Sendable {
 		// Shadow under the recording.
 		let shadow = project.style.shadow
 		if shadow.opacity > 0.001, !layout.fillsCanvas {
-			let radius = CGFloat(shadow.radius) * shortSide
-			let shape = roundedRect(layout.content, radius: layout.cornerRadius, color: CIColor(red: 0, green: 0, blue: 0, alpha: CGFloat(shadow.opacity)))
-			let blurred = shape
-				.transformed(by: CGAffineTransform(translationX: 0, y: -CGFloat(shadow.offsetY) * shortSide))
-				.clampedToExtent()
-				.applyingGaussianBlur(sigma: max(0.1, radius / 2))
-				.cropped(to: canvasRect)
-			frame = blurred.composited(over: frame)
+			// The shadow only changes with the layout, so it's blurred once and reused as pixels.
+			let key = "shadow \(layout.content) \(layout.cornerRadius) \(shadow.opacity) \(shadow.radius) \(shadow.offsetY) \(canvas)"
+			let cached = shapes.value(for: key) {
+				let radius = CGFloat(shadow.radius) * shortSide
+				let shape = roundedRect(layout.content, radius: layout.cornerRadius, color: CIColor(red: 0, green: 0, blue: 0, alpha: CGFloat(shadow.opacity)))
+				let blurred = shape
+					.transformed(by: CGAffineTransform(translationX: 0, y: -CGFloat(shadow.offsetY) * shortSide))
+					.clampedToExtent()
+					.applyingGaussianBlur(sigma: max(0.1, radius / 2))
+					.cropped(to: canvasRect)
+				return RenderContext.rasterize(blurred, in: canvasRect)
+			}
+			if let cached { frame = cached.composited(over: frame) }
 		}
 
 		// The recording, framed by the camera.

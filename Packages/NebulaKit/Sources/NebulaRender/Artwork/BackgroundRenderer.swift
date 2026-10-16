@@ -23,8 +23,17 @@ public final class BackgroundRenderer: Sendable {
 	public func image(for background: Background, blur: Double, size: CGSize, bundleURL: URL?) -> CIImage {
 		let key = Key(background: background, blur: blur, width: Int(size.width), height: Int(size.height), bundlePath: bundleURL?.path ?? "")
 		return cache.value(for: key) {
-			Self.render(background, blur: blur, size: size, bundleURL: bundleURL)
+			let image = Self.render(background, blur: blur, size: size, bundleURL: bundleURL)
+			// A solid colour is already free to draw; anything else is rasterized once.
+			if case .color = background { return image }
+			return Self.rasterize(image, size: size)
 		} ?? CIImage(color: CIColor.black).cropped(to: CGRect(origin: .zero, size: size))
+	}
+
+	/// Renders a Core Image recipe to pixels once, so each frame draws a texture instead of
+	/// re-running the scale, blur and grain filters.
+	static func rasterize(_ image: CIImage, size: CGSize) -> CIImage {
+		RenderContext.rasterize(image, in: CGRect(origin: .zero, size: size))
 	}
 
 	static func render(_ background: Background, blur: Double, size: CGSize, bundleURL: URL?) -> CIImage {

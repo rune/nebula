@@ -306,9 +306,7 @@ private struct ClipView: View {
 	}
 
 	@ViewBuilder private var menu: some View {
-		let playhead = store.playheadSourceTime
-		Button("Split at Playhead") { store.splitAtPlayhead() }
-			.disabled(!(playhead > clip.source.start + 0.05 && playhead < clip.source.end - 0.05))
+		SplitButton(store: store, clip: clip, title: "Split at Playhead")
 		Menu("Speed") {
 			ForEach([0.5, 1, 1.5, 2, 3, 4, 8], id: \.self) { rate in
 				Button(Format.rate(rate) + (rate == clip.rate ? "  ✓" : "")) { store.setRate(rate, for: clip) }
@@ -350,6 +348,30 @@ private struct ClipView: View {
 				}
 				trimBase = nil
 			})
+	}
+}
+
+/// "Split" for a clip. Its own view, so only it re-renders as the playhead moves.
+struct SplitButton: View {
+	let store: ProjectStore
+	let clip: Clip
+	var title = "Split at playhead"
+	var styled = false
+
+	var body: some View {
+		let playhead = store.playheadSourceTime
+		let enabled = playhead > clip.source.start + 0.05 && playhead < clip.source.end - 0.05
+		if styled {
+			Button {
+				store.splitAtPlayhead()
+			} label: {
+				Label(title, systemImage: "scissors").frame(maxWidth: .infinity)
+			}
+			.buttonStyle(NebulaButtonStyle(.secondary, height: 32))
+			.disabled(!enabled)
+		} else {
+			Button(title) { store.splitAtPlayhead() }.disabled(!enabled)
+		}
 	}
 }
 

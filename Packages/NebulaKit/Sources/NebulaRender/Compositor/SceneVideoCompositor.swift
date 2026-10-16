@@ -39,6 +39,21 @@ public enum RenderContext {
 	}()
 
 	static let outputColorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
+
+	/// Renders an image once into a GPU-resident (IOSurface) buffer and returns an image that
+	/// reads from it. Drawing it later is a texture read: no filters re-run, no upload.
+	static func rasterize(_ image: CIImage, in rect: CGRect) -> CIImage {
+		var buffer: CVPixelBuffer?
+		let attributes: [CFString: Any] = [
+			kCVPixelBufferIOSurfacePropertiesKey: [:] as CFDictionary,
+			kCVPixelBufferMetalCompatibilityKey: true,
+		]
+		CVPixelBufferCreate(nil, Int(rect.width), Int(rect.height), kCVPixelFormatType_32BGRA, attributes as CFDictionary, &buffer)
+		guard let buffer else { return image }
+		shared.render(image.transformed(by: CGAffineTransform(translationX: -rect.minX, y: -rect.minY)), to: buffer, bounds: CGRect(origin: .zero, size: rect.size), colorSpace: outputColorSpace)
+		return CIImage(cvPixelBuffer: buffer, options: [.colorSpace: outputColorSpace])
+			.transformed(by: CGAffineTransform(translationX: rect.minX, y: rect.minY))
+	}
 }
 
 /// Request counts, for diagnosing the preview.
