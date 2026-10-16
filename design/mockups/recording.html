@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Nebula — Recording</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+	body { width: 1600px; height: 1000px; position: relative; overflow: hidden;
+		background: radial-gradient(900px 600px at 20% 30%, #3a2c6e, transparent 70%), radial-gradient(900px 700px at 85% 80%, #1f4a73, transparent 70%), linear-gradient(160deg, #23263a, #121522); }
+	.menubar { position: absolute; top: 0; left: 0; right: 0; height: 30px; background: rgba(20,20,28,0.55); backdrop-filter: blur(20px); display: flex; align-items: center; padding: 0 16px; gap: 20px; font-size: 13px; font-weight: 600; color: #e9e8ef; }
+	.menubar .right { margin-left: auto; display: flex; gap: 14px; align-items: center; }
+	.rec-mb { display: flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 6px; background: rgba(255,59,92,0.18); color: #ff9aae; font-weight: 750; font-variant-numeric: tabular-nums; }
+	.rec-mb i { width: 8px; height: 8px; border-radius: 50%; background: #ff3b5c; display: block; }
+	.appwin { position: absolute; left: 260px; top: 120px; width: 1080px; height: 660px; border-radius: 12px; background: #f6f6f8; box-shadow: 0 30px 80px rgba(0,0,0,0.45); overflow: hidden; }
+	.appwin .bar { height: 40px; background: #ececf0; border-bottom: 1px solid #ddd; }
+	.appwin .grid { display: grid; grid-template-columns: 220px 1fr; height: 620px; }
+	.appwin .grid div:first-child { background: #efeff3; border-right: 1px solid #e2e2e8; }
+	.widget { position: absolute; right: 64px; top: 64px; display: flex; align-items: center; gap: 6px; padding: 7px; border-radius: 16px; background: rgba(10,10,14,0.9); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 24px 60px rgba(0,0,0,0.55); }
+	.widget .time { display: flex; align-items: center; gap: 9px; padding: 0 12px 0 10px; height: 40px; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+	.widget .time i { width: 10px; height: 10px; border-radius: 50%; background: #ff3b5c;  display: block; }
+	.widget .lv { display: flex; gap: 2px; align-items: center; margin-left: 4px; }
+	.widget .lv b { width: 3px; border-radius: 2px; background: #3ddc97; display: block; }
+	.w-btn { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: var(--text-2); }
+	.w-btn:hover, .w-btn.hl { background: var(--surface-3); color: var(--text-1); }
+	.w-btn .icon { width: 17px; height: 17px; }
+	.w-sep { width: 1px; height: 24px; background: var(--hairline-strong); margin: 0 3px; }
+	.stop { height: 40px; padding: 0 14px; border-radius: 11px; background: var(--gradient); display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800;  }
+	.stop span { width: 11px; height: 11px; border-radius: 3px; background: #fff; display: block; }
+	.tip { position: absolute; right: 120px; top: 120px; font-size: 11.5px; font-weight: 650; color: var(--text-2); padding: 6px 9px; border-radius: 8px; background: rgba(10,10,14,0.92); border: 1px solid var(--hairline-strong); }
+	.notes { position: absolute; left: 36px; bottom: 40px; width: 360px; border-radius: 14px; background: rgba(10,10,14,0.9); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 24px 60px rgba(0,0,0,0.55); overflow: hidden; }
+	.notes header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--hairline); font-size: 12px; font-weight: 750; color: var(--text-2); }
+	.notes header em { margin-left: auto; font-style: normal; font-size: 10.5px; color: var(--lavender); padding: 2px 7px; border-radius: 6px; background: rgba(140,40,255,0.12); }
+	.notes p { padding: 14px 16px 18px; font-size: 18px; line-height: 1.55; font-weight: 600; color: var(--text-3); }
+	.notes p b { color: var(--text-1); font-weight: 700; }
+	.notes p mark { background: none; color: #fff; text-decoration: underline; text-decoration-color: var(--violet); text-underline-offset: 5px; text-decoration-thickness: 2px; }
+</style>
+</head>
+<body>
+	<div class="menubar"><span></span><span>Finder</span><span>File</span><span>Edit</span><div class="right"><div class="rec-mb"><i></i>01:24</div><span>Thu 16 Oct 21:06</span></div></div>
+	<div class="appwin"><div class="bar"></div><div class="grid"><div></div><div></div></div></div>
+	<div class="widget">
+		<div class="time"><i></i>01:24<span class="lv"><b style="height:6px"></b><b style="height:12px"></b><b style="height:9px"></b><b style="height:14px"></b></span></div>
+		<div class="w-sep"></div>
+		<div class="w-btn hl"><svg class="icon" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></div>
+		<div class="w-btn"><svg class="icon" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg></div>
+		<div class="w-btn"><svg class="icon" viewBox="0 0 24 24"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></div>
+		<div class="w-sep"></div>
+		<div class="stop"><span></span>Finish</div>
+	</div>
+	<div class="tip">Pause · ⌥⌘P</div>
+	<div class="notes">
+		<header><svg class="icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h3"/></svg>Speaker notes<em>Not recorded</em></header>
+		<p><b>Open settings, then</b> <mark>name the workspace</mark> “Orbit Labs”. Invite one teammate and press <b>Continue</b>. Mention the free trial.</p>
+	</div>
+</body>
+</html>

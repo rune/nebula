@@ -1,0 +1,83 @@
+/* Nebula design tokens — mirrored 1:1 in NebulaDesign/Theme.swift. */
+@font-face {
+	font-family: "Manrope";
+	src: url("../../Packages/NebulaKit/Sources/NebulaDesign/Resources/Manrope-Variable.ttf") format("truetype");
+	font-weight: 200 800;
+}
+
+:root {
+	/* Surfaces, darkest to lightest */
+	--bg-window: #040406;
+	--bg-canvas: #07070A;
+	--surface-1: #0C0C11;
+	--surface-2: #121218;
+	--surface-3: #19191F;
+	--hairline: rgba(255, 255, 255, 0.055);
+	--hairline-strong: rgba(255, 255, 255, 0.10);
+
+	/* Text */
+	--text-1: #F3F2F7;
+	--text-2: #A09EAD;
+	--text-3: #65636F;
+
+	/* Accent */
+	--violet: #8C28FF;
+	--violet-soft: rgba(140, 40, 255, 0.16);
+	--violet-line: rgba(160, 95, 255, 0.55);
+	--lavender: #B089F0;
+	--gradient: linear-gradient(180deg, #B22EFF 0%, #6828FF 100%);
+
+	/* Timeline tracks */
+	--track-zoom: #8C28FF;
+	--track-speed: #6E7BFF;
+	--track-mask: #D14BFF;
+	--track-note: #E6E3F0;
+	--track-cut: #2A2930;
+
+	--radius-s: 7px;
+	--radius-m: 10px;
+	--radius-l: 14px;
+	--shadow-panel: 0 20px 60px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+	font-family: "Manrope", system-ui, sans-serif;
+	font-feature-settings: "tnum" 1, "cv11" 1;
+	color: var(--text-1);
+	background: #1b1b1f;
+	-webkit-font-smoothing: antialiased;
+}
+
+.window {
+	position: relative;
+	background: var(--bg-window);
+	border-radius: 14px;
+	border: 1px solid rgba(255, 255, 255, 0.09);
+	box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+	overflow: hidden;
+}
+
+.traffic { display: flex; gap: 8px; }
+.traffic span { width: 12px; height: 12px; border-radius: 50%; display: block; }
+.traffic span:nth-child(1) { background: #ff5f57; }
+.traffic span:nth-child(2) { background: #febc2e; }
+.traffic span:nth-child(3) { background: #28c840; }
+
+.btn {
+	display: inline-flex; align-items: center; gap: 7px;
+	height: 30px; padding: 0 12px; border-radius: 8px;
+	font-size: 12.5px; font-weight: 650; letter-spacing: -0.005em;
+	color: var(--text-1); background: var(--surface-2); border: 1px solid var(--hairline-strong);
+}
+.btn.primary {
+	background: var(--gradient); border: 0;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+}
+.btn.ghost { background: transparent; border-color: transparent; color: var(--text-2); }
+.kbd {
+	font-size: 10.5px; font-weight: 700; color: var(--text-3);
+	border: 1px solid var(--hairline-strong); border-radius: 5px; padding: 1px 5px;
+}
+.icon { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }

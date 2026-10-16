@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Nebula — Editor</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+	body { width: 1600px; height: 1000px; padding: 20px; background: #0c0c0f; }
+	.window { width: 1560px; height: 960px; display: grid; grid-template-rows: 52px 1fr 268px; }
+
+	/* Toolbar */
+	.toolbar { display: flex; align-items: center; padding: 0 14px 0 18px; gap: 18px; border-bottom: 1px solid var(--hairline); background: linear-gradient(180deg, #0b0b10, #070709); }
+	.crumbs { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-3); margin-left: 8px; }
+	.crumbs b { color: var(--text-1); font-weight: 700; }
+	.crumbs .saved { margin-left: 10px; font-size: 11.5px; font-weight: 600; color: var(--text-3); display: flex; align-items: center; gap: 6px; }
+	.crumbs .saved i { width: 6px; height: 6px; border-radius: 50%; background: #3ddc97; display: block;  }
+	.toolbar .spacer { flex: 1; }
+	.toolbar .mcp { font-size: 11.5px; font-weight: 650; color: var(--lavender); display: flex; align-items: center; gap: 7px; padding: 5px 10px; border-radius: 999px; background: rgba(140,40,255,0.10); border: 1px solid rgba(160,95,255,0.25); }
+	.toolbar .mcp i { width: 6px; height: 6px; border-radius: 50%; background: var(--lavender);  display:block }
+	.btn.polish { color: #e9dcff; background: rgba(140,40,255,0.10); border-color: rgba(160,95,255,0.32); }
+
+	/* Main */
+	.main { display: grid; grid-template-columns: 1fr 312px; min-height: 0; }
+	.stage { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: var(--bg-canvas); }
+	.frame { position: relative; width: 1010px; height: 568px; border-radius: 12px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06); }
+	.wallpaper { position: absolute; inset: 0; background:
+		radial-gradient(520px 420px at 14% 20%, rgba(104,40,255,0.95), transparent 70%),
+		radial-gradient(460px 380px at 88% 12%, rgba(178,46,255,0.85), transparent 70%),
+		radial-gradient(640px 420px at 55% 105%, rgba(42,15,110,1), transparent 70%), #07050d; }
+	.shot { position: absolute; left: 90px; top: 50px; width: 830px; height: 468px; border-radius: 13px; overflow: hidden; background: #f7f7f9; box-shadow: 0 26px 60px rgba(0,0,0,0.55); transform-origin: 70% 62%; }
+	/* A light SaaS app inside the recording, zoomed by the camera */
+	.app { position: absolute; inset: 0; transform: scale(1.32) translate(-70px, -40px); transform-origin: 0 0; display: grid; grid-template-columns: 170px 1fr; font-family: system-ui; color: #1b1b23; }
+	.app .side { background: #f0f0f4; border-right: 1px solid #e3e3ea; padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; }
+	.app .side div { height: 10px; border-radius: 4px; background: #dcdce5; }
+	.app .side div.on { background: #cbbcff; }
+	.app .body { padding: 22px 26px; display: flex; flex-direction: column; gap: 14px; }
+	.app h3 { font-size: 17px; font-weight: 750; }
+	.app .field { display: grid; gap: 6px; font-size: 11px; color: #6a6a78; font-weight: 600; }
+	.app .input { height: 32px; border-radius: 8px; border: 1.5px solid #8C28FF; background: #fff;  padding: 0 10px; display:flex; align-items:center; font-size: 12.5px; color:#1b1b23; font-weight: 600 }
+	.app .input.plain { border-color: #e1e1e8; box-shadow: none; color: #9a9aa8; font-weight: 500 }
+	.app .row { display: flex; gap: 10px; align-items: center; }
+	.app .cta { height: 32px; padding: 0 16px; border-radius: 8px; background: #1b1b23; color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; }
+	.caret { width: 1.5px; height: 15px; background: #8C28FF; margin-left: 2px; }
+	.cursor { position: absolute; left: 610px; top: 330px; width: 26px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
+	.ripple { position: absolute; left: 592px; top: 312px; width: 40px; height: 40px; border-radius: 50%; border: 2.5px solid rgba(176,137,240,0.9); background: rgba(176,137,240,0.18); }
+	.keycaps { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: flex; gap: 6px; }
+	.keycaps span { min-width: 34px; height: 34px; padding: 0 10px; border-radius: 8px; background: rgba(22,20,30,0.94); border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 3px 0 rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
+	.chip { position: absolute; left: 14px; top: 14px; font-size: 11px; font-weight: 700; padding: 5px 9px; border-radius: 7px; background: rgba(8,8,12,0.72); border: 1px solid rgba(255,255,255,0.1); color: var(--lavender); backdrop-filter: blur(10px); }
+
+	.transport { display: flex; align-items: center; gap: 22px; width: 1010px; }
+	.transport .time { font-size: 13px; font-weight: 650; color: var(--text-1); font-variant-numeric: tabular-nums; }
+	.transport .time em { font-style: normal; color: var(--text-3); }
+	.transport .play { width: 38px; height: 38px; border-radius: 50%; background: var(--text-1); color: #000; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
+	.transport .group { display: flex; align-items: center; gap: 16px; color: var(--text-2); }
+	.transport .sp { flex: 1; }
+	.pill { font-size: 11.5px; font-weight: 650; color: var(--text-2); padding: 5px 9px; border-radius: 7px; border: 1px solid var(--hairline-strong); }
+
+	/* Inspector */
+	.inspector { margin: 12px 12px 12px 0; border-radius: var(--radius-l); background: var(--surface-1); border: 1px solid var(--hairline); box-shadow: var(--shadow-panel); display: flex; flex-direction: column; overflow: hidden; }
+	.tabs { display: flex; gap: 4px; padding: 8px; border-bottom: 1px solid var(--hairline); }
+	.tabs div { flex: 1; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-3); }
+	.tabs div.on { background: var(--surface-3); color: var(--text-1); box-shadow: 0 0 0 1px var(--hairline-strong) inset; }
+	.section { padding: 16px 16px 4px; }
+	.section h4 { font-size: 11px; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; display: flex; justify-content: space-between; }
+	.seg { display: flex; background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 9px; padding: 3px; margin-bottom: 12px; }
+	.seg div { flex: 1; text-align: center; font-size: 12px; font-weight: 650; color: var(--text-3); padding: 6px 0; border-radius: 6px; }
+	.seg div.on { background: var(--surface-3); color: var(--text-1); box-shadow: 0 1px 2px rgba(0,0,0,0.5), 0 0 0 1px var(--hairline-strong) inset; }
+	.swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+	.swatches div { height: 44px; border-radius: 9px; border: 1px solid var(--hairline-strong); }
+	.swatches div.on { box-shadow: 0 0 0 2px var(--bg-window), 0 0 0 3.5px var(--violet); }
+	.slider { margin-bottom: 14px; }
+	.slider .row { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: var(--text-2); margin-bottom: 9px; }
+	.slider .row b { color: var(--text-1); font-weight: 700; font-variant-numeric: tabular-nums; }
+	.track { position: relative; height: 4px; border-radius: 4px; background: var(--surface-3); }
+	.track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: linear-gradient(90deg, #6828FF, #B22EFF); }
+	.track b { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+	.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+	.chips div { font-size: 12px; font-weight: 650; color: var(--text-2); padding: 6px 10px; border-radius: 8px; border: 1px solid var(--hairline-strong); }
+	.chips div.on { color: #fff; border-color: rgba(160,95,255,0.6); background: var(--violet-soft); }
+	.toggle-row { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; font-weight: 600; color: var(--text-2); margin-bottom: 12px; }
+	.toggle { width: 30px; height: 18px; border-radius: 999px; background: var(--violet); position: relative; }
+	.toggle::after { content: ""; position: absolute; right: 2px; top: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+	.toggle.off { background: var(--surface-3); }
+	.toggle.off::after { right: auto; left: 2px; background: #8b8996; }
+
+	/* Timeline */
+	.timeline { border-top: 1px solid var(--hairline); background: #08080b; display: grid; grid-template-rows: 42px 1fr; }
+	.tl-bar { display: flex; align-items: center; gap: 6px; padding: 0 14px; border-bottom: 1px solid var(--hairline); }
+	.tool { height: 28px; padding: 0 9px; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 650; color: var(--text-2); border-radius: 7px; }
+	.tool.on { background: var(--surface-2); color: var(--text-1); box-shadow: 0 0 0 1px var(--hairline-strong) inset; }
+	.tl-bar .sep { width: 1px; height: 18px; background: var(--hairline-strong); margin: 0 6px; }
+	.tl-bar .sp { flex: 1; }
+	.tl-body { position: relative; display: grid; grid-template-columns: 116px 1fr; }
+	.labels { border-right: 1px solid var(--hairline); padding-top: 26px; }
+	.labels div { height: 34px; display: flex; align-items: center; gap: 8px; padding-left: 14px; font-size: 12px; font-weight: 650; color: var(--text-3); }
+	.lanes { position: relative; padding: 0 16px; }
+	.ruler { height: 26px; position: relative; font-size: 10.5px; font-weight: 650; color: var(--text-3); }
+	.ruler span { position: absolute; top: 7px; }
+	.lane { position: relative; height: 34px; }
+	.lane::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; bottom: 4px; border-radius: 7px; background: rgba(255,255,255,0.018); }
+	.block { position: absolute; top: 5px; bottom: 5px; border-radius: 7px; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; gap: 6px; padding: 0 9px; white-space: nowrap; overflow: hidden; }
+	.clip { background: linear-gradient(180deg, #1d1c24, #16151c); border: 1px solid rgba(255,255,255,0.08); color: var(--text-2); }
+	.clip .thumbs { position: absolute; inset: 0; display: flex; gap: 2px; padding: 3px; opacity: 0.55; }
+	.clip .thumbs i { flex: 1; border-radius: 4px; background: linear-gradient(135deg, #2a2440, #191822); }
+	.clip label { position: relative; }
+	.cut { background: repeating-linear-gradient(135deg, rgba(255,255,255,0.05) 0 5px, transparent 5px 10px); border: 1px dashed rgba(255,255,255,0.14); color: var(--text-3); }
+	.zoom { background: rgba(140,40,255,0.20); border: 1px solid rgba(160,95,255,0.55); color: #e3d4ff; }
+	.zoom.sel { background: rgba(140,40,255,0.32); box-shadow: 0 0 0 2px rgba(176,137,240,0.9); }
+	.speed { background: rgba(110,123,255,0.18); border: 1px solid rgba(110,123,255,0.5); color: #cfd4ff; }
+	.mask { background: rgba(209,75,255,0.14); border: 1px solid rgba(209,75,255,0.45); color: #f1c9ff; }
+	.note { background: rgba(230,227,240,0.08); border: 1px solid rgba(230,227,240,0.25); color: var(--text-1); }
+	.cap { background: rgba(255,255,255,0.04); border: 1px solid var(--hairline-strong); color: var(--text-2); font-weight: 600; }
+	.wave { position: absolute; left: 0; right: 0; top: 7px; bottom: 7px; display: flex; align-items: center; gap: 2px; }
+	.wave i { flex: 1; background: #3a3846; border-radius: 2px; }
+	.playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff;  }
+	.playhead::before { content: "0:18.2"; position: absolute; top: 3px; left: 50%; transform: translateX(-50%); font-size: 10.5px; font-weight: 800; color: #000; background: #fff; padding: 2px 6px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<div class="window">
+	<div class="toolbar">
+		<div class="traffic"><span></span><span></span><span></span></div>
+		<div class="crumbs">Library <svg class="icon" viewBox="0 0 24 24" style="width:12px"><path d="m9 6 6 6-6 6"/></svg> <b>Onboarding demo</b><span class="saved"><i></i>Saved</span></div>
+		<div class="spacer"></div>
+		<div class="mcp"><i></i>Claude connected</div>
+		<div class="btn ghost"><svg class="icon" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg></div>
+		<div class="btn polish"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.4 2.4M15.3 15.3l2.4 2.4M17.7 6.3l-2.4 2.4M8.7 15.3l-2.4 2.4"/></svg>Polish</div>
+		<div class="btn primary"><svg class="icon" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</div>
+	</div>
+
+	<div class="main">
+		<div class="stage">
+			<div class="frame">
+				<div class="wallpaper"></div>
+				<div class="shot">
+					<div class="app">
+						<div class="side"><div style="width:60%;height:14px;background:#1b1b23;margin-bottom:10px"></div><div class="on"></div><div></div><div></div><div style="width:70%"></div><div></div></div>
+						<div class="body">
+							<h3>Create workspace</h3>
+							<div class="field">Workspace name<div class="input">Orbit Labs<span class="caret"></span></div></div>
+							<div class="field">Invite teammates<div class="input plain">name@company.com</div></div>
+							<div class="row"><div class="cta">Continue</div><div style="font-size:12px;color:#8a8a96;font-weight:600">Skip for now</div></div>
+						</div>
+					</div>
+				</div>
+				<div class="ripple"></div>
+				<svg class="cursor" viewBox="0 0 17 24"><path d="M4 3v16.5l3.8-3.6 2.6 5.7 2.7-1.2-2.6-5.6 5.1-.2z" fill="#fff" stroke="#000" stroke-width="1.25" stroke-linejoin="round"/></svg>
+				<div class="keycaps"><span>⌘</span><span>↩</span></div>
+				<div class="chip">Zoom 1.8× · Field</div>
+			</div>
+			<div class="transport">
+				<div class="pill">Full quality</div>
+				<div class="sp"></div>
+				<div class="group">
+					<svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px"><path d="M19 20 9 12l10-8zM5 19V5"/></svg>
+					<div class="play"><svg viewBox="0 0 24 24" style="width:16px;height:16px;margin-left:2px"><path d="M7 4.5v15l12-7.5z" fill="#000"/></svg></div>
+					<svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px"><path d="m5 4 10 8-10 8zM19 5v14"/></svg>
+				</div>
+				<div class="time">0:18.2 <em>/ 0:34.6</em></div>
+				<div class="sp"></div>
+				<div class="pill">1×</div>
+				<div class="pill">16:9</div>
+			</div>
+		</div>
+
+		<div class="inspector">
+			<div class="tabs">
+				<div class="on"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m3 16 5-5 4 4 3-3 6 6"/></svg></div>
+				<div><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M11 8v6M8 11h6"/></svg></div>
+				<div><svg class="icon" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg></div>
+				<div><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 13h4M13 13h4M7 16h10"/></svg></div>
+				<div><svg class="icon" viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg></div>
+			</div>
+			<div class="section">
+				<h4>Background</h4>
+				<div class="seg"><div class="on">Wallpaper</div><div>Gradient</div><div>Color</div><div>Image</div></div>
+				<div class="swatches">
+					<div class="on" style="background: radial-gradient(circle at 20% 25%, #6828FF, transparent 60%), radial-gradient(circle at 85% 20%, #B22EFF, transparent 55%), #07050d"></div>
+					<div style="background: radial-gradient(circle at 15% 85%, #8C28FF, transparent 60%), radial-gradient(circle at 85% 80%, #FF5FA2, transparent 55%), #0c0614"></div>
+					<div style="background: radial-gradient(circle at 20% 25%, #1E5BFF, transparent 60%), radial-gradient(circle at 80% 75%, #7A3CFF, transparent 55%), #04080f"></div>
+					<div style="background: radial-gradient(circle at 15% 85%, #FF6A3D, transparent 60%), radial-gradient(circle at 85% 20%, #B22EFF, transparent 55%), #0d0605"></div>
+					<div style="background: radial-gradient(circle at 25% 30%, #B089F0, transparent 60%), radial-gradient(circle at 80% 80%, #6E6A85, transparent 55%), #121018"></div>
+					<div style="background: radial-gradient(circle at 50% 50%, #8C28FF, transparent 45%), #020204"></div>
+					<div style="background: radial-gradient(circle at 20% 80%, #1FAA6B, transparent 60%), radial-gradient(circle at 85% 25%, #3E7BFA, transparent 55%), #050b08"></div>
+					<div style="background: radial-gradient(circle at 10% 10%, #FFB547, transparent 55%), radial-gradient(circle at 90% 30%, #FF4F7A, transparent 55%), radial-gradient(circle at 50% 95%, #7B2CFF, transparent 55%), #120708"></div>
+				</div>
+			</div>
+			<div class="section">
+				<h4>Frame</h4>
+				<div class="slider"><div class="row">Padding<b>7%</b></div><div class="track"><i style="width:34%"></i><b style="left:34%"></b></div></div>
+				<div class="slider"><div class="row">Corner radius<b>18</b></div><div class="track"><i style="width:45%"></i><b style="left:45%"></b></div></div>
+				<div class="slider"><div class="row">Shadow<b>55%</b></div><div class="track"><i style="width:55%"></i><b style="left:55%"></b></div></div>
+				<div class="toggle-row">Inset border<div class="toggle off"></div></div>
+			</div>
+			<div class="section">
+				<h4>Aspect ratio</h4>
+				<div class="chips"><div>Auto</div><div class="on">16:9</div><div>9:16</div><div>1:1</div><div>4:3</div><div>4:5</div></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="timeline">
+		<div class="tl-bar">
+			<div class="tool on"><svg class="icon" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg>Select</div>
+			<div class="tool"><svg class="icon" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg>Split <span class="kbd">C</span></div>
+			<div class="sep"></div>
+			<div class="tool"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Zoom <span class="kbd">Z</span></div>
+			<div class="tool"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/></svg>Speed <span class="kbd">S</span></div>
+			<div class="tool"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 12h16M12 4v16"/></svg>Mask <span class="kbd">M</span></div>
+			<div class="tool"><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/></svg>Text <span class="kbd">T</span></div>
+			<div class="sp"></div>
+			<div class="tool"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M8 11h6"/></svg></div>
+			<div style="width:110px" class="track"><i style="width:40%"></i><b style="left:40%"></b></div>
+			<div class="tool"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M11 8v6"/></svg></div>
+		</div>
+		<div class="tl-body">
+			<div class="labels">
+				<div><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/></svg>Clips</div>
+				<div><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Zoom</div>
+				<div><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10"/></svg>Overlays</div>
+				<div><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 13h4M13 13h4"/></svg>Captions</div>
+				<div><svg class="icon" viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg>Audio</div>
+			</div>
+			<div class="lanes">
+				<div class="ruler"><span style="left:16px">0:00</span><span style="left:20%">0:07</span><span style="left:40%">0:14</span><span style="left:60%">0:21</span><span style="left:80%">0:28</span></div>
+				<div class="lane">
+					<div class="block clip" style="left:0;width:23%"><div class="thumbs"><i></i><i></i><i></i><i></i></div><label>Clip</label></div>
+					<div class="block cut" style="left:23.4%;width:7%">cut · 3.1s</div>
+					<div class="block clip" style="left:30.8%;width:31%"><div class="thumbs"><i></i><i></i><i></i><i></i><i></i></div><label></label></div>
+					<div class="block speed" style="left:62.2%;width:13%">⏩ 2.5× typing</div>
+					<div class="block clip" style="left:75.6%;width:24.4%"><div class="thumbs"><i></i><i></i><i></i><i></i></div></div>
+				</div>
+				<div class="lane">
+					<div class="block zoom" style="left:6%;width:14%">1.6× · Click</div>
+					<div class="block zoom sel" style="left:42%;width:17%">1.8× · Field</div>
+					<div class="block zoom" style="left:59.2%;width:12%">2.0× · Follow</div>
+					<div class="block zoom" style="left:82%;width:11%">1.5×</div>
+				</div>
+				<div class="lane">
+					<div class="block note" style="left:44%;width:10%">“Name your workspace”</div>
+					<div class="block mask" style="left:66%;width:22%">Blur · email</div>
+				</div>
+				<div class="lane">
+					<div class="block cap" style="left:2%;width:15%">So first, open settings…</div>
+					<div class="block cap" style="left:31%;width:18%">then name your workspace</div>
+					<div class="block cap" style="left:50%;width:12%">and press return</div>
+				</div>
+				<div class="lane">
+					<div class="wave"><script>document.write(Array.from({length:150},(_, i)=>{const h=8+Math.abs(Math.sin(i*0.37)*Math.cos(i*0.11))*20+(i%7==0?6:0);return `<i style="height:${h}px;${i>44&&i<92?'background:#4b4458':''}"></i>`}).join(''))</script></div>
+				</div>
+				<div class="playhead" style="left:calc(16px + (100% - 32px) * 0.52)"></div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

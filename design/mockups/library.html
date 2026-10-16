@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Nebula — Library</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+	body { width: 1600px; height: 1000px; padding: 40px 80px; background: #0c0c0f; }
+	.window { width: 1440px; height: 920px; display: grid; grid-template-columns: 232px 1fr; }
+	.sidebar { background: #08080b; border-right: 1px solid var(--hairline); padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; }
+	.brand { display: flex; align-items: center; gap: 10px; padding: 18px 8px 22px; font-size: 16px; font-weight: 800; letter-spacing: -0.01em; }
+	.orb { width: 26px; height: 26px; border-radius: 8px; background: radial-gradient(circle at 35% 30%, #e7d4ff, #8C28FF 42%, #1b0d2e 100%);  }
+	.nav { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; font-weight: 650; color: var(--text-2); }
+	.nav.on { background: var(--surface-2); color: var(--text-1); box-shadow: 0 0 0 1px var(--hairline) inset; }
+	.nav em { margin-left: auto; font-style: normal; font-size: 11px; color: var(--text-3); }
+	.group { margin-top: 18px; padding: 0 10px 6px; font-size: 10.5px; font-weight: 750; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-3); }
+	.status { margin-top: auto; border-radius: 12px; padding: 12px; background: var(--surface-1); border: 1px solid var(--hairline); font-size: 12px; font-weight: 600; color: var(--text-2); display: grid; gap: 6px; }
+	.status b { color: var(--text-1); font-size: 12.5px; display: flex; align-items: center; gap: 7px; }
+	.status b i { width: 7px; height: 7px; border-radius: 50%; background: #3ddc97;  display: block; }
+	.content { display: grid; grid-template-rows: 64px 1fr; background: var(--bg-window); }
+	.top { display: flex; align-items: center; gap: 12px; padding: 0 26px; border-bottom: 1px solid var(--hairline); }
+	.top h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.015em; }
+	.search { margin-left: 18px; width: 340px; height: 34px; border-radius: 9px; background: var(--surface-1); border: 1px solid var(--hairline-strong); display: flex; align-items: center; gap: 8px; padding: 0 12px; font-size: 13px; color: var(--text-3); font-weight: 600; }
+	.search .kbd { margin-left: auto; }
+	.top .sp { flex: 1; }
+	.grid { padding: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-content: start; }
+	.card { border-radius: 14px; overflow: hidden; background: var(--surface-1); border: 1px solid var(--hairline); }
+	.card.hover { box-shadow: 0 0 0 1.5px rgba(176,137,240,0.8); }
+	.thumb { position: relative; height: 200px; overflow: hidden; }
+	.thumb .wp { position: absolute; inset: 0; }
+	.thumb .shot { position: absolute; left: 11%; right: 11%; top: 12%; bottom: 12%; border-radius: 7px; background: #f5f5f8; box-shadow: 0 12px 30px rgba(0,0,0,0.45); overflow: hidden; }
+	.thumb .shot::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 26%; background: #ececf1; border-right: 1px solid #e0e0e6; }
+	.thumb .shot.dark { background: #16161c; }
+	.thumb .shot.dark::before { background: #1d1d25; border-color: #26262f; }
+	.thumb .dur { position: absolute; right: 10px; bottom: 10px; font-size: 11px; font-weight: 750; padding: 3px 7px; border-radius: 6px; background: rgba(5,5,8,0.75); backdrop-filter: blur(10px); }
+	.thumb .play { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px; border-radius: 50%; background: rgba(255,255,255,0.92); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+	.meta { padding: 13px 14px 14px; display: flex; align-items: center; gap: 10px; }
+	.meta div { display: grid; gap: 3px; }
+	.meta b { font-size: 13.5px; font-weight: 750; }
+	.meta span { font-size: 12px; font-weight: 600; color: var(--text-3); }
+	.meta .tags { margin-left: auto; display: flex; gap: 6px; }
+	.tag { font-size: 10.5px; font-weight: 750; padding: 3px 7px; border-radius: 6px; color: var(--lavender); background: rgba(140,40,255,0.12); border: 1px solid rgba(160,95,255,0.3); }
+	.tag.grey { color: var(--text-2); background: var(--surface-2); border-color: var(--hairline-strong); }
+	.newcard { border-radius: 14px; border: 1.5px dashed rgba(255,255,255,0.12); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--text-2); font-size: 13px; font-weight: 650; height: 266px; background: radial-gradient(240px 140px at 50% 40%, rgba(140,40,255,0.10), transparent 70%); }
+	.newcard .big { width: 52px; height: 52px; border-radius: 16px; background: var(--gradient); display: flex; align-items: center; justify-content: center;  }
+	.newcard small { color: var(--text-3); font-size: 11.5px; }
+</style>
+</head>
+<body>
+<div class="window">
+	<div class="sidebar">
+		<div class="traffic" style="padding:2px 6px"><span></span><span></span><span></span></div>
+		<div class="brand"><div class="orb"></div>Nebula</div>
+		<div class="nav on"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>All recordings<em>14</em></div>
+		<div class="nav"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Recent<em>4</em></div>
+		<div class="nav"><svg class="icon" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Exports</div>
+		<div class="group">Style presets</div>
+		<div class="nav"><span style="width:14px;height:14px;border-radius:4px;background:radial-gradient(circle at 25% 25%,#6828FF,transparent 65%),#07050d;border:1px solid var(--hairline-strong)"></span>Nebula<em>default</em></div>
+		<div class="nav"><span style="width:14px;height:14px;border-radius:4px;background:#0b0b0f;border:1px solid var(--hairline-strong)"></span>Minimal</div>
+		<div class="nav"><span style="width:14px;height:14px;border-radius:4px;background:radial-gradient(circle at 20% 80%,#8C28FF,transparent 60%),radial-gradient(circle at 85% 80%,#FF5FA2,transparent 55%),#0c0614;border:1px solid var(--hairline-strong)"></span>Social</div>
+		<div class="status">
+			<b><i></i>MCP server running</b>
+			127.0.0.1:39351 · 2 tools calls today
+		</div>
+	</div>
+	<div class="content">
+		<div class="top">
+			<h1>All recordings</h1>
+			<div class="search"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Search recordings<span class="kbd">⌘F</span></div>
+			<div class="sp"></div>
+			<div class="btn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M5 20h14"/></svg>Import</div>
+			<div class="btn primary"><svg class="icon" viewBox="0 0 24 24" style="fill:#fff;stroke:none"><circle cx="12" cy="12" r="6"/></svg>New recording <span class="kbd" style="color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.35)">⌥⌘↩</span></div>
+		</div>
+		<div class="grid">
+			<div class="card hover">
+				<div class="thumb"><div class="wp" style="background: radial-gradient(circle at 15% 20%, #6828FF, transparent 55%), radial-gradient(circle at 85% 15%, #B22EFF, transparent 50%), #07050d"></div><div class="shot"></div><div class="play"><svg viewBox="0 0 24 24" style="width:16px;height:16px;margin-left:2px"><path d="M7 4.5v15l12-7.5z" fill="#000"/></svg></div><div class="dur">0:34</div></div>
+				<div class="meta"><div><b>Onboarding demo</b><span>Edited 2 min ago · 3024 × 1964</span></div><div class="tags"><span class="tag">Polished</span></div></div>
+			</div>
+			<div class="card">
+				<div class="thumb"><div class="wp" style="background: radial-gradient(circle at 15% 85%, #8C28FF, transparent 55%), radial-gradient(circle at 85% 80%, #FF5FA2, transparent 50%), #0c0614"></div><div class="shot dark"></div><div class="dur">1:12</div></div>
+				<div class="meta"><div><b>Checkout flow walkthrough</b><span>Yesterday · 2880 × 1800</span></div><div class="tags"><span class="tag">Polished</span><span class="tag grey">CC</span></div></div>
+			</div>
+			<div class="card">
+				<div class="thumb"><div class="wp" style="background: radial-gradient(circle at 20% 25%, #1E5BFF, transparent 55%), radial-gradient(circle at 80% 75%, #7A3CFF, transparent 50%), #04080f"></div><div class="shot"></div><div class="dur">0:48</div></div>
+				<div class="meta"><div><b>Dashboard filters</b><span>Oct 14 · 3024 × 1964</span></div><div class="tags"><span class="tag grey">Draft</span></div></div>
+			</div>
+			<div class="card">
+				<div class="thumb"><div class="wp" style="background: #0b0b0f"></div><div class="shot dark" style="left:25%;right:25%;top:6%;bottom:6%"></div><div class="dur">0:21</div></div>
+				<div class="meta"><div><b>Mobile settings (9:16)</b><span>Oct 12 · 1080 × 1920</span></div><div class="tags"><span class="tag">Polished</span></div></div>
+			</div>
+			<div class="card">
+				<div class="thumb"><div class="wp" style="background: radial-gradient(circle at 10% 10%, #FFB547, transparent 50%), radial-gradient(circle at 90% 30%, #FF4F7A, transparent 50%), radial-gradient(circle at 50% 95%, #7B2CFF, transparent 50%), #120708"></div><div class="shot"></div><div class="dur">2:05</div></div>
+				<div class="meta"><div><b>Imported · recording-1786012034690</b><span>Oct 9 · from OpenScreen</span></div><div class="tags"><span class="tag grey">Imported</span></div></div>
+			</div>
+			<div class="newcard"><div class="big"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;stroke:#fff;stroke-width:2.2"><path d="M12 5v14M5 12h14"/></svg></div>New recording<small>or drop a video / .openscreen project here</small></div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

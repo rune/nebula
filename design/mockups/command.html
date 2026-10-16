@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Nebula — Command palette and Polish</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+	body { width: 1600px; height: 1000px; position: relative; overflow: hidden; background: #08070c; }
+	.bg { position: absolute; inset: 0; background: url("editor.png") center / cover; }
+	.scrim { position: absolute; inset: 0; background: rgba(2,2,4,0.62); }
+	.palette { position: absolute; left: 300px; top: 150px; width: 640px; border-radius: 16px; background: rgba(12,12,17,0.96); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(0,0,0,0.6); overflow: hidden; backdrop-filter: blur(40px); }
+	.palette .input { display: flex; align-items: center; gap: 12px; height: 58px; padding: 0 18px; border-bottom: 1px solid var(--hairline); font-size: 17px; font-weight: 600; }
+	.palette .input .icon { width: 18px; height: 18px; color: var(--text-3); }
+	.palette .input .caret { width: 1.5px; height: 20px; background: var(--violet); margin-left: -8px; }
+	.palette .input .kbd { margin-left: auto; }
+	.list { padding: 8px; }
+	.list h5 { padding: 10px 10px 6px; font-size: 10.5px; font-weight: 750; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-3); }
+	.item { display: flex; align-items: center; gap: 12px; height: 42px; padding: 0 10px; border-radius: 9px; font-size: 13.5px; font-weight: 650; color: var(--text-1); }
+	.item .ic { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--surface-2); border: 1px solid var(--hairline); color: var(--text-2); }
+	.item .ic .icon { width: 14px; height: 14px; }
+	.item em { font-style: normal; color: var(--text-3); font-weight: 600; font-size: 12.5px; }
+	.item .kbd { margin-left: auto; }
+	.item.on { background: rgba(140,40,255,0.16); box-shadow: 0 0 0 1px rgba(160,95,255,0.35) inset; }
+	.item.on .ic { background: var(--gradient); color: #fff; border: 0; }
+	.footer { display: flex; gap: 16px; padding: 10px 18px; border-top: 1px solid var(--hairline); font-size: 11.5px; font-weight: 600; color: var(--text-3); }
+	.footer span { display: flex; gap: 6px; align-items: center; }
+
+	.popover { position: absolute; right: 120px; top: 70px; width: 340px; border-radius: 16px; background: rgba(12,12,17,0.97); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 100px rgba(0,0,0,0.75); overflow: hidden; }
+	.popover::before { content: ""; position: absolute; top: -7px; right: 120px; width: 14px; height: 14px; transform: rotate(45deg); background: rgba(12,12,17,0.97); border-left: 1px solid rgba(255,255,255,0.11); border-top: 1px solid rgba(255,255,255,0.11); }
+	.popover header { padding: 16px 16px 10px; }
+	.popover header b { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+	.popover header p { margin-top: 6px; font-size: 12.5px; color: var(--text-2); line-height: 1.5; font-weight: 550; }
+	.opt { display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; font-weight: 650; }
+	.opt small { display: block; font-size: 11.5px; font-weight: 550; color: var(--text-3); margin-top: 2px; }
+	.opt .toggle { margin-left: auto; flex-shrink: 0; }
+	.toggle { width: 30px; height: 18px; border-radius: 999px; background: var(--violet); position: relative; }
+	.toggle::after { content: ""; position: absolute; right: 2px; top: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+	.toggle.off { background: var(--surface-3); }
+	.toggle.off::after { right: auto; left: 2px; background: #8b8996; }
+	.slider { padding: 6px 16px 14px; }
+	.slider .row { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: var(--text-2); margin-bottom: 10px; }
+	.slider .row b { color: var(--text-1); }
+	.track { position: relative; height: 4px; border-radius: 4px; background: var(--surface-3); }
+	.track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: linear-gradient(90deg, #6828FF, #B22EFF); }
+	.track b { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #fff;  }
+	.popover .go { margin: 4px 16px 16px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13.5px; font-weight: 800; background: var(--gradient);  }
+	.popover hr { border: 0; border-top: 1px solid var(--hairline); margin: 4px 0; }
+
+	.toast { position: absolute; left: 50%; bottom: 300px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 14px; border-radius: 12px; background: rgba(14,14,19,0.97); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 24px 60px rgba(0,0,0,0.6); font-size: 13px; font-weight: 650; }
+	.toast .spark { width: 26px; height: 26px; border-radius: 8px; background: var(--gradient); display: flex; align-items: center; justify-content: center; }
+	.toast em { font-style: normal; color: var(--text-3); font-weight: 600; }
+	.toast .btn { height: 26px; font-size: 12px; }
+</style>
+</head>
+<body>
+	<div class="bg"></div>
+	<div class="scrim"></div>
+
+	<div class="palette">
+		<div class="input"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>zoom<span class="caret"></span><span class="kbd">esc</span></div>
+		<div class="list">
+			<h5>Actions</h5>
+			<div class="item on"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M11 8v6M8 11h6"/></svg></span>Add zoom at playhead <span class="kbd">Z</span></div>
+			<div class="item"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg></span>Auto zoom on clicks <em>· Polish</em></div>
+			<div class="item"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4l16 16M20 4 4 20"/></svg></span>Remove all auto zooms</div>
+			<h5>Settings</h5>
+			<div class="item"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M4 12h16M12 4v16"/></svg></span>Zoom animation <em>· Mellow</em><span class="kbd">⌘2</span></div>
+			<div class="item"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span>Motion blur <em>· 50%</em></div>
+		</div>
+		<div class="footer"><span><span class="kbd">↑↓</span> Navigate</span><span><span class="kbd">↩</span> Run</span><span><span class="kbd">⌘/</span> All shortcuts</span></div>
+	</div>
+
+	<div class="popover">
+		<header><b><svg class="icon" viewBox="0 0 24 24" style="color:#B089F0"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.4 2.4M15.3 15.3l2.4 2.4M17.7 6.3l-2.4 2.4M8.7 15.3l-2.4 2.4"/></svg>Polish</b><p>Reads your clicks, typing, audio and screen changes, then edits the timeline. Everything stays editable — ⌘Z undoes it.</p></header>
+		<hr>
+		<div class="opt"><div>Smart zooms<small>Clicks, typing into fields, pans between</small></div><div class="toggle"></div></div>
+		<div class="opt"><div>Cut dead air<small>Nothing moving, nobody talking</small></div><div class="toggle"></div></div>
+		<div class="opt"><div>Speed up typing<small>Long typing with no voice-over</small></div><div class="toggle"></div></div>
+		<div class="opt"><div>Trim start and end</div><div class="toggle"></div></div>
+		<div class="opt"><div>Smooth cursor</div><div class="toggle off"></div></div>
+		<div class="slider"><div class="row">Max zoom<b>2.2×</b></div><div class="track"><i style="width:30%"></i><b style="left:30%"></b></div></div>
+		<div class="go"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>Polish recording</div>
+	</div>
+
+	<div class="toast"><span class="spark"><svg class="icon" viewBox="0 0 24 24" style="width:14px"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg></span>Claude added 4 zooms and cut 3 pauses <em>· 41s → 29s</em><span class="btn">Undo ⌘Z</span></div>
+</body>
+</html>

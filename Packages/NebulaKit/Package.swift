@@ -35,5 +35,6 @@ let package = Package(
 		.testTarget(name: "NebulaRenderTests", dependencies: ["NebulaRender"]),
 		.testTarget(name: "NebulaAudioTests", dependencies: ["NebulaAudio"]),
 		.testTarget(name: "NebulaMCPTests", dependencies: ["NebulaMCP"]),
+		.testTarget(name: "NebulaCaptionsTests", dependencies: ["NebulaCaptions", "NebulaCore"]),
 	]
 )
