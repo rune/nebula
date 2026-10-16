@@ -118,7 +118,7 @@ public enum PolishPlanner {
 
 	// MARK: - Typing
 
-	static func typingBursts(input: InputTrack, maxGap: Double) -> [TimeRange] {
+	public static func typingBursts(input: InputTrack, maxGap: Double) -> [TimeRange] {
 		let typing = input.keys.filter { $0.kind == .typing }.map(\.t).sorted()
 		var bursts: [TimeRange] = []
 		for t in typing {

@@ -12,10 +12,20 @@ public struct SceneLayout: Sendable {
 	public let videoSize: CGSize
 	let crop: NormRect
 
+	/// True when the recording covers the whole frame (no background, corners or shadow).
+	public let fillsCanvas: Bool
+
+	/// The frame's shape: the chosen ratio, or for `.auto` the screen's shape (window/area
+	/// recordings) or the recording's own shape (full-display recordings and imports).
+	public static func aspect(for project: Project) -> Double {
+		if let value = project.style.aspectRatio.value { return value }
+		if let screen = project.media.screen { return screen.aspect }
+		return project.media.aspect * project.style.crop.width / max(project.style.crop.height, 0.01)
+	}
+
 	/// Output size for a project at a given short-side resolution (even dimensions).
 	public static func canvasSize(for project: Project, shortSide: Int) -> CGSize {
-		let cropAspect = project.media.aspect * project.style.crop.width / max(project.style.crop.height, 0.01)
-		let aspect = project.style.aspectRatio.value ?? cropAspect
+		let aspect = aspect(for: project)
 		let short = Double(shortSide)
 		let size = aspect >= 1 ? CGSize(width: short * aspect, height: short) : CGSize(width: short, height: short / aspect)
 		return CGSize(width: (size.width / 2).rounded() * 2, height: (size.height / 2).rounded() * 2)
@@ -26,14 +36,36 @@ public struct SceneLayout: Sendable {
 		self.videoSize = CGSize(width: project.media.width, height: project.media.height)
 		self.crop = project.style.crop
 		let shortSide = min(canvas.width, canvas.height)
-		let pad = CGFloat(project.style.padding.clamped(to: 0...0.4)) * shortSide
-		let available = CGRect(origin: .zero, size: canvas).insetBy(dx: pad, dy: pad)
+		let padding = CGFloat(project.style.padding.clamped(to: 0...0.4))
 		let cropAspect = CGFloat(project.media.aspect * crop.width / max(crop.height, 0.01))
-		var size = available.size
-		if size.width / max(size.height, 1) > cropAspect {
-			size.width = size.height * cropAspect
+
+		var size: CGSize
+		if project.style.placement == .original, let screen = project.media.screen {
+			// The screen as it appears in the frame, then the window at its real share of it.
+			let screenAspect = CGFloat(screen.aspect)
+			var screenSize = canvas
+			if canvas.width / max(canvas.height, 1) > screenAspect {
+				screenSize.width = canvas.height * screenAspect
+			} else {
+				screenSize.height = canvas.width / screenAspect
+			}
+			size = CGSize(
+				width: screenSize.width * CGFloat(screen.captureRect.width * crop.width),
+				height: screenSize.height * CGFloat(screen.captureRect.height * crop.height)
+			)
+			let shrink = max(0.2, 1 - 2 * padding)
+			size = CGSize(width: size.width * shrink, height: size.height * shrink)
+			// Never larger than the frame (e.g. a big window in a vertical frame).
+			let limit = min(canvas.width * 0.96 / max(size.width, 1), canvas.height * 0.96 / max(size.height, 1), 1)
+			size = CGSize(width: size.width * limit, height: size.height * limit)
 		} else {
-			size.height = size.width / cropAspect
+			let pad = padding * shortSide
+			size = CGRect(origin: .zero, size: canvas).insetBy(dx: pad, dy: pad).size
+			if size.width / max(size.height, 1) > cropAspect {
+				size.width = size.height * cropAspect
+			} else {
+				size.height = size.width / cropAspect
+			}
 		}
 		content = CGRect(
 			x: ((canvas.width - size.width) / 2).rounded(),
@@ -41,7 +73,8 @@ public struct SceneLayout: Sendable {
 			width: size.width.rounded(),
 			height: size.height.rounded()
 		)
-		cornerRadius = CGFloat(project.style.cornerRadius.clamped(to: 0...0.1)) * shortSide
+		fillsCanvas = content.width >= canvas.width - 2 && content.height >= canvas.height - 2
+		cornerRadius = fillsCanvas ? 0 : CGFloat(project.style.cornerRadius.clamped(to: 0...0.1)) * shortSide
 	}
 
 	/// The part of the recording shown for a camera state, in normalized (top-left) coordinates.

@@ -19,6 +19,8 @@ public struct ProjectBundle: Sendable, Hashable {
 	static let inputFileName = "input.json"
 	public static let thumbnailFileName = "thumbnail.jpg"
 	public static let mediaFolderName = "media"
+	/// The desktop wallpaper captured at the start of a recording, inside `media/`.
+	public static let desktopFileName = "desktop.jpg"
 
 	public let url: URL
 

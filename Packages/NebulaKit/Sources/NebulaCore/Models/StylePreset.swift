@@ -52,25 +52,28 @@ public struct StylePreset: Codable, Hashable, Sendable, Identifiable {
 
 	public static let builtIn: [StylePreset] = [
 		StylePreset(
-			name: "Nebula",
-			style: Style(),
+			id: UUID(uuidString: "6A1C2F7E-0000-4000-8000-000000000001")!,
+			name: "Real desktop",
+			style: Style(background: .desktop, placement: .original),
 			camera: CameraSettings(),
 			cursor: CursorSettings(),
 			shortcutOverlay: ShortcutOverlaySettings()
 		),
 		StylePreset(
-			name: "Minimal",
-			style: Style(background: .color(ColorValue(hex: "#0B0B0F")!), padding: 0.05, cornerRadius: 0.012, shadow: ShadowStyle(opacity: 0.35)),
+			id: UUID(uuidString: "6A1C2F7E-0000-4000-8000-000000000002")!,
+			name: "Clean",
+			style: Style(background: .color(ColorValue(hex: "#0B0B0F")!), placement: .fit, padding: 0.05, cornerRadius: 0.014, shadow: ShadowStyle(opacity: 0.35)),
 			camera: CameraSettings(preset: .quick, motionBlur: 0.3),
 			cursor: CursorSettings(size: 1.4, clickEffect: .circle),
 			shortcutOverlay: ShortcutOverlaySettings()
 		),
 		StylePreset(
-			name: "Social",
-			style: Style(background: .wallpaper("dusk"), padding: 0.09, cornerRadius: 0.03, aspectRatio: .vertical),
-			camera: CameraSettings(preset: .mellow, motionBlur: 0.6),
+			id: UUID(uuidString: "6A1C2F7E-0000-4000-8000-000000000003")!,
+			name: "Vertical",
+			style: Style(background: .desktop, backgroundBlur: 0.4, placement: .fit, padding: 0.04, cornerRadius: 0.025, aspectRatio: .vertical),
+			camera: CameraSettings(preset: .mellow, motionBlur: 0.4),
 			cursor: CursorSettings(size: 2.2),
-			shortcutOverlay: ShortcutOverlaySettings(size: 0.06)
+			shortcutOverlay: ShortcutOverlaySettings(size: 0.05)
 		),
 	]
 }

@@ -59,6 +59,26 @@ struct RenderTests {
 		#expect(zoomed.maxX <= 1 + 1e-9 && zoomed.maxY <= 1 + 1e-9 && abs(zoomed.width - 0.5) < 1e-9)
 	}
 
+	@Test func windowRecordingKeepsItsOnScreenSizeOnAScreenShapedFrame() {
+		// A 1200×800 pt window on a 1512×982 pt screen (Retina ×2).
+		var project = Project(name: "Window", media: MediaInfo(duration: 2, width: 2400, height: 1600))
+		project.media.screen = ScreenGeometry(width: 3024, height: 1964, captureRect: NormRect(x: 0.1, y: 0.09, width: 1200 / 1512, height: 800 / 982))
+		let canvas = SceneLayout.canvasSize(for: project, shortSide: 1964)
+		#expect(abs(canvas.width / canvas.height - 3024.0 / 1964.0) < 0.01)
+		let layout = SceneLayout(project: project, canvas: canvas)
+		#expect(abs(layout.content.width - 2400) <= 2)
+		#expect(abs(layout.content.midX - canvas.width / 2) <= 1)
+		#expect(!layout.fillsCanvas)
+	}
+
+	@Test func fullDisplayRecordingFillsTheFrame() {
+		let project = Project(name: "Display", media: MediaInfo(duration: 2, width: 3024, height: 1964))
+		let canvas = SceneLayout.canvasSize(for: project, shortSide: 1080)
+		let layout = SceneLayout(project: project, canvas: canvas)
+		#expect(layout.fillsCanvas)
+		#expect(layout.cornerRadius == 0)
+	}
+
 	@Test func composedFrameHasRecordingOverBackground() throws {
 		var project = testProject()
 		project.style.background = .color(ColorValue(hex: "#FF0000")!)

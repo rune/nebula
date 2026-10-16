@@ -117,18 +117,16 @@ public enum OpenScreenImporter {
 
 	private static func importStyle(_ editor: OSEditor) -> Style {
 		var style = Style()
+		style.placement = .fit
 		if let wallpaper = editor.wallpaper {
 			if let color = ColorValue(hex: wallpaper) {
 				style.background = .color(color)
-			} else if wallpaper.hasPrefix("/wallpapers/wallpaper"),
-				let number = Int(wallpaper.filter(\.isNumber)) {
-				let ids = BuiltInWallpapers.ids
-				style.background = .wallpaper(ids[(number - 1) % ids.count])
 			} else if wallpaper.hasPrefix("file://"), let url = URL(string: wallpaper) {
 				style.background = .image(path: url.path)
-			} else if wallpaper.hasPrefix("/") {
+			} else if wallpaper.hasPrefix("/"), !wallpaper.hasPrefix("/wallpapers/") {
 				style.background = .image(path: wallpaper)
 			}
+			// OpenScreen's bundled wallpapers aren't available; keep the neutral default.
 		}
 		// OpenScreen's padding 0–100 shrinks the recording to 100–60% of the canvas.
 		style.padding = ((editor.padding ?? 50) / 100 * 0.2).clamped(to: 0...0.4)

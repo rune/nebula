@@ -68,6 +68,7 @@ struct ProjectBundleTests {
 		project.zooms = [ZoomItem(range: TimeRange(start: 1, end: 3), target: .rect(NormRect(x: 0.1, y: 0.1, width: 0.3, height: 0.1)))]
 		project.annotations = [AnnotationItem(range: TimeRange(start: 0, end: 2), kind: .text(TextAnnotation(text: "Hi", position: .center)))]
 		project.style.background = .gradient(GradientFill(colors: [.violet, .black]))
+		project.media.screen = ScreenGeometry(width: 3024, height: 1964, captureRect: NormRect(x: 0.1, y: 0.1, width: 0.6, height: 0.7))
 		try bundle.write(project)
 		try bundle.write(InputTrack(cursor: [CursorSample(t: 0, x: 0.5, y: 0.5)]))
 		#expect(try bundle.readProject() == project)
@@ -117,7 +118,8 @@ struct OpenScreenImportTests {
 		#expect(project.annotations.count == 1)
 		#expect(project.masks.first?.kind == .pixelate(amount: 0.6))
 		#expect(project.style.aspectRatio == .wide)
-		#expect(project.style.background == .wallpaper(BuiltInWallpapers.ids[2]))
+		#expect(project.style.background == Style().background)
+		#expect(project.style.placement == .fit)
 		#expect(result.input.cursor.count == 3)
 		#expect(result.input.clicks.count == 1)
 		#expect(result.input.clicks.first?.upT == 0.15)

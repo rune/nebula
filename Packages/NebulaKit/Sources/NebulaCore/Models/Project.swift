@@ -79,6 +79,8 @@ public struct MediaInfo: Codable, Hashable, Sendable {
 	public var height: Int
 	public var frameRate: Double
 	public var hasSystemAudio: Bool
+	/// For window and area recordings: the screen they were on and where they sat on it.
+	public var screen: ScreenGeometry?
 
 	public init(
 		videoFile: String = ProjectBundle.videoFileName,
@@ -87,7 +89,8 @@ public struct MediaInfo: Codable, Hashable, Sendable {
 		width: Int,
 		height: Int,
 		frameRate: Double = 60,
-		hasSystemAudio: Bool = false
+		hasSystemAudio: Bool = false,
+		screen: ScreenGeometry? = nil
 	) {
 		self.videoFile = videoFile
 		self.microphoneFile = microphoneFile
@@ -96,8 +99,26 @@ public struct MediaInfo: Codable, Hashable, Sendable {
 		self.height = height
 		self.frameRate = frameRate
 		self.hasSystemAudio = hasSystemAudio
+		self.screen = screen
 	}
 
 	public var hasMicrophone: Bool { microphoneFile != nil }
+	public var aspect: Double { Double(width) / Double(max(height, 1)) }
+}
+
+/// The screen a window or area recording came from.
+public struct ScreenGeometry: Codable, Hashable, Sendable {
+	/// Screen size in pixels.
+	public var width: Int
+	public var height: Int
+	/// The recorded window or area within the screen, normalized.
+	public var captureRect: NormRect
+
+	public init(width: Int, height: Int, captureRect: NormRect) {
+		self.width = width
+		self.height = height
+		self.captureRect = captureRect
+	}
+
 	public var aspect: Double { Double(width) / Double(max(height, 1)) }
 }

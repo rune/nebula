@@ -2,6 +2,7 @@ import AppKit
 import AVFoundation
 import CoreMedia
 import Foundation
+import ImageIO
 import NebulaCore
 import os
 @preconcurrency import ScreenCaptureKit
@@ -29,6 +30,10 @@ public struct RecordingResult: Sendable {
 	public var duration: Double
 	public var pixelSize: CGSize
 	public var input: InputTrack
+	/// For window/area recordings: the screen and where the recording sat on it.
+	public var screen: ScreenGeometry?
+	/// JPEG of the desktop wallpaper (no icons, no windows) captured when recording started.
+	public var desktopJPEG: Data?
 }
 
 public enum RecorderError: LocalizedError {
@@ -69,6 +74,8 @@ public final class ScreenRecorder: NSObject, @unchecked Sendable {
 	private var videoURL: URL?
 	private var micURL: URL?
 	private var pixelSize: CGSize = .zero
+	private var screen: ScreenGeometry?
+	private var desktopJPEG: Data?
 
 	// Timing (host clock). Guarded by `lock`.
 	private var startTime: CMTime = .invalid
@@ -107,6 +114,25 @@ public final class ScreenRecorder: NSObject, @unchecked Sendable {
 			throw RecorderError.permissionDenied
 		}
 		let (filter, captureRect) = try makeFilter(options: options, content: content)
+		let display = displayContaining(captureRect, options: options, content: content)
+		desktopJPEG = await Self.captureWallpaper(display: display, content: content)
+		screen = nil
+		if case .display = options.source {
+			// A full-display recording is the whole screen; no geometry needed.
+		} else if let display {
+			let bounds = CGDisplayBounds(display.displayID)
+			let scaleFactor = Double(SCShareableContent.info(for: SCContentFilter(display: display, excludingWindows: [])).pointPixelScale)
+			screen = ScreenGeometry(
+				width: Int(bounds.width * scaleFactor),
+				height: Int(bounds.height * scaleFactor),
+				captureRect: NormRect(
+					x: (captureRect.minX - bounds.minX) / bounds.width,
+					y: (captureRect.minY - bounds.minY) / bounds.height,
+					width: captureRect.width / bounds.width,
+					height: captureRect.height / bounds.height
+				)
+			)
+		}
 		let info = SCShareableContent.info(for: filter)
 		let scale = Double(info.pointPixelScale)
 		let pointSize = captureRect.size
@@ -219,7 +245,9 @@ public final class ScreenRecorder: NSObject, @unchecked Sendable {
 			microphoneURL: micURL,
 			duration: duration,
 			pixelSize: pixelSize,
-			input: input
+			input: input,
+			screen: screen,
+			desktopJPEG: desktopJPEG
 		)
 	}
 
@@ -264,6 +292,39 @@ public final class ScreenRecorder: NSObject, @unchecked Sendable {
 			guard let window = content.windows.first(where: { $0.windowID == id }) else { throw RecorderError.sourceUnavailable }
 			return (SCContentFilter(desktopIndependentWindow: window), window.frame)
 		}
+	}
+
+	/// The display a recording happens on.
+	private func displayContaining(_ rect: CGRect, options: RecordingOptions, content: SCShareableContent) -> SCDisplay? {
+		switch options.source {
+		case .display(let id), .area(let id, _):
+			return content.displays.first { $0.displayID == id }
+		case .window:
+			let center = CGPoint(x: rect.midX, y: rect.midY)
+			return content.displays.first { CGDisplayBounds($0.displayID).contains(center) } ?? content.displays.first
+		}
+	}
+
+	/// The desktop picture as macOS draws it (dynamic wallpapers included), without icons or windows.
+	private static func captureWallpaper(display: SCDisplay?, content: SCShareableContent) async -> Data? {
+		guard let display else { return nil }
+		let desktopLevel = Int(CGWindowLevelForKey(.desktopWindow))
+		let wallpaper = content.windows.filter { window in
+			window.windowLayer == desktopLevel
+				|| (window.owningApplication?.bundleIdentifier == "com.apple.dock" && (window.title ?? "").hasPrefix("Wallpaper"))
+		}
+		guard !wallpaper.isEmpty else { return nil }
+		let filter = SCContentFilter(display: display, including: wallpaper)
+		let config = SCStreamConfiguration()
+		let scale = SCShareableContent.info(for: filter).pointPixelScale
+		config.width = Int(display.frame.width * CGFloat(scale))
+		config.height = Int(display.frame.height * CGFloat(scale))
+		config.showsCursor = false
+		guard let image = try? await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config) else { return nil }
+		let data = NSMutableData()
+		guard let destination = CGImageDestinationCreateWithData(data, "public.jpeg" as CFString, 1, nil) else { return nil }
+		CGImageDestinationAddImage(destination, image, [kCGImageDestinationLossyCompressionQuality: 0.9] as CFDictionary)
+		return CGImageDestinationFinalize(destination) ? data as Data : nil
 	}
 
 	// MARK: - Samples

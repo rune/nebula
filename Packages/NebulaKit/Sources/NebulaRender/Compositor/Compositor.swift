@@ -30,7 +30,7 @@ public final class Compositor: Sendable {
 
 		// Shadow under the recording.
 		let shadow = project.style.shadow
-		if shadow.opacity > 0.001 {
+		if shadow.opacity > 0.001, !layout.fillsCanvas {
 			let radius = CGFloat(shadow.radius) * shortSide
 			let shape = roundedRect(layout.content, radius: layout.cornerRadius, color: CIColor(red: 0, green: 0, blue: 0, alpha: CGFloat(shadow.opacity)))
 			let blurred = shape
@@ -60,7 +60,7 @@ public final class Compositor: Sendable {
 		])
 		frame = video.composited(over: frame)
 
-		if project.style.inset > 0.0005 {
+		if project.style.inset > 0.0005, !layout.fillsCanvas {
 			let width = CGFloat(project.style.inset) * shortSide
 			let stroke = CIFilter.roundedRectangleStrokeGenerator()
 			stroke.extent = layout.content.insetBy(dx: width / 2, dy: width / 2)

@@ -35,36 +35,17 @@ public final class BackgroundRenderer: Sendable {
 			return CIImage(color: color.ciColor).cropped(to: rect)
 		case .gradient(let fill):
 			image = drawGradient(fill, size: size) ?? CIImage(color: .black).cropped(to: rect)
-		case .wallpaper(let id):
-			image = drawWallpaper(BuiltInWallpapers.spec(id: id), size: size) ?? CIImage(color: .black).cropped(to: rect)
 		case .image(let path):
 			let url = path.hasPrefix("/") ? URL(fileURLWithPath: path) : bundleURL?.appending(path: path)
-			image = url.flatMap { aspectFill(url: $0, size: size) } ?? CIImage(color: .black).cropped(to: rect)
+			// A missing image (e.g. a recording made without a desktop capture) falls back to near-black.
+			image = url.flatMap { aspectFill(url: $0, size: size) }
+				?? CIImage(color: CIColor(red: 0.043, green: 0.043, blue: 0.059)).cropped(to: rect)
 		}
 		if blur > 0.001 {
 			let radius = blur * Double(min(size.width, size.height)) * 0.04
 			image = image.clampedToExtent().applyingGaussianBlur(sigma: radius).cropped(to: rect)
 		}
 		return image
-	}
-
-	/// Soft colour fields on a dark base with a touch of grain, so gradients don't band.
-	static func drawWallpaper(_ spec: WallpaperSpec, size: CGSize) -> CIImage? {
-		let drawn = TextArtwork.draw(size: size) { context in
-			context.setFillColor(spec.base.cgColor)
-			context.fill(CGRect(origin: .zero, size: size))
-			let longSide = max(size.width, size.height)
-			for blob in spec.blobs {
-				let center = CGPoint(x: blob.center.x * size.width, y: (1 - blob.center.y) * size.height)
-				let radius = blob.radius * longSide
-				let colors = [blob.color.withAlpha(0.95).cgColor, blob.color.withAlpha(0.35).cgColor, blob.color.withAlpha(0).cgColor] as CFArray
-				guard let gradient = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB), colors: colors, locations: [0, 0.45, 1]) else { continue }
-				context.setBlendMode(.screen)
-				context.drawRadialGradient(gradient, startCenter: center, startRadius: 0, endCenter: center, endRadius: radius, options: [])
-			}
-		}
-		guard let base = drawn?.image else { return nil }
-		return addGrain(to: base, size: size)
 	}
 
 	static func drawGradient(_ fill: GradientFill, size: CGSize) -> CIImage? {
