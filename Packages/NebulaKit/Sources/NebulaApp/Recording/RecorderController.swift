@@ -117,6 +117,12 @@ public final class RecorderController {
 				try? await Task.sleep(for: .seconds(1))
 				if Task.isCancelled { return }
 			}
+			if seconds <= 0 {
+				// Let the control pill appear before capture starts, so it is left out of the recording.
+				self.phase = .countdown(0)
+				try? await Task.sleep(for: .milliseconds(150))
+				if Task.isCancelled { return }
+			}
 			await self.beginCapture(source: source)
 		}
 	}

@@ -18,6 +18,13 @@ public final class PreviewEngine {
 	public private(set) var isPlaying = false
 	public private(set) var isReady = false
 	public private(set) var playable: PlayableComposition?
+	/// Playback speed in the editor (does not affect export).
+	public var playbackRate: Float = 1 {
+		didSet {
+			player.defaultRate = playbackRate
+			if isPlaying { player.rate = playbackRate }
+		}
+	}
 
 	@ObservationIgnored private var timeObserver: Any?
 	@ObservationIgnored private var buildTask: Task<Void, Never>?
@@ -98,6 +105,7 @@ public final class PreviewEngine {
 
 	public func play() {
 		if currentTime >= duration - 0.05 { seek(to: 0) }
+		player.defaultRate = playbackRate
 		player.play()
 		isPlaying = true
 	}

@@ -24,6 +24,7 @@ public final class AppModel {
 	/// The project in the frontmost editor window.
 	public var activeStoreURL: URL?
 	public var showCommandPalette = false
+	public var showExportSheet = false
 	public var lastError: String?
 	public let mcp: MCPController
 

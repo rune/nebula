@@ -10,7 +10,7 @@ Nebula is a native macOS screen recorder and editor for polished product demos. 
 
 | Area | Behaviour |
 | --- | --- |
-| Sources | Full display, a single window, or a dragged area. Window mode can resize the window to a preset size (1280×720, 1920×1080, 1080×1920 …) before recording. |
+| Sources | Full display, a single window, or a dragged area. The desktop wallpaper is captured with the recording, so it can be the background later. |
 | Quality | Native pixel resolution (Retina), 60 fps, HEVC in a fragmented `.mov`. Cursor is **not** baked in; it is recorded separately and drawn in post. |
 | Audio | Microphone (device picker) and system audio, captured as separate tracks. |
 | Flow | Menu-bar icon or global hotkey (⌥⌘↵) opens the recording bar → choose source → 3-second countdown → floating control widget (timer, pause/resume, restart, discard, finish) → project opens in the editor, with a quick-export widget. |
@@ -45,8 +45,8 @@ Everything Polish adds is undoable as one step, and every setting it uses is con
   - Audio: waveform, per-section volume.
   - Music.
 - **Look:**
-  - Background: built-in wallpapers, macOS wallpapers, gradient, solid colour or your own image, with optional blur.
-  - Frame: padding, inset, corner radius, shadow.
+  - Background: by default the real desktop that was behind the recording. Window and area recordings sit at their true on-screen size on a frame shaped like the screen ("As on screen"); full-display recordings fill the frame with no background. Alternatives: any macOS wallpaper, a colour or gradient, or your own image, with optional blur.
+  - Frame: As on screen (with a scale) or Fit with padding; corner radius, shadow.
   - Crop.
   - Aspect ratio: Auto, 16:9, 9:16, 1:1, 4:3, 4:5.
 - **Camera:** spring presets (Slow / Mellow / Quick / Rapid / Custom tension and friction) and motion blur strength.
@@ -58,7 +58,7 @@ Everything Polish adds is undoable as one step, and every setting it uses is con
   - background music with automatic ducking under speech
   - mic noise reduction
 - **Workflow:**
-  - ⌘K command palette and full keyboard shortcuts (⌘/ shows them)
+  - ⌘K command palette and single-key editing shortcuts (Space, Z, C, S, M, T, A, ←/→)
   - style presets
   - project library
   - import `.openscreen` projects
@@ -75,5 +75,5 @@ Everything Polish adds is undoable as one step, and every setting it uses is con
 - Nebula runs a local MCP server (Streamable HTTP, `127.0.0.1:39351/mcp`, local connections only).
 - Tools edit the open project live: every change is undoable with ⌘Z and shown in a toast.
 - Tools can also run Polish with options, generate captions, render preview frames and export.
-- Tools can start, pause and stop recordings, after the user confirms the first one in each session.
+- Tools can start and stop recordings. Settings decide whether Nebula asks first, always allows or never allows this.
 - The MCP server and the UI drive the **same actions**, described in [ARCHITECTURE.md](ARCHITECTURE.md).

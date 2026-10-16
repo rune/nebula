@@ -95,7 +95,7 @@ enum MCPTools {
 	// MARK: - Reading
 
 	static let status = MCPTool(name: "status", title: "Status", description: "What Nebula is doing: open projects, the frontmost editor, recording state.", readOnly: true) { _ in
-		try await MainActor.run {
+		await MainActor.run {
 			.json(StatusSummary(
 				openProjects: app.stores.values.map(\.project.name),
 				frontmost: app.activeStore?.project.name,
@@ -232,7 +232,7 @@ enum MCPTools {
 		options.deadAirMinimum = args["dead_air_minimum"]?.doubleValue ?? options.deadAirMinimum
 		options.typingSpeed = args["typing_speed"]?.doubleValue ?? options.typingSpeed
 		let plan = try await store.polish(options: options, source: .assistant)
-		return try await MainActor.run { .json(EditResult(summary: "Polish: \(plan.summary)", project: ProjectSummary(store))) }
+		return await MainActor.run { .json(EditResult(summary: "Polish: \(plan.summary)", project: ProjectSummary(store))) }
 	}
 
 	static let addZoom = MCPTool(

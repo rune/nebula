@@ -1,0 +1,67 @@
+name: Nebula
+options:
+  bundleIdPrefix: app.nebula
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+  indentWidth: 4
+  tabWidth: 4
+  usesTabs: true
+
+packages:
+  NebulaKit:
+    path: Packages/NebulaKit
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: 28934CQZVB
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: YES
+    DEAD_CODE_STRIPPING: YES
+
+targets:
+  Nebula:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+    dependencies:
+      - package: NebulaKit
+        product: NebulaApp
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Nebula
+        CFBundleName: Nebula
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.video
+        LSMinimumSystemVersion: "15.0"
+        NSHumanReadableCopyright: Copyright © 2026 Soham Samal. MIT License.
+        NSMicrophoneUsageDescription: Nebula records your voice with your screen recordings.
+        NSScreenCaptureUsageDescription: Nebula records your screen.
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Nebula Project
+            CFBundleTypeRole: Editor
+            LSHandlerRank: Owner
+            LSTypeIsPackage: true
+            LSItemContentTypes: [app.nebula.project]
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: app.nebula.project
+            UTTypeDescription: Nebula Project
+            UTTypeConformsTo: [com.apple.package, public.composite-content]
+            UTTypeTagSpecification:
+              public.filename-extension: [nebula]
+    entitlements:
+      path: App/Nebula.entitlements
+      properties:
+        com.apple.security.device.audio-input: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.nebula.Nebula
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_LSUIElement: NO
+        COMBINE_HIDPI_IMAGES: YES
