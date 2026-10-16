@@ -191,8 +191,8 @@ struct TimelineView: View {
 							.lineLimit(1)
 							.padding(.horizontal, 8)
 							.frame(width: max(out.duration * pps - 2, 4), height: Row.lane - 4, alignment: .leading)
-							.background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Theme.surface2))
-							.overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(Theme.hairlineStrong))
+							.background(RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous).fill(Theme.surface2))
+							.overlay(RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous).strokeBorder(Theme.hairlineStrong))
 							.clipped()
 							.offset(x: out.start * pps + 1, y: 2)
 							.onTapGesture { store.preview.seek(to: out.start) }
@@ -233,7 +233,7 @@ private struct ClipTrack: View {
 	var body: some View {
 		let clips = store.project.clips
 		ZStack(alignment: .topLeading) {
-			RoundedRectangle(cornerRadius: 7, style: .continuous)
+			RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous)
 				.fill(Theme.surface1)
 				.contentShape(Rectangle())
 				.onTapGesture { store.selectClip(nil) }
@@ -276,7 +276,7 @@ private struct ClipView: View {
 						}
 						.padding(.horizontal, 5)
 						.frame(height: 16)
-						.background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(Theme.trackSpeed))
+						.background(RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous).fill(Theme.trackSpeed))
 					}
 					if width > 90 {
 						Text(Format.time(clip.outputDuration))
@@ -290,9 +290,9 @@ private struct ClipView: View {
 			}
 		}
 		.frame(width: width, height: height)
-		.clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+		.clipShape(RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous))
 		.overlay(
-			RoundedRectangle(cornerRadius: 6, style: .continuous)
+			RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous)
 				.strokeBorder(selected ? Theme.lavender : sped ? Theme.trackSpeed.opacity(0.8) : hovering ? Color.white.opacity(0.22) : Theme.hairlineStrong, lineWidth: selected ? 2 : 1)
 		)
 		.overlay(alignment: .leading) { trimHandle(.start, selected: selected) }
@@ -469,7 +469,7 @@ private struct TrackLane<Content: View>: View {
 
 	var body: some View {
 		ZStack(alignment: .topLeading) {
-			RoundedRectangle(cornerRadius: 7, style: .continuous)
+			RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous)
 				.fill(Theme.surface1)
 				.contentShape(Rectangle())
 				.gesture(SpatialTapGesture().onEnded { tap in
@@ -531,7 +531,7 @@ private struct PlayheadView: View {
 				.foregroundStyle(Theme.window)
 				.padding(.horizontal, 6)
 				.frame(height: 18)
-				.background(RoundedRectangle(cornerRadius: 5, style: .continuous).fill(Theme.text1))
+				.background(RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous).fill(Theme.text1))
 				.fixedSize()
 		}
 		.frame(width: 60)
@@ -573,8 +573,8 @@ private struct TimelineBlock: View {
 		.foregroundStyle(tint == Theme.trackNote ? Theme.text1 : selected ? .white : Color.white.opacity(0.88))
 		.padding(.horizontal, 8)
 		.frame(width: width, height: height, alignment: .leading)
-		.background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(tint.opacity(selected ? 0.42 : 0.24)))
-		.overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(selected ? Theme.lavender : tint.opacity(0.5), lineWidth: selected ? 1.5 : 1))
+		.background(RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous).fill(tint.opacity(selected ? 0.42 : 0.24)))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous).strokeBorder(selected ? Theme.lavender : tint.opacity(0.5), lineWidth: selected ? 1.5 : 1))
 		.clipped()
 		.contentShape(Rectangle())
 		.overlay(alignment: .leading) { edgeHandle(.start, output: output) }

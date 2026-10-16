@@ -51,7 +51,7 @@ public struct LibraryView: View {
 		} isTargeted: { dropTargeted = $0 }
 		.overlay {
 			if dropTargeted {
-				RoundedRectangle(cornerRadius: 14, style: .continuous)
+				RoundedRectangle(cornerRadius: Theme.radius, style: .continuous)
 					.strokeBorder(Theme.violetLine, style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
 					.padding(8)
 					.allowsHitTesting(false)
@@ -128,8 +128,8 @@ public struct LibraryView: View {
 			}
 			.padding(.horizontal, 12)
 			.frame(width: 300, height: 32)
-			.background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Theme.surface1))
-			.overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).strokeBorder(Theme.hairlineStrong))
+			.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface1))
+			.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
 			Spacer()
 			Button {
 				ImportPanel.run(app: app)
@@ -206,8 +206,8 @@ private struct SidebarRow: View {
 		.foregroundStyle(selected ? Theme.text1 : Theme.text2)
 		.padding(.horizontal, 10)
 		.frame(height: 34)
-		.background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(selected ? Theme.surface3 : hovering ? Theme.surface2 : .clear))
-		.overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(selected ? Theme.hairlineStrong : .clear))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(selected ? Theme.surface3 : hovering ? Theme.surface2 : .clear))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(selected ? Theme.hairlineStrong : .clear))
 		.contentShape(Rectangle())
 		.onHover { hovering = $0 }
 		.onTapGesture(perform: action)
@@ -263,7 +263,7 @@ private struct ProjectCard: View {
 					.foregroundStyle(Theme.text1)
 					.padding(.horizontal, 7)
 					.padding(.vertical, 3)
-					.background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.black.opacity(0.7)))
+					.background(RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous).fill(Color.black.opacity(0.7)))
 					.padding(10)
 			}
 			.frame(height: 170)
@@ -274,9 +274,9 @@ private struct ProjectCard: View {
 			}
 			.padding(14)
 		}
-		.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.surface1))
-		.clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-		.overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(hovering ? Theme.violetLine : Theme.hairline, lineWidth: hovering ? 1.5 : 1))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface1))
+		.clipShape(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(hovering ? Theme.violetLine : Theme.hairline, lineWidth: hovering ? 1.5 : 1))
 		.contentShape(Rectangle())
 		.onHover { value in withAnimation(Theme.snappy) { hovering = value } }
 		.onTapGesture { app.open(entry.bundle.url) }
@@ -299,14 +299,14 @@ private struct NewRecordingTile: View {
 				.font(.system(size: 20, weight: .semibold))
 				.foregroundStyle(.white)
 				.frame(width: 48, height: 48)
-				.background(RoundedRectangle(cornerRadius: 13, style: .continuous).fill(Theme.gradient))
+				.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.gradient))
 			Text("New recording").font(.nebula(13.5, 700)).foregroundStyle(Theme.text1)
 			Text("or drop a video / .openscreen project here").font(.nebula(12, 550)).foregroundStyle(Theme.text3)
 		}
 		.frame(maxWidth: .infinity)
 		.frame(height: 240)
-		.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(hovering ? Theme.surface1 : .clear))
-		.overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.hairlineStrong, style: StrokeStyle(lineWidth: 1, dash: [6, 5])))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(hovering ? Theme.surface1 : .clear))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong, style: StrokeStyle(lineWidth: 1, dash: [6, 5])))
 		.contentShape(Rectangle())
 		.onHover { hovering = $0 }
 		.onTapGesture { app.recorder.showPicker() }
@@ -364,7 +364,7 @@ private struct MCPStatusCard: View {
 		}
 		.padding(12)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Theme.surface2))
-		.overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Theme.hairline))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface2))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairline))
 	}
 }

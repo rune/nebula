@@ -39,7 +39,7 @@ public struct SettingsView: View {
 					.foregroundStyle(tab == item ? Theme.text1 : Theme.text2)
 					.padding(.horizontal, 10)
 					.frame(height: 32)
-					.background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(tab == item ? Theme.surface3 : .clear))
+					.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(tab == item ? Theme.surface3 : .clear))
 					.contentShape(Rectangle())
 					.onTapGesture { tab = item }
 				}
@@ -169,7 +169,7 @@ private struct ClaudeSettings: View {
 					.textSelection(.enabled)
 					.padding(12)
 					.frame(maxWidth: .infinity, alignment: .leading)
-					.background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Theme.surface2))
+					.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface2))
 				Button(copied ? "Copied" : "Copy command") {
 					NSPasteboard.general.clearContents()
 					NSPasteboard.general.setString(app.mcp.setupCommand, forType: .string)
@@ -243,8 +243,8 @@ private struct PermissionRow: View {
 			}
 		}
 		.padding(12)
-		.background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Theme.surface1))
-		.overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Theme.hairline))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface1))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairline))
 	}
 }
 

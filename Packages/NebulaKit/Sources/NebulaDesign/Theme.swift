@@ -38,9 +38,15 @@ public enum Theme {
 	public static let trackNote = Color(hex: 0xE6E3F0)
 
 	// MARK: Shape
-	public static let radiusS: CGFloat = 7
-	public static let radiusM: CGFloat = 10
-	public static let radiusL: CGFloat = 14
+	/// The one corner radius for boxes: buttons, fields, chips, tiles, cards, panels, sheets.
+	public static let radius: CGFloat = 12
+	/// For a highlight inset 3 pt inside a `radius` box, so the two curves stay concentric.
+	public static let radiusInner: CGFloat = 9
+	/// Only for tiny items: timeline blocks, keycaps, badges, handles.
+	public static let radiusSmall: CGFloat = 6
+	public static let radiusS: CGFloat = radiusSmall
+	public static let radiusM: CGFloat = radius
+	public static let radiusL: CGFloat = radius
 
 	// MARK: Motion
 	public static let snappy = Animation.spring(response: 0.28, dampingFraction: 0.86)

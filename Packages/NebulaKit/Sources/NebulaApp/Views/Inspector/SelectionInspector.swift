@@ -206,8 +206,8 @@ private struct FocusPicker: View {
 			})
 		}
 		.aspectRatio(aspect, contentMode: .fit)
-		.clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-		.overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(Theme.hairlineStrong))
+		.clipShape(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
 		.task(id: zoom.id) {
 			let middle = (zoom.range.start + zoom.range.end) / 2
 			frame = try? await FrameGrabber.sourceFrame(video: store.videoURL, at: middle, maxWidth: 640)

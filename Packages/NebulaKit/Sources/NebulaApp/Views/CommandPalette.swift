@@ -116,9 +116,9 @@ private struct CommandPaletteView: View {
 			.padding(.horizontal, 16)
 			.frame(height: 36)
 		}
-		.background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Theme.surface1))
-		.overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Theme.hairlineStrong))
-		.clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface1))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
+		.clipShape(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous))
 		.padding(1)
 		.onAppear { focused = true }
 		.onChange(of: query) { index = 0 }
@@ -162,7 +162,7 @@ private struct CommandRow: View {
 				.font(.system(size: 13, weight: .medium))
 				.foregroundStyle(selected ? Theme.lavender : Theme.text2)
 				.frame(width: 28, height: 28)
-				.background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(selected ? Theme.violetSoft : Theme.surface2))
+				.background(RoundedRectangle(cornerRadius: Theme.radiusInner, style: .continuous).fill(selected ? Theme.violetSoft : Theme.surface2))
 			Text(action.title).font(.nebula(13.5, 650)).foregroundStyle(action.isEnabled ? Theme.text1 : Theme.text3)
 			Spacer()
 			Text(action.group.rawValue).font(.nebula(11.5, 600)).foregroundStyle(Theme.text3)
@@ -170,7 +170,7 @@ private struct CommandRow: View {
 		}
 		.padding(.horizontal, 10)
 		.frame(height: 42)
-		.background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(selected ? Theme.surface3 : .clear))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(selected ? Theme.surface3 : .clear))
 		.contentShape(Rectangle())
 	}
 }

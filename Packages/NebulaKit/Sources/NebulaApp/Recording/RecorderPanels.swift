@@ -223,8 +223,8 @@ private struct RecorderBar: View {
 					.foregroundStyle(Color(hex: 0xFF8FA3))
 					.padding(.horizontal, 12)
 					.padding(.vertical, 6)
-					.background(Capsule().fill(Theme.surface1))
-					.overlay(Capsule().strokeBorder(Theme.hairlineStrong))
+					.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface1))
+					.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
 			}
 			HStack(spacing: 8) {
 				BarIconButton(symbol: "xmark", help: "Cancel (Esc)") { recorder.cancelPicker() }
@@ -235,7 +235,7 @@ private struct RecorderBar: View {
 					}
 				}
 				.padding(3)
-				.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.surface2))
+				.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface2))
 				Rectangle().fill(Theme.hairline).frame(width: 1, height: 34).padding(.horizontal, 2)
 				SourceMenu()
 				MicrophoneMenu()
@@ -265,8 +265,8 @@ private struct RecorderBar: View {
 				.fixedSize()
 			}
 			.padding(8)
-			.background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(Theme.surface1))
-			.overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(Theme.hairlineStrong))
+			.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface1))
+			.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
 		}
 		.fixedSize()
 		.padding(5)
@@ -290,8 +290,8 @@ private struct ModeButton: View {
 			}
 			.foregroundStyle(selected ? Theme.text1 : Theme.text3)
 			.frame(width: 64, height: 46)
-			.background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(selected ? Theme.surface3 : .clear))
-			.overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).strokeBorder(selected ? Theme.hairlineStrong : .clear))
+			.background(RoundedRectangle(cornerRadius: Theme.radiusInner, style: .continuous).fill(selected ? Theme.surface3 : .clear))
+			.overlay(RoundedRectangle(cornerRadius: Theme.radiusInner, style: .continuous).strokeBorder(selected ? Theme.hairlineStrong : .clear))
 			.contentShape(Rectangle())
 		}
 		.buttonStyle(.plain)
@@ -312,8 +312,8 @@ private struct BarIconButton: View {
 				.font(.system(size: 15, weight: .medium))
 				.foregroundStyle(isOn ? Theme.lavender : hovering ? Theme.text1 : Theme.text2)
 				.frame(width: 52, height: 52)
-				.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(isOn ? Theme.violetSoft : hovering ? Theme.surface3 : Theme.surface2))
-				.overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(isOn ? Theme.violetLine.opacity(0.6) : Theme.hairline))
+				.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(isOn ? Theme.violetSoft : hovering ? Theme.surface3 : Theme.surface2))
+				.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(isOn ? Theme.violetLine.opacity(0.6) : Theme.hairline))
 				.contentShape(Rectangle())
 		}
 		.buttonStyle(.plain)
@@ -341,8 +341,8 @@ private struct BarMenu<Content: View>: View {
 			}
 			.padding(.horizontal, 12)
 			.frame(width: 176, height: 52, alignment: .leading)
-			.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.surface2))
-			.overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.hairline))
+			.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface2))
+			.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairline))
 			.contentShape(Rectangle())
 		}
 		.menuStyle(.button)
@@ -461,7 +461,7 @@ private struct SelectionOverlay: View {
 							.monospacedDigit()
 							.foregroundStyle(Theme.text1)
 							.padding(.horizontal, 9).padding(.vertical, 5)
-							.background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(Theme.surface1))
+							.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface1))
 							.offset(x: rect.midX - 50, y: max(8, rect.minY - 34))
 							.frame(width: 100)
 							.allowsHitTesting(false)
@@ -482,7 +482,7 @@ private struct SelectionOverlay: View {
 						.font(.nebula(15, 700))
 						.foregroundStyle(Theme.text1)
 						.padding(.horizontal, 16).padding(.vertical, 10)
-						.background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Theme.surface1))
+						.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface1))
 						.position(x: proxy.size.width / 2, y: proxy.size.height / 2)
 				}
 			}
@@ -567,9 +567,9 @@ private struct CountdownView: View {
 	var body: some View {
 		ZStack {
 			if case .countdown(let value) = app.recorder.phase, value > 0 {
-				RoundedRectangle(cornerRadius: 36, style: .continuous)
+				RoundedRectangle(cornerRadius: Theme.radius, style: .continuous)
 					.fill(Theme.surface1.opacity(0.94))
-					.overlay(RoundedRectangle(cornerRadius: 36, style: .continuous).strokeBorder(Theme.hairlineStrong))
+					.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
 				Text("\(value)")
 					.font(.nebula(84, 800))
 					.monospacedDigit()
@@ -638,8 +638,8 @@ private struct RecordingControl: View {
 		}
 		.frame(height: 50)
 		.fixedSize()
-		.background(Capsule().fill(Theme.surface1))
-		.overlay(Capsule().strokeBorder(Theme.hairlineStrong))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface1))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
 		.padding(5)
 		.task(id: confirmDiscard) {
 			guard confirmDiscard else { return }
@@ -682,8 +682,8 @@ private struct SpeakerNotesView: View {
 				.background(Color.clear)
 		}
 		.padding(14)
-		.background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Theme.surface1.opacity(0.96)))
-		.overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.hairlineStrong))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface1.opacity(0.96)))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
 		.padding(4)
 	}
 }

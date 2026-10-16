@@ -242,10 +242,10 @@ private struct SwatchTile: View {
 	let action: () -> Void
 
 	var body: some View {
-		RoundedRectangle(cornerRadius: 7, style: .continuous)
+		RoundedRectangle(cornerRadius: Theme.radius, style: .continuous)
 			.fill(fill)
 			.frame(height: height)
-			.overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).strokeBorder(selected ? Theme.lavender : Theme.hairlineStrong, lineWidth: selected ? 2 : 1))
+			.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(selected ? Theme.lavender : Theme.hairlineStrong, lineWidth: selected ? 2 : 1))
 			.contentShape(Rectangle())
 			.onTapGesture(perform: action)
 	}

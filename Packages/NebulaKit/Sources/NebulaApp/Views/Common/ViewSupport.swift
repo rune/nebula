@@ -95,8 +95,8 @@ struct MenuChip<Content: View>: View {
 			}
 			.padding(.horizontal, 10)
 			.frame(height: 26)
-			.background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(Theme.surface2))
-			.overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).strokeBorder(Theme.hairlineStrong))
+			.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface2))
+			.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
 		}
 		.menuStyle(.button)
 		.buttonStyle(.plain)
@@ -122,8 +122,8 @@ struct RateChips: View {
 					.foregroundStyle(selected ? .white : Theme.text2)
 					.frame(maxWidth: .infinity)
 					.frame(height: 28)
-					.background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(selected ? Theme.violetSoft : .clear))
-					.overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).strokeBorder(selected ? Theme.violetLine : Theme.hairlineStrong))
+					.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(selected ? Theme.violetSoft : .clear))
+					.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(selected ? Theme.violetLine : Theme.hairlineStrong))
 					.contentShape(Rectangle())
 					.onTapGesture { onSelect(option) }
 			}
@@ -144,8 +144,8 @@ struct NebulaTextField: View {
 			.foregroundStyle(Theme.text1)
 			.padding(.horizontal, 10)
 			.frame(height: 30)
-			.background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Theme.surface2))
-			.overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(Theme.hairlineStrong))
+			.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface2))
+			.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
 			.onSubmit(onCommit)
 	}
 }

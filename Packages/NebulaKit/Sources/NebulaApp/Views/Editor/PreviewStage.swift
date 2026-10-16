@@ -24,8 +24,8 @@ struct PreviewStage: View {
 					}
 				}
 				.frame(width: size.width, height: size.height)
-				.clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-				.overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Theme.hairline))
+				.clipShape(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous))
+				.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairline))
 				.shadow(color: .black.opacity(0.55), radius: 26, y: 14)
 				.overlay(StageOverlay(store: store, size: size))
 				.overlay(alignment: .topLeading) { PlacementBadge(project: store.project).padding(12) }
@@ -73,8 +73,8 @@ private struct PlacementBadge: View {
 				.foregroundStyle(Theme.lavender)
 				.padding(.horizontal, 9)
 				.padding(.vertical, 5)
-				.background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(Color.black.opacity(0.55)))
-				.overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).strokeBorder(Theme.hairlineStrong))
+				.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Color.black.opacity(0.55)))
+				.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairlineStrong))
 				.allowsHitTesting(false)
 		}
 	}
@@ -214,7 +214,7 @@ private struct StageOverlay: View {
 	// Masks: drag to move, corner to resize.
 	@ViewBuilder private func maskHandles(_ mask: MaskItem, mapper: StageMapper) -> some View {
 		let frame = mapper.rect(mask.rect)
-		RoundedRectangle(cornerRadius: 6, style: .continuous)
+		RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous)
 			.strokeBorder(Theme.lavender, style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
 			.background(Theme.violet.opacity(0.08))
 			.frame(width: frame.width, height: frame.height)
@@ -252,7 +252,7 @@ private struct StageOverlay: View {
 			let center = mapper.point(label.position, anchor: note.anchor)
 			let height = label.fontSize * size.height * 1.7
 			let width = max(40, Double(label.text.count) * label.fontSize * size.height * 0.62 + height * 0.8)
-			RoundedRectangle(cornerRadius: 6, style: .continuous)
+			RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous)
 				.strokeBorder(Theme.lavender, style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
 				.frame(width: width, height: height)
 				.contentShape(Rectangle())

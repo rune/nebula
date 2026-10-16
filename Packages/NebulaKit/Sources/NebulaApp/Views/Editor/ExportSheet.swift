@@ -74,7 +74,7 @@ struct ExportSheet: View {
 			}
 			.padding(.horizontal, 10)
 			.frame(height: 36)
-			.background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Theme.surface2))
+			.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface2))
 			if let error {
 				Text(error).font(.nebula(12, 600)).foregroundStyle(Color(hex: 0xFF8FA3))
 			}

@@ -226,8 +226,8 @@ private struct ModelRow: View {
 			Text(model.approximateSize).font(.nebula(11, 600)).foregroundStyle(Theme.text3)
 		}
 		.padding(10)
-		.background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(selected ? Theme.violetSoft : Theme.surface2))
-		.overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).strokeBorder(selected ? Theme.violetLine : Theme.hairline))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(selected ? Theme.violetSoft : Theme.surface2))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(selected ? Theme.violetLine : Theme.hairline))
 		.contentShape(Rectangle())
 		.onTapGesture(perform: action)
 	}
@@ -250,7 +250,7 @@ private struct CaptionLineEditor: View {
 				.font(.nebula(12.5, 550))
 				.foregroundStyle(Theme.text1)
 				.padding(7)
-				.background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(Theme.surface2))
+				.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface2))
 				.onSubmit(commit)
 				.onChange(of: text) { commitIfIdle() }
 		}
@@ -369,7 +369,7 @@ struct ItemListRow: View {
 		}
 		.padding(.horizontal, 8)
 		.frame(height: 30)
-		.background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(hovering ? Theme.surface2 : .clear))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(hovering ? Theme.surface2 : .clear))
 		.contentShape(Rectangle())
 		.onHover { hovering = $0 }
 		.onTapGesture(perform: action)

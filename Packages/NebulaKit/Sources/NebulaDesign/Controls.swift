@@ -39,8 +39,8 @@ private struct NebulaButtonBody: View {
 			.padding(.horizontal, height > 34 ? 16 : 12)
 			.frame(height: height)
 			.background(background)
-			.clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-			.overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(border, lineWidth: 1))
+			.clipShape(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous))
+			.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(border, lineWidth: 1))
 			.opacity(isEnabled ? 1 : 0.4)
 			.scaleEffect(configuration.isPressed ? 0.97 : 1)
 			.animation(Theme.snappy, value: configuration.isPressed)
@@ -105,8 +105,8 @@ public struct IconButton: View {
 				.font(.system(size: 13, weight: .medium))
 				.foregroundStyle(isOn ? Theme.text1 : hovering ? Theme.text1 : Theme.text2)
 				.frame(width: 30, height: 30)
-				.background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(isOn ? Theme.surface3 : hovering ? Theme.surface2 : .clear))
-				.overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(isOn ? Theme.hairlineStrong : .clear))
+				.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(isOn ? Theme.surface3 : hovering ? Theme.surface2 : .clear))
+				.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(isOn ? Theme.hairlineStrong : .clear))
 		}
 		.buttonStyle(.plain)
 		.help(help)
@@ -140,9 +140,9 @@ public struct SegmentedPicker<Value: Hashable>: View {
 					.padding(.vertical, 6)
 					.background {
 						if selected {
-							RoundedRectangle(cornerRadius: 6, style: .continuous)
+							RoundedRectangle(cornerRadius: Theme.radiusInner, style: .continuous)
 								.fill(Theme.surface3)
-								.overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(Theme.hairlineStrong))
+								.overlay(RoundedRectangle(cornerRadius: Theme.radiusInner, style: .continuous).strokeBorder(Theme.hairlineStrong))
 								.shadow(color: .black.opacity(0.5), radius: 1, y: 1)
 								.matchedGeometryEffect(id: "segment", in: namespace)
 						}
@@ -152,8 +152,8 @@ public struct SegmentedPicker<Value: Hashable>: View {
 			}
 		}
 		.padding(3)
-		.background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Theme.surface2))
-		.overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).strokeBorder(Theme.hairline))
+		.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface2))
+		.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairline))
 	}
 }
 
@@ -176,8 +176,8 @@ public struct ChipPicker<Value: Hashable>: View {
 					.foregroundStyle(selected ? .white : Theme.text2)
 					.padding(.horizontal, 10)
 					.padding(.vertical, 6)
-					.background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(selected ? Theme.violetSoft : .clear))
-					.overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(selected ? Theme.violetLine : Theme.hairlineStrong))
+					.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(selected ? Theme.violetSoft : .clear))
+					.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(selected ? Theme.violetLine : Theme.hairlineStrong))
 					.contentShape(Rectangle())
 					.onTapGesture { withAnimation(Theme.snappy) { selection = value } }
 			}
@@ -311,7 +311,7 @@ public struct KeyHint: View {
 			.foregroundStyle(Theme.text3)
 			.padding(.horizontal, 5)
 			.padding(.vertical, 1)
-			.overlay(RoundedRectangle(cornerRadius: 5, style: .continuous).strokeBorder(Theme.hairlineStrong))
+			.overlay(RoundedRectangle(cornerRadius: Theme.radiusSmall, style: .continuous).strokeBorder(Theme.hairlineStrong))
 	}
 }
 

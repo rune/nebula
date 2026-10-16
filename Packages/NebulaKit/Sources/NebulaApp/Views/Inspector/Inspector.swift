@@ -67,8 +67,8 @@ struct Inspector: View {
 						.foregroundStyle(tab == item ? Theme.text1 : Theme.text3)
 						.frame(maxWidth: .infinity)
 						.frame(height: 32)
-						.background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(tab == item ? Theme.surface3 : .clear))
-						.overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(tab == item ? Theme.hairlineStrong : .clear))
+						.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(tab == item ? Theme.surface3 : .clear))
+						.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(tab == item ? Theme.hairlineStrong : .clear))
 						.contentShape(Rectangle())
 				}
 				.buttonStyle(.plain)
