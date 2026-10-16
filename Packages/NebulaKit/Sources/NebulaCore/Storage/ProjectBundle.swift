@@ -6,13 +6,15 @@ import Foundation
 /// Demo.nebula/
 ///   project.json      edits (Project)
 ///   input.json        cursor, clicks, keys (InputTrack)
-///   recording.mov     video + system audio + microphone tracks
+///   recording.mov     video + system audio
+///   microphone.mov    microphone audio (if recorded)
 ///   thumbnail.jpg
 ///   media/            imported music, images, denoised audio
 /// ```
 public struct ProjectBundle: Sendable, Hashable {
 	public static let fileExtension = "nebula"
 	public static let videoFileName = "recording.mov"
+	public static let microphoneFileName = "microphone.mov"
 	static let projectFileName = "project.json"
 	static let inputFileName = "input.json"
 	public static let thumbnailFileName = "thumbnail.jpg"
@@ -30,6 +32,13 @@ public struct ProjectBundle: Sendable, Hashable {
 	public var mediaURL: URL { url.appending(path: Self.mediaFolderName, directoryHint: .isDirectory) }
 
 	public func videoURL(for project: Project) -> URL { url.appending(path: project.media.videoFile) }
+
+	public func microphoneURL(for project: Project) -> URL? {
+		project.media.microphoneFile.map { url.appending(path: $0) }
+	}
+
+	/// Denoised microphone audio, written when noise reduction is turned on.
+	public var denoisedMicrophoneURL: URL { mediaURL.appending(path: "microphone-denoised.m4a") }
 
 	public var name: String { url.deletingPathExtension().lastPathComponent }
 

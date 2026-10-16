@@ -64,34 +64,40 @@ public struct Project: Codable, Hashable, Sendable {
 }
 
 /// Facts about the recorded media, filled in once at import or recording time.
+///
+/// The video file holds the video track and, when recorded, system audio as its only audio
+/// track. The microphone is a separate audio file so it can be denoised, transcribed and
+/// leveled on its own.
 public struct MediaInfo: Codable, Hashable, Sendable {
 	/// Video file name inside the bundle.
 	public var videoFile: String
+	/// Microphone audio file name inside the bundle, if a mic was recorded.
+	public var microphoneFile: String?
 	public var duration: Double
 	/// Pixel size of the recording.
 	public var width: Int
 	public var height: Int
 	public var frameRate: Double
 	public var hasSystemAudio: Bool
-	public var hasMicrophone: Bool
 
 	public init(
 		videoFile: String = ProjectBundle.videoFileName,
+		microphoneFile: String? = nil,
 		duration: Double,
 		width: Int,
 		height: Int,
 		frameRate: Double = 60,
-		hasSystemAudio: Bool = false,
-		hasMicrophone: Bool = false
+		hasSystemAudio: Bool = false
 	) {
 		self.videoFile = videoFile
+		self.microphoneFile = microphoneFile
 		self.duration = duration
 		self.width = width
 		self.height = height
 		self.frameRate = frameRate
 		self.hasSystemAudio = hasSystemAudio
-		self.hasMicrophone = hasMicrophone
 	}
 
+	public var hasMicrophone: Bool { microphoneFile != nil }
 	public var aspect: Double { Double(width) / Double(max(height, 1)) }
 }
