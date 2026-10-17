@@ -52,7 +52,8 @@ html {
 
 body {
 	margin: 0;
-	background: var(--bg);
+	/* Transparent so the fixed backdrop below shows through; html paints the base colour. */
+	background: transparent;
 	color: var(--text-1);
 	font-family: var(--font);
 	font-size: 17px;
@@ -62,6 +63,19 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	text-rendering: optimizeLegibility;
 	overflow-x: clip;
+}
+
+/* A faint violet rising from the bottom of the window. Its top edge is a U: it climbs higher at
+   the sides than in the middle, like the dusk behind the Rune mark, but kept low and quiet. The
+   ellipse is the dark sky; everything outside it fades to violet. */
+.backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+	background:
+		radial-gradient(115% 105% at 50% -8%, transparent 68%, rgba(104, 40, 255, 0.05) 79%, rgba(124, 40, 255, 0.12) 91%, rgba(150, 50, 255, 0.19) 104%),
+		var(--bg);
 }
 
 img,
