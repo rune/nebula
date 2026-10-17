@@ -53,15 +53,16 @@ const stack = ["Swift 6", "SwiftUI", "ScreenCaptureKit", "Core Image", "AVFounda
 				</div>
 			</div>
 
+			<!-- `name` keeps one answer open without scripts; with them, motion.ts animates instead. -->
 			<div class="list">
 				{faqs.map((faq, index) => (
-					<details class="item" data-reveal>
+					<details class="item" name="faq" data-reveal data-faq>
 						<summary>
 							<span class="num">{String(index + 1).padStart(2, "0")}</span>
 							<span class="q">{faq.q}</span>
 							<span class="plus" aria-hidden="true"><Icon name="plus" size={18} /></span>
 						</summary>
-						<div class="answer"><p>{faq.a}</p></div>
+						<div class="answer" data-faq-answer><p>{faq.a}</p></div>
 					</details>
 				))}
 			</div>
@@ -121,6 +122,7 @@ const stack = ["Swift 6", "SwiftUI", "ScreenCaptureKit", "Core Image", "AVFounda
 
 	.num {
 		flex: none;
+		width: 24px;
 		font-family: var(--mono);
 		font-size: 12.5px;
 		font-weight: 400;
@@ -139,21 +141,31 @@ const stack = ["Swift 6", "SwiftUI", "ScreenCaptureKit", "Core Image", "AVFounda
 			color 0.3s;
 	}
 
+	/* `expanded` follows `open`, but is set by motion.ts as soon as a close starts, so the icon
+	   turns back while the answer is still folding away. */
 	summary:hover .plus,
-	.item[open] .plus {
+	.item.expanded .plus,
+	.list:not(.ready) .item[open] .plus {
 		color: var(--text-1);
 	}
 
-	.item[open] .plus {
+	.item.expanded .plus,
+	.list:not(.ready) .item[open] .plus {
 		transform: rotate(45deg);
 	}
 
-	.item[open] .num {
+	.item.expanded .num,
+	.list:not(.ready) .item[open] .num {
 		color: var(--lavender);
 	}
 
 	.answer {
-		padding: 0 40px 22px 40px;
+		overflow: hidden;
+	}
+
+	/* Lines the answer up with the question: number width plus the gap. */
+	.answer p {
+		padding: 0 40px 22px 42px;
 		font-size: 15.5px;
 		line-height: 1.65;
 		color: var(--text-2);
@@ -163,7 +175,7 @@ const stack = ["Swift 6", "SwiftUI", "ScreenCaptureKit", "Core Image", "AVFounda
 		.layout {
 			grid-template-columns: 1fr;
 		}
-		.answer {
+		.answer p {
 			padding-right: 0;
 		}
 	}

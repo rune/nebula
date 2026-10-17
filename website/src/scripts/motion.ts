@@ -124,6 +124,62 @@ function setupNav() {
 	layout();
 }
 
+/** FAQ: one answer open at a time, folding open and closed. */
+function setupFaq() {
+	const items = $$<HTMLDetailsElement>("[data-faq]");
+	if (!items.length) return;
+	items[0].parentElement!.classList.add("ready");
+	const animate = () => !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+	const close = (item: HTMLDetailsElement) => {
+		item.classList.remove("expanded");
+		const answer = $("[data-faq-answer]", item)!;
+		if (!animate()) {
+			item.open = false;
+			return;
+		}
+		gsap.fromTo(answer, { height: answer.offsetHeight }, {
+			height: 0,
+			opacity: 0,
+			duration: 0.4,
+			ease: "power2.inOut",
+			overwrite: true,
+			onComplete: () => {
+				item.open = false;
+				gsap.set(answer, { clearProps: "height,opacity" });
+				ScrollTrigger.refresh();
+			},
+		});
+	};
+
+	const open = (item: HTMLDetailsElement) => {
+		item.classList.add("expanded");
+		item.open = true;
+		if (!animate()) return;
+		const answer = $("[data-faq-answer]", item)!;
+		gsap.fromTo(answer, { height: 0, opacity: 0 }, {
+			height: "auto",
+			opacity: 1,
+			duration: 0.5,
+			ease: "power3.out",
+			overwrite: true,
+			clearProps: "height,opacity",
+			onComplete: () => ScrollTrigger.refresh(),
+		});
+	};
+
+	for (const item of items) {
+		// Scripts handle the one-at-a-time rule, so the browser's version can't snap others shut.
+		item.removeAttribute("name");
+		$("summary", item)!.addEventListener("click", (event) => {
+			event.preventDefault();
+			if (item.classList.contains("expanded")) return close(item);
+			for (const other of items) if (other !== item && other.classList.contains("expanded")) close(other);
+			open(item);
+		});
+	}
+}
+
 // MARK: Look plates (works with and without motion)
 
 function setupLook(animate: boolean) {
@@ -422,6 +478,7 @@ function init() {
 	setupNav();
 	setupAnchors();
 	setupCopy();
+	setupFaq();
 }
 
 init();
