@@ -19,7 +19,12 @@ public struct ProjectLibrary: Sendable {
 		self.rootURL = rootURL
 	}
 
+	/// `~/Movies/Nebula`, or `NEBULA_LIBRARY` when set (used to run against a separate library,
+	/// e.g. for demo captures).
 	public static var defaultRoot: URL {
+		if let custom = ProcessInfo.processInfo.environment["NEBULA_LIBRARY"], !custom.isEmpty {
+			return URL(fileURLWithPath: custom, isDirectory: true)
+		}
 		let movies = FileManager.default.urls(for: .moviesDirectory, in: .userDomainMask).first
 			?? FileManager.default.homeDirectoryForCurrentUser.appending(path: "Movies")
 		return movies.appending(path: "Nebula", directoryHint: .isDirectory)
