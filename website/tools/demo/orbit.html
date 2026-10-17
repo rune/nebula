@@ -1,0 +1,193 @@
+<!doctype html>
+<!--
+	"Orbit": a fictional app used to make Nebula's demo recording. Its state is a pure function of
+	time: render(t) draws the exact frame for t seconds, so the recording is deterministic and the
+	cursor/click/typing data in script.json matches it to the frame. No cursor is drawn here:
+	Nebula records the cursor separately and draws its own.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+	:root {
+		--bg: #f6f6f8; --panel: #ffffff; --line: #e7e6ec; --text: #17161c; --muted: #6f6c7b;
+		--accent: #6d3df5; --accent-soft: #efe9ff; --green: #1f9d6b;
+	}
+	* { box-sizing: border-box; margin: 0; }
+	html, body { width: 1440px; height: 900px; overflow: hidden; background: var(--bg); }
+	body { font: 500 14px/1.45 -apple-system, "SF Pro Text", system-ui, sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
+
+	.window { position: absolute; inset: 0; display: grid; grid-template-columns: 248px 1fr; grid-template-rows: 52px 1fr; }
+	.titlebar { grid-column: 1 / -1; display: flex; align-items: center; gap: 18px; padding: 0 18px; border-bottom: 1px solid var(--line); background: #fbfbfc; }
+	.lights { display: flex; gap: 8px; }
+	.lights i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+	.lights i:nth-child(2) { background: #febc2e; } .lights i:nth-child(3) { background: #28c840; }
+	.crumbs { color: var(--muted); font-weight: 600; } .crumbs b { color: var(--text); }
+	.search { margin-left: auto; width: 280px; height: 30px; border-radius: 8px; background: #f0eff4; color: #9b98a7; display: flex; align-items: center; padding: 0 12px; font-size: 13px; }
+
+	.sidebar { border-right: 1px solid var(--line); background: #fbfbfc; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
+	.brand { display: flex; align-items: center; gap: 10px; padding: 6px 10px 18px; font-weight: 750; font-size: 16px; }
+	.brand .mark { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, #8b5cf6, #5b2ee5); position: relative; }
+	.brand .mark::after { content: ""; position: absolute; inset: 7px; border-radius: 50%; border: 2px solid #fff; }
+	.nav { height: 34px; border-radius: 8px; display: flex; align-items: center; gap: 10px; padding: 0 10px; color: var(--muted); font-weight: 600; }
+	.nav.on { background: #efedf4; color: var(--text); }
+	.nav s { width: 16px; height: 16px; border-radius: 5px; background: currentColor; opacity: 0.35; text-decoration: none; }
+	.side-label { margin: 18px 10px 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: #a19eac; text-transform: uppercase; }
+
+	.main { position: relative; padding: 40px 56px; overflow: hidden; }
+	.page-title { font-size: 26px; font-weight: 750; letter-spacing: -0.02em; }
+	.page-sub { color: var(--muted); margin-top: 6px; }
+	.empty { margin-top: 36px; height: 520px; border: 1.5px dashed #dddbe5; border-radius: 16px; display: grid; place-items: center; text-align: center; }
+	.empty h3 { font-size: 18px; font-weight: 700; margin-top: 18px; }
+	.empty p { color: var(--muted); margin: 6px 0 22px; }
+	.planet { width: 72px; height: 72px; margin: 0 auto; border-radius: 50%; background: linear-gradient(135deg, #c4b5fd, #7c3aed); position: relative; }
+	.planet::after { content: ""; position: absolute; left: -14px; right: -14px; top: 30px; height: 12px; border-radius: 50%; border: 3px solid #a78bfa; transform: rotate(-14deg); }
+	.btn { height: 40px; padding: 0 18px; border-radius: 10px; border: 0; font: inherit; font-weight: 650; display: inline-flex; align-items: center; gap: 8px; }
+	.btn.primary { background: var(--accent); color: #fff; }
+	.btn.ghost { background: #f0eff4; color: var(--text); }
+
+	.grid { position: absolute; inset: 132px 56px 40px 56px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-content: start; }
+	.card { height: 150px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); padding: 18px; }
+	.card b { display: block; font-size: 15px; } .card span { color: var(--muted); font-size: 13px; }
+	.bar { height: 8px; border-radius: 4px; background: #eeedf3; margin-top: 46px; overflow: hidden; } .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+
+	.scrim { position: absolute; inset: 0; background: rgba(23, 22, 28, 0.32); }
+	.modal { position: absolute; left: 50%; top: 50%; width: 520px; margin: -232px 0 0 -260px; background: var(--panel); border-radius: 18px; box-shadow: 0 30px 80px rgba(20, 10, 50, 0.25); padding: 28px; }
+	.modal h2 { font-size: 21px; font-weight: 750; letter-spacing: -0.01em; }
+	.modal .hint { color: var(--muted); margin-top: 4px; }
+	.field { margin-top: 22px; } .field label { font-size: 13px; font-weight: 650; color: #44414e; }
+	.input { margin-top: 8px; height: 44px; border-radius: 10px; border: 1.5px solid var(--line); display: flex; align-items: center; padding: 0 14px; font-size: 15px; background: #fff; }
+	.input.focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+	.input .ph { color: #a8a5b3; }
+	.caret { display: inline-block; width: 1.5px; height: 19px; background: var(--accent); margin-left: 1px; vertical-align: -4px; }
+	.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+	.chip { background: var(--accent-soft); color: #4c25c9; border-radius: 6px; padding: 2px 8px; font-weight: 650; font-size: 13px; }
+	.actions { margin-top: 26px; display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
+	.kbd { color: #9b98a7; font-size: 12px; margin-right: auto; }
+	.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; }
+	.toast { position: absolute; right: 32px; bottom: 32px; background: #17161c; color: #fff; border-radius: 12px; padding: 14px 18px; display: flex; gap: 12px; align-items: center; font-weight: 600; }
+	.toast i { width: 22px; height: 22px; border-radius: 50%; background: var(--green); display: grid; place-items: center; font-style: normal; font-size: 13px; }
+	.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="window">
+	<div class="titlebar">
+		<div class="lights"><i></i><i></i><i></i></div>
+		<div class="crumbs">Orbit <span>›</span> <b id="crumb">Workspaces</b></div>
+		<div class="search">Search Orbit…</div>
+	</div>
+	<aside class="sidebar">
+		<div class="brand"><span class="mark"></span>Orbit</div>
+		<div class="nav on"><s></s>Workspaces</div>
+		<div class="nav"><s></s>Projects</div>
+		<div class="nav"><s></s>Inbox</div>
+		<div class="nav"><s></s>Reports</div>
+		<div class="side-label">Favorites</div>
+		<div class="nav"><s></s>Launch plan</div>
+		<div class="nav"><s></s>Design reviews</div>
+	</aside>
+	<main class="main">
+		<div class="page-title" id="title">Workspaces</div>
+		<div class="page-sub" id="sub">Bring your team together in one place.</div>
+		<div class="empty" id="empty">
+			<div>
+				<div class="planet"></div>
+				<h3>No workspaces yet</h3>
+				<p>Create one to start planning with your team.</p>
+				<button class="btn primary" id="newBtn">+ New workspace</button>
+			</div>
+		</div>
+		<div class="grid hidden" id="grid">
+			<div class="card"><b>Launch plan</b><span>12 tasks · due Friday</span><div class="bar"><i style="width:64%"></i></div></div>
+			<div class="card"><b>Design reviews</b><span>4 open threads</span><div class="bar"><i style="width:38%"></i></div></div>
+			<div class="card"><b>Roadmap</b><span>Q4 · 3 milestones</span><div class="bar"><i style="width:22%"></i></div></div>
+			<div class="card"><b>Onboarding</b><span>Welcome checklist</span><div class="bar"><i style="width:80%"></i></div></div>
+			<div class="card"><b>Research</b><span>9 interviews</span><div class="bar"><i style="width:47%"></i></div></div>
+			<div class="card"><b>Brand</b><span>Assets and guidelines</span><div class="bar"><i style="width:91%"></i></div></div>
+		</div>
+		<div class="scrim hidden" id="scrim"></div>
+		<div class="modal hidden" id="modal">
+			<h2>Create workspace</h2>
+			<div class="hint">Workspaces hold your projects, docs and people.</div>
+			<div class="field"><label>Workspace name</label><div class="input" id="name"></div></div>
+			<div class="field"><label>Invite teammates</label><div class="input" id="invite"></div></div>
+			<div class="actions">
+				<span class="kbd">⌘↩ to create</span>
+				<button class="btn ghost">Cancel</button>
+				<button class="btn primary" id="create">Create workspace</button>
+			</div>
+		</div>
+		<div class="toast hidden" id="toast"><i>✓</i>Orbit Labs is ready · 2 invites sent</div>
+	</main>
+</div>
+<script>
+	// The timeline, in seconds. Shared with render.cjs, which turns it into cursor/click/key data.
+	window.SCRIPT = {
+		duration: 17.5,
+		name: "Orbit Labs",
+		invites: ["maya@orbitlabs.co", "sam@orbitlabs.co"],
+		clickNew: 2.5, nameClick: 3.5, nameType: [3.7, 5.9],
+		inviteClick: 9.7, inviteType: [9.9, 13.9], submit: 14.6, ready: 15.4,
+	};
+	const S = window.SCRIPT;
+	const $ = (id) => document.getElementById(id);
+	const clamp01 = (v) => Math.max(0, Math.min(1, v));
+	const ease = (v) => 1 - Math.pow(1 - clamp01(v), 3);
+	const typed = (text, [a, b], t) => text.slice(0, Math.round(text.length * clamp01((t - a) / (b - a))));
+
+	window.render = (t) => {
+		const modalOpen = t >= S.clickNew && t < S.ready;
+		const done = t >= S.ready;
+		$("empty").classList.toggle("hidden", done);
+		$("grid").classList.toggle("hidden", !done);
+		$("title").textContent = done ? "Orbit Labs" : "Workspaces";
+		$("crumb").textContent = done ? "Orbit Labs" : "Workspaces";
+		$("sub").textContent = done ? "6 projects · 3 members" : "Bring your team together in one place.";
+		$("newBtn").style.background = t > 1.9 && t < S.clickNew + 0.1 ? "#5b2ee5" : "";
+
+		const p = ease((t - S.clickNew) / 0.25);
+		$("scrim").classList.toggle("hidden", !modalOpen);
+		$("modal").classList.toggle("hidden", !modalOpen);
+		$("scrim").style.opacity = p;
+		$("modal").style.opacity = p;
+		$("modal").style.transform = `scale(${0.96 + 0.04 * p})`;
+
+		const nameText = typed(S.name, S.nameType, t);
+		const nameFocus = t >= S.nameClick && t < S.inviteClick;
+		$("name").classList.toggle("focus", nameFocus);
+		$("name").innerHTML = nameText
+			? nameText + (nameFocus && Math.floor(t * 2) % 2 === 0 ? '<span class="caret"></span>' : "")
+			: (nameFocus ? '<span class="caret"></span>' : '<span class="ph">e.g. Acme Design</span>');
+
+		const inviteText = typed(S.invites.join(", "), S.inviteType, t);
+		const inviteFocus = t >= S.inviteClick;
+		$("invite").classList.toggle("focus", inviteFocus);
+		const parts = inviteText.split(", ");
+		const chips = parts.slice(0, -1).map((p) => `<span class="chip">${p}</span>`).join("");
+		const current = parts[parts.length - 1];
+		$("invite").innerHTML = `<span class="chips">${chips}</span>&nbsp;${current}` +
+			(inviteFocus && t < S.submit && Math.floor(t * 2) % 2 === 0 ? '<span class="caret"></span>' : "") +
+			(!inviteText && !inviteFocus ? '<span class="ph">name@company.com</span>' : "");
+
+		const busy = t >= S.submit && t < S.ready;
+		$("create").innerHTML = busy ? '<span class="spinner" style="transform:rotate(' + (t * 720) + 'deg)"></span>Creating…' : "Create workspace";
+
+		$("toast").classList.toggle("hidden", !(t >= S.ready + 0.2 && t < S.ready + 3.2));
+		$("toast").style.opacity = ease((t - S.ready - 0.2) / 0.3);
+		return new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+	};
+
+	// Where things are on screen (CSS px), for the cursor path and the focused-field rects.
+	window.layout = () => {
+		window.render(S.clickNew + 1);
+		const box = (id) => { const r = $(id).getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; };
+		const result = { newBtn: null, name: box("name"), invite: box("invite"), create: box("create") };
+		window.render(0);
+		result.newBtn = box("newBtn");
+		return result;
+	};
+	window.render(0);
+</script>
+</body>
+</html>

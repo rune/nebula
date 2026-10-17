@@ -1,0 +1,42 @@
+---
+import "../styles/global.css";
+import { site } from "../site";
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+const { title = `${site.name} · ${site.tagline}`, description = site.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL("/og.jpg", Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="dark" />
+		<meta name="theme-color" content="#040406" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={ogImage} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<!-- Hide reveal targets only when scripts run and motion is welcome; otherwise everything
+		     is visible from the first paint. -->
+		<script is:inline>
+			if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");
+		</script>
+	</head>
+	<body>
+		<slot />
+		<script>
+			import "../scripts/motion";
+		</script>
+	</body>
+</html>

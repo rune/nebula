@@ -1,0 +1,171 @@
+---
+import { Image } from "astro:assets";
+import Chapter from "./Chapter.astro";
+import desktop from "../assets/shots/look-desktop.jpg";
+import gradient from "../assets/shots/look-gradient.jpg";
+import color from "../assets/shots/look-color.jpg";
+import vertical from "../assets/shots/look-vertical.jpg";
+
+const looks = [
+	{ id: "desktop", label: "Your desktop", note: "The wallpaper that was behind the window, with the window at its real size.", src: desktop, alt: "The Orbit window at its real size on the desktop wallpaper it was recorded over" },
+	{ id: "gradient", label: "Gradient", note: "Fit with padding, rounded corners and a soft shadow.", src: gradient, alt: "The Orbit window on a violet gradient with padding and a shadow" },
+	{ id: "color", label: "Colour", note: "A plain, calm background when the content should do the talking.", src: color, alt: "The Orbit window on a near-black background" },
+	{ id: "vertical", label: "9:16", note: "Vertical for Shorts and Reels. The zoom keeps the action in frame.", src: vertical, alt: "A vertical 9:16 version zoomed in on the Orbit dialog" },
+];
+---
+
+<section class="chapter-section look" id="look">
+	<div class="container">
+		<Chapter number="03" name="Look" note="Desktop · Gradient · Colour · 9:16" />
+		<div class="head">
+			<div>
+				<h2 data-reveal>Your real desktop, not a template.</h2>
+				<p class="lede" data-reveal>
+					Nebula saves the wallpaper that was behind your window, so the video looks like your Mac,
+					only calmer. Prefer something else? Pick a gradient, a colour or a new shape.
+				</p>
+			</div>
+			<p class="margin-note" data-reveal><strong>16:9 · 9:16 · 1:1 · 4:5</strong>Change the shape at any time. Zooms re-frame themselves.</p>
+		</div>
+
+		<figure class="figure">
+			<div class="shot canvas" data-reveal>
+				{looks.map((look, index) => (
+					<div class:list={["slide", look.id, { active: index === 0 }]} data-look-slide={look.id}>
+						<Image src={look.src} alt={look.alt} widths={[700, 1392]} sizes="(min-width: 1340px) 1240px, 92vw" format="webp" />
+					</div>
+				))}
+			</div>
+			<div class="plates" role="tablist" aria-label="Backgrounds">
+				{looks.map((look, index) => (
+					<button role="tab" class:list={["plate", { active: index === 0 }]} aria-selected={index === 0 ? "true" : "false"} data-look-tab={look.id}>
+						<span class="progress"><i></i></span>
+						<span class="label"><span class="letter">{String.fromCharCode(65 + index)}</span>{look.label}</span>
+						<span class="note">{look.note}</span>
+					</button>
+				))}
+			</div>
+		</figure>
+	</div>
+</section>
+
+<style>
+	.figure {
+		margin-top: clamp(48px, 6vw, 80px);
+	}
+
+	.canvas {
+		aspect-ratio: 1392 / 900;
+		background: #08070c;
+	}
+
+	.slide {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		transition: opacity 0.7s var(--ease);
+	}
+
+	.slide.active {
+		opacity: 1;
+	}
+
+	.slide :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.slide.vertical :global(img) {
+		width: auto;
+		height: 94%;
+		margin: 3% auto 0;
+		border-radius: 8px;
+	}
+
+	.plates {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 24px;
+		margin-top: 20px;
+	}
+
+	.plate {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 0;
+		border: 0;
+		background: none;
+		text-align: left;
+		cursor: pointer;
+	}
+
+	/* A clip on a track: fills while that background is showing. */
+	.progress {
+		position: relative;
+		height: 2px;
+		border-radius: 1px;
+		background: var(--line-strong);
+		overflow: hidden;
+	}
+
+	.progress i {
+		position: absolute;
+		inset: 0;
+		background: var(--violet);
+		transform-origin: left;
+		transform: scaleX(0);
+	}
+
+	.plate.active .progress i {
+		transform: scaleX(var(--fill, 1));
+	}
+
+	.label {
+		display: flex;
+		gap: 10px;
+		margin-top: 6px;
+		font-size: 15px;
+		font-weight: 600;
+		color: var(--text-3);
+		transition: color 0.3s;
+	}
+
+	.letter {
+		font-family: var(--mono);
+		font-size: 13px;
+		font-weight: 400;
+		line-height: 1.75;
+	}
+
+	.note {
+		font-size: 13.5px;
+		line-height: 1.5;
+		color: var(--text-3);
+		opacity: 0.6;
+		transition:
+			opacity 0.3s,
+			color 0.3s;
+	}
+
+	.plate:hover .label,
+	.plate.active .label {
+		color: var(--text-1);
+	}
+
+	.plate.active .letter {
+		color: var(--lavender);
+	}
+
+	.plate.active .note {
+		color: var(--text-2);
+		opacity: 1;
+	}
+
+	@media (max-width: 760px) {
+		.plates {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+</style>

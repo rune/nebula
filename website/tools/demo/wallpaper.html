@@ -1,0 +1,51 @@
+<!doctype html>
+<!-- An original wallpaper for the demo "desktop": layered violet bands on deep indigo. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+	* { margin: 0; }
+	html, body { width: 1728px; height: 1117px; overflow: hidden; background: #0d0820; }
+	svg { display: block; }
+</style>
+</head>
+<body>
+<svg width="1728" height="1117" viewBox="0 0 1728 1117" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0" stop-color="#120a2e"/>
+			<stop offset="0.55" stop-color="#1d0f4a"/>
+			<stop offset="1" stop-color="#2a1366"/>
+		</linearGradient>
+		<linearGradient id="b1" x1="0" y1="0" x2="1" y2="0.4">
+			<stop offset="0" stop-color="#3b1d8f"/>
+			<stop offset="1" stop-color="#7a4cf0"/>
+		</linearGradient>
+		<linearGradient id="b2" x1="0" y1="0" x2="1" y2="0.6">
+			<stop offset="0" stop-color="#5a2fd0"/>
+			<stop offset="1" stop-color="#b48cff"/>
+		</linearGradient>
+		<linearGradient id="b3" x1="0" y1="1" x2="1" y2="0">
+			<stop offset="0" stop-color="#2b1470"/>
+			<stop offset="1" stop-color="#9a6cff"/>
+		</linearGradient>
+		<linearGradient id="b4" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0" stop-color="#d9c6ff"/>
+			<stop offset="1" stop-color="#8f5df5"/>
+		</linearGradient>
+		<filter id="soft" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="6"/></filter>
+		<filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.045 0"/></filter>
+	</defs>
+	<rect width="1728" height="1117" fill="url(#sky)"/>
+	<g filter="url(#soft)">
+		<path d="M-80 760 C 260 560, 620 600, 900 700 S 1500 860, 1820 620 L 1820 1200 L -80 1200 Z" fill="url(#b1)" opacity="0.85"/>
+		<path d="M-80 860 C 300 700, 640 760, 980 840 S 1520 930, 1820 760 L 1820 1200 L -80 1200 Z" fill="url(#b2)" opacity="0.8"/>
+		<path d="M-80 960 C 380 860, 760 900, 1080 960 S 1560 1010, 1820 900 L 1820 1200 L -80 1200 Z" fill="url(#b3)" opacity="0.9"/>
+		<path d="M-80 1040 C 420 980, 820 1010, 1160 1050 S 1600 1080, 1820 1010 L 1820 1200 L -80 1200 Z" fill="url(#b4)" opacity="0.55"/>
+		<path d="M1820 120 C 1500 260, 1260 220, 1060 330 S 760 520, 560 470 L 560 470 C 820 380, 1080 300, 1820 40 Z" fill="#6d43e6" opacity="0.28"/>
+	</g>
+	<rect width="1728" height="1117" filter="url(#grain)"/>
+</svg>
+<script>window.render = () => Promise.resolve();</script>
+</body>
+</html>

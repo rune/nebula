@@ -1,0 +1,170 @@
+---
+import Chapter from "./Chapter.astro";
+import Icon from "./Icon.astro";
+import { links } from "../site";
+
+const faqs = [
+	{
+		q: "Is Nebula really free?",
+		a: "Yes. It's open source under the MIT license: no account, no watermark, no subscription.",
+	},
+	{
+		q: "What do I need to run it?",
+		a: "A Mac with macOS 15 Sequoia or later, Apple silicon or Intel. Nebula asks for Screen Recording permission the first time; Microphone and Accessibility are optional.",
+	},
+	{
+		q: "Does anything leave my Mac?",
+		a: "No. Recording, Polish, captions (Whisper runs on your Mac) and export all happen locally. The MCP server only listens on 127.0.0.1 and refuses requests from web pages.",
+	},
+	{
+		q: "Does it record what I type?",
+		a: "No. Nebula notes when you are typing, so it can zoom in and speed it up, and which shortcuts you press, like ⌘C, so it can show keycaps. The characters you type are never stored.",
+	},
+	{
+		q: "macOS says it can't check the app. What do I do?",
+		a: "This first release isn't notarized yet. In Applications, right-click Nebula, choose Open, and confirm once. After that it opens normally.",
+	},
+	{
+		q: "How does Claude connect?",
+		a: "Run the one-line command in the Claude chapter with Nebula open. Claude Code, or any MCP client, then talks to Nebula on your Mac using your own Claude account. Recording through Claude asks you first unless you change that in Settings.",
+	},
+	{
+		q: "Can I bring my OpenScreen projects?",
+		a: "Yes. Drop a .openscreen project, or any MP4 or MOV, onto the library and it becomes a Nebula project, zooms and trims included.",
+	},
+];
+
+const stack = ["Swift 6", "SwiftUI", "ScreenCaptureKit", "Core Image", "AVFoundation", "WhisperKit"];
+---
+
+<section class="chapter-section faq" id="faq">
+	<div class="container">
+		<Chapter number="06" name="Questions" note="MIT licensed" />
+		<div class="layout">
+			<div class="side">
+				<h2 data-reveal>Built in the open.</h2>
+				<p class="lede" data-reveal>
+					Nebula is a native Mac app written in {stack.slice(0, -1).join(", ")} and {stack.at(-1)}. Read
+					the code, open an issue or send a pull request.
+				</p>
+				<div class="links" data-reveal>
+					<a class="button ghost" href={links.github}><Icon name="github" size={17} />Source on GitHub</a>
+					<a class="button ghost" href={links.issues}>Report an issue</a>
+				</div>
+			</div>
+
+			<div class="list">
+				{faqs.map((faq, index) => (
+					<details class="item" data-reveal>
+						<summary>
+							<span class="num">{String(index + 1).padStart(2, "0")}</span>
+							<span class="q">{faq.q}</span>
+							<span class="plus" aria-hidden="true"><Icon name="plus" size={18} /></span>
+						</summary>
+						<div class="answer"><p>{faq.a}</p></div>
+					</details>
+				))}
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.layout {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: 48px 80px;
+		margin-top: clamp(36px, 4vw, 56px);
+	}
+
+	.side h2 {
+		font-size: clamp(34px, 4.4vw, 58px);
+		font-weight: 600;
+		line-height: 1.04;
+		letter-spacing: -0.035em;
+	}
+
+	.side .lede {
+		margin-top: 22px;
+	}
+
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-top: 32px;
+	}
+
+	.list {
+		border-bottom: 1px solid var(--line);
+	}
+
+	.item {
+		border-top: 1px solid var(--line);
+	}
+
+	summary {
+		display: flex;
+		align-items: baseline;
+		gap: 18px;
+		padding: 20px 0;
+		cursor: pointer;
+		list-style: none;
+		font-size: 17px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.num {
+		flex: none;
+		font-family: var(--mono);
+		font-size: 12.5px;
+		font-weight: 400;
+		color: var(--text-3);
+	}
+
+	.q {
+		flex: 1;
+	}
+
+	.plus {
+		align-self: center;
+		color: var(--text-3);
+		transition:
+			transform 0.3s var(--ease),
+			color 0.3s;
+	}
+
+	summary:hover .plus,
+	.item[open] .plus {
+		color: var(--text-1);
+	}
+
+	.item[open] .plus {
+		transform: rotate(45deg);
+	}
+
+	.item[open] .num {
+		color: var(--lavender);
+	}
+
+	.answer {
+		padding: 0 40px 22px 40px;
+		font-size: 15.5px;
+		line-height: 1.65;
+		color: var(--text-2);
+	}
+
+	@media (max-width: 960px) {
+		.layout {
+			grid-template-columns: 1fr;
+		}
+		.answer {
+			padding-right: 0;
+		}
+	}
+</style>

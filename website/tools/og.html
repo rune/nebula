@@ -1,0 +1,31 @@
+<!doctype html>
+<!-- The social preview image (public/og.jpg). Render at 1200×630, e.g. with tools/demo's Electron. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+	@font-face { font-family: Manrope; src: url("../node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2") format("woff2"); font-weight: 200 800; }
+	* { margin: 0; box-sizing: border-box; }
+	html, body { width: 1200px; height: 630px; overflow: hidden; background: #040406; font-family: Manrope, sans-serif; color: #f3f2f7; }
+	.copy { position: absolute; left: 72px; top: 76px; width: 520px; }
+	.brand { display: flex; align-items: center; gap: 14px; font-size: 26px; font-weight: 780; }
+	h1 { margin-top: 44px; font-size: 64px; line-height: 1.02; letter-spacing: -0.045em; font-weight: 790; }
+	h1 span { background: linear-gradient(100deg, #d9c8ff, #b089f0 45%, #8c28ff); -webkit-background-clip: text; color: transparent; }
+	p { margin-top: 26px; font-size: 21px; line-height: 1.5; color: #a09ead; font-weight: 560; }
+	.shot { position: absolute; left: 640px; top: 96px; width: 820px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 40px 80px -20px rgba(0,0,0,0.9); }
+	.ring { position: absolute; left: -140px; top: 300px; width: 1500px; height: 360px; border: 1.2px solid rgba(176,137,240,0.2); border-radius: 50%; transform: rotate(-9deg); }
+</style>
+</head>
+<body>
+	<div class="ring"></div>
+	<img class="shot" src="../src/assets/shots/editor.png" alt="">
+	<div class="copy">
+		<div class="brand">
+			<svg width="44" height="44" viewBox="0 0 64 64"><defs><linearGradient id="o" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c45cff"/><stop offset="0.5" stop-color="#8c28ff"/><stop offset="1" stop-color="#4f1bc9"/></linearGradient></defs><rect x="1" y="1" width="62" height="62" rx="15" fill="#0b0910" stroke="rgba(255,255,255,0.1)"/><path d="M10 32 A 22 7 0 0 1 54 32" fill="none" stroke="#b089f0" stroke-width="2.6" transform="rotate(-20 32 32)"/><circle cx="31" cy="32" r="14" fill="url(#o)"/><path d="M54 32 A 22 7 0 0 1 10 32" fill="none" stroke="#b089f0" stroke-width="2.6" transform="rotate(-20 32 32)"/><circle cx="52.5" cy="25" r="3.2" fill="#fff"/></svg>
+			Nebula
+		</div>
+		<h1>Screen recordings that <span>edit themselves.</span></h1>
+		<p>A free, open-source screen recorder for macOS. One click adds the zooms, cuts and smooth cursor.</p>
+	</div>
+</body>
+</html>

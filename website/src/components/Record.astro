@@ -1,0 +1,141 @@
+---
+import { Picture, Image } from "astro:assets";
+import Chapter from "./Chapter.astro";
+import wallpaper from "../assets/shots/wallpaper.jpg";
+import raw from "../assets/shots/raw-poster.jpg";
+import bar from "../assets/shots/recorder-bar.png";
+
+const spec = [
+	{ term: "Display, window or area", text: "Pick a window and Nebula records just that window, at its real size." },
+	{ term: "Voice and system audio", text: "On separate tracks, so each one can be fixed on its own." },
+	{ term: "Nothing extra on screen", text: "Nebula's own windows and your desktop icons stay out of the shot." },
+	{ term: "Retina, 60 fps", text: "The cursor, clicks and shortcuts are captured apart from the video and redrawn sharp later." },
+];
+---
+
+<section class="chapter-section record" id="record">
+	<div class="container">
+		<Chapter number="01" name="Record" note="⌥⌘↩" />
+		<div class="head">
+			<div>
+				<h2 data-reveal>Press ⌥⌘↩. Record anything.</h2>
+				<p class="lede" data-reveal>
+					A display, a single window or an area you drag out. Nebula keeps out of the way while you
+					record, then opens the editor the moment you stop.
+				</p>
+			</div>
+			<p class="margin-note" data-reveal><strong>No account</strong>Download, grant Screen Recording once, and you are recording.</p>
+		</div>
+
+		<figure class="figure" data-record-scene>
+			<div class="shot desk">
+				<Picture src={wallpaper} alt="" formats={["avif", "webp"]} widths={[960, 1600, 2480]} sizes="(min-width: 1340px) 1240px, 92vw" class="wall" />
+				<div class="window" data-record-window>
+					<Image src={raw} alt="The Orbit demo app, ready to be recorded" widths={[720, 1440]} sizes="(min-width: 1340px) 1030px, 80vw" format="webp" />
+					<svg class="outline" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+						<rect x="0.2" y="0.2" width="99.6" height="99.6" rx="0.8" pathLength="1" data-record-outline />
+					</svg>
+					<span class="size" data-record-size>1440 × 900</span>
+				</div>
+				<div class="bar" data-record-bar>
+					<Image src={bar} alt="Nebula's recording bar: display, window or area, microphone, system audio and Record" widths={[700, 1019, 2038]} sizes="(min-width: 1340px) 760px, 80vw" format="webp" />
+				</div>
+			</div>
+			<figcaption class="caption"><span>Window mode. Nebula outlines the window it will record and keeps it at its real size.</span></figcaption>
+		</figure>
+
+		<dl class="spec">
+			{spec.map((row) => (
+				<div data-reveal>
+					<dt>{row.term}</dt>
+					<dd>{row.text}</dd>
+				</div>
+			))}
+		</dl>
+	</div>
+</section>
+
+<style>
+	.figure {
+		margin-top: clamp(48px, 6vw, 80px);
+	}
+
+	.desk {
+		aspect-ratio: 16 / 10;
+		background: #0d0820;
+	}
+
+	.desk :global(.wall) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.window {
+		position: absolute;
+		left: 8.3%;
+		top: 7%;
+		width: 83.4%;
+	}
+
+	.window :global(img) {
+		width: 100%;
+		border-radius: 8px;
+		box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.7);
+	}
+
+	.outline {
+		position: absolute;
+		inset: -8px;
+		width: calc(100% + 16px);
+		height: calc(100% + 16px);
+		max-width: none;
+		overflow: visible;
+		pointer-events: none;
+	}
+
+	.outline rect {
+		fill: none;
+		stroke: var(--violet);
+		stroke-width: 2;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.size {
+		position: absolute;
+		left: 50%;
+		bottom: calc(100% + 14px);
+		transform: translateX(-50%);
+		padding: 3px 10px;
+		border-radius: 999px;
+		background: var(--violet);
+		font-family: var(--mono);
+		font-size: 12px;
+		color: #fff;
+	}
+
+	.bar {
+		position: absolute;
+		left: 50%;
+		bottom: 5%;
+		width: 60%;
+		transform: translateX(-50%);
+		filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
+	}
+
+	.bar :global(img) {
+		width: 100%;
+	}
+
+	.spec {
+		margin-top: clamp(48px, 6vw, 72px);
+	}
+
+	@media (max-width: 700px) {
+		.size {
+			display: none;
+		}
+	}
+</style>

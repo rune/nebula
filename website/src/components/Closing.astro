@@ -1,0 +1,120 @@
+---
+import Icon from "./Icon.astro";
+import Logo from "./Logo.astro";
+import { links, site } from "../site";
+---
+
+<section class="closing" data-closing>
+	<div class="container">
+		<div class="end-ruler" aria-hidden="true" data-ruler></div>
+		<h2 class="statement" data-reveal>
+			Record something <span class="fill-mark" data-closing-fill>worth watching.</span>
+		</h2>
+		<div class="cta" data-reveal>
+			<a class="button primary" href={links.dmg}><Icon name="download" size={17} />Download for Mac</a>
+			<a class="button ghost" href={links.releases}>All releases</a>
+			<span class="meta">v{site.version} · {site.dmgSize} · {site.requirements}</span>
+		</div>
+	</div>
+</section>
+
+<footer class="footer">
+	<div class="container foot">
+		<a class="brand" href="#top"><Logo size={20} /><span>Nebula</span></a>
+		<nav aria-label="Footer">
+			<a href={links.dmg}>Download</a>
+			<a href={links.github}>GitHub</a>
+			<a href={links.releases}>Releases</a>
+			<a href={links.issues}>Issues</a>
+			<a href={links.license}>MIT License</a>
+		</nav>
+		<p class="fine">© {new Date().getFullYear()} Nebula contributors</p>
+	</div>
+</footer>
+
+<style>
+	.closing {
+		padding-block: clamp(120px, 14vw, 200px) clamp(96px, 10vw, 140px);
+	}
+
+	/* The page's last clip: a ruler that ends in an out-point. */
+	.end-ruler {
+		height: 12px;
+		margin-bottom: clamp(48px, 6vw, 72px);
+		transform-origin: left;
+		background:
+			linear-gradient(var(--violet), var(--violet)) right bottom / 2px 100% no-repeat,
+			linear-gradient(var(--line-strong), var(--line-strong)) left bottom / 100% 1px no-repeat,
+			repeating-linear-gradient(90deg, var(--tick) 0 1px, transparent 1px 64px) left bottom / 100% 12px no-repeat,
+			repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 8px) left bottom / 100% 6px no-repeat;
+	}
+
+	.statement {
+		font-size: clamp(44px, 7vw, 104px);
+		font-weight: 600;
+		line-height: 1.02;
+		letter-spacing: -0.045em;
+		max-width: 11em;
+	}
+
+	.cta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 12px;
+		margin-top: clamp(36px, 4vw, 52px);
+	}
+
+	.meta {
+		margin-left: 12px;
+		font-family: var(--mono);
+		font-size: 12.5px;
+		color: var(--text-3);
+	}
+
+	.footer {
+		border-top: 1px solid var(--line);
+	}
+
+	.foot {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 16px 32px;
+		padding-block: 28px;
+		font-size: 14px;
+		color: var(--text-3);
+	}
+
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 9px;
+		font-weight: 650;
+		color: var(--text-1);
+	}
+
+	.foot nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 22px;
+	}
+
+	.foot nav a:hover {
+		color: var(--text-1);
+	}
+
+	.fine {
+		margin-left: auto;
+	}
+
+	@media (max-width: 640px) {
+		.meta {
+			margin-left: 0;
+			width: 100%;
+		}
+		.fine {
+			margin-left: 0;
+		}
+	}
+</style>

@@ -1,0 +1,224 @@
+---
+import { Image } from "astro:assets";
+import Chapter from "./Chapter.astro";
+import timeline from "../assets/shots/timeline.png";
+import camera from "../assets/shots/inspector-camera.png";
+import cursor from "../assets/shots/inspector-cursor.png";
+import palette from "../assets/shots/palette.png";
+import exportSheet from "../assets/shots/export-sheet.png";
+
+// Numbered pins on the timeline screenshot (x, y in % of the image), keyed to the list below it.
+const pins = [
+	{ x: 57.6, y: 29, title: "Split", text: "Cut a clip in two at the playhead.", key: "C" },
+	{ x: 47.5, y: 52, title: "Trim", text: "Drag either edge of a clip." },
+	{ x: 50.4, y: 45, title: "Speed", text: "Play any clip from 0.5× to 8×." },
+	{ x: 67.4, y: 40, title: "Restore", text: "Removed parts are a double-click away." },
+	{ x: 80, y: 70, title: "Zoom", text: "Move or stretch any zoom Polish made." },
+];
+
+const plates = [
+	{ title: "A camera that eases", text: "Spring physics with four presets, gentle motion blur, and a follow mode that only pans when it has to.", image: camera, alt: "The camera inspector: motion presets and motion blur", kind: "panel" },
+	{ title: "A cursor worth watching", text: "Smoothed, enlarged and redrawn sharp at any zoom, with click ripples. It hides itself when idle.", image: cursor, alt: "The cursor inspector: size, smoothing and click effects", kind: "panel" },
+	{ title: "⌘K for everything", text: "Every command in one searchable list, with single-key shortcuts for the ones you use most.", image: palette, alt: "The command palette", kind: "wide" },
+	{ title: "Export anywhere", text: "MP4 up to 4K60 in H.264 or HEVC, or GIF. Or copy the video, or one frame, to the clipboard.", image: exportSheet, alt: "The export sheet: resolution, frame rate, quality and codec", kind: "panel" },
+];
+
+const more = ["blur and pixelate", "spotlight", "text and arrows", "on-device captions", "noise reduction", "music that ducks under speech", "per-section volume", "style presets", "crop", "OpenScreen import"];
+---
+
+<section class="chapter-section edit" id="edit">
+	<div class="container">
+		<Chapter number="04" name="Edit" note="Split · Trim · Ripple · Speed" />
+		<div class="head">
+			<div>
+				<h2 data-reveal>Then make it yours.</h2>
+				<p class="lede" data-reveal>
+					The timeline works like a video editor's. Split, trim, ripple-delete and set the speed of each
+					clip. Everything Polish did is there as an ordinary edit.
+				</p>
+			</div>
+			<p class="margin-note" data-reveal><strong>⌘Z, all the way back</strong>Every change, yours or Claude's, is one step in the undo history.</p>
+		</div>
+
+		<figure class="figure" data-pins>
+			<div class="shot timeline">
+				<Image src={timeline} alt="Nebula's timeline: clips with thumbnails and 2.5× speed badges, a marker where a pause was removed, and zoom blocks below" widths={[1240, 2016]} sizes="(min-width: 1340px) 1240px, 96vw" format="webp" />
+				{pins.map((pin, index) => (
+					<span class="pin" style={`left:${pin.x}%;top:${pin.y}%`} aria-hidden="true" data-pin>{index + 1}</span>
+				))}
+			</div>
+			<ol class="key">
+				{pins.map((pin, index) => (
+					<li data-reveal>
+						<span class="num">{index + 1}</span>
+						<span><b>{pin.title}</b>{pin.key && <span class="kbd">{pin.key}</span>}<br />{pin.text}</span>
+					</li>
+				))}
+			</ol>
+		</figure>
+
+		<div class="plates">
+			{plates.map((plate) => (
+				<figure class="plate" data-reveal>
+					<div class:list={["frame", plate.kind]}>
+						<Image src={plate.image} alt={plate.alt} widths={[420, 700]} sizes="(min-width: 960px) 420px, 80vw" format="webp" />
+					</div>
+					<figcaption>
+						<h3>{plate.title}</h3>
+						<p>{plate.text}</p>
+					</figcaption>
+				</figure>
+			))}
+		</div>
+
+		<p class="more" data-reveal>
+			<b>Also in the box:</b>{" "}
+			{more.map((item, index) => <span>{item}{index < more.length - 1 ? ", " : "."}</span>)}
+		</p>
+	</div>
+</section>
+
+<style>
+	.figure {
+		margin-top: clamp(48px, 6vw, 80px);
+	}
+
+	.pin {
+		position: absolute;
+		display: grid;
+		place-items: center;
+		width: 22px;
+		height: 22px;
+		margin: -11px 0 0 -11px;
+		border-radius: 999px;
+		background: var(--violet);
+		box-shadow: 0 0 0 3px rgba(5, 5, 7, 0.85);
+		font-family: var(--mono);
+		font-size: 11.5px;
+		color: #fff;
+	}
+
+	.key {
+		display: grid;
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+		gap: 24px;
+		margin-top: 24px;
+	}
+
+	.key li {
+		display: flex;
+		gap: 10px;
+		font-size: 14px;
+		line-height: 1.5;
+		color: var(--text-2);
+	}
+
+	.key b {
+		margin-right: 8px;
+		font-weight: 600;
+		color: var(--text-1);
+	}
+
+	.num {
+		flex: none;
+		font-family: var(--mono);
+		font-size: 12.5px;
+		line-height: 1.7;
+		color: var(--lavender);
+	}
+
+	.plates {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 24px;
+		margin-top: clamp(80px, 9vw, 128px);
+	}
+
+	.frame {
+		height: 340px;
+		border-radius: var(--radius);
+		background: var(--surface-1);
+		border: 1px solid var(--line);
+		overflow: hidden;
+		display: flex;
+		justify-content: center;
+		padding: 28px 20px 0;
+		/* The panel runs off the bottom of the plate. */
+		mask-image: linear-gradient(#000 72%, transparent);
+		-webkit-mask-image: linear-gradient(#000 72%, transparent);
+	}
+
+	.frame :global(img) {
+		width: 100%;
+		max-width: 300px;
+		height: auto;
+		align-self: flex-start;
+		border-radius: 10px;
+	}
+
+	.frame.wide {
+		align-items: center;
+		padding: 0 16px;
+		mask-image: none;
+		-webkit-mask-image: none;
+	}
+
+	.frame.wide :global(img) {
+		max-width: none;
+		align-self: center;
+	}
+
+	.plate figcaption {
+		margin-top: 18px;
+	}
+
+	.plate h3 {
+		font-size: 16px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+
+	.plate p {
+		margin-top: 6px;
+		font-size: 14.5px;
+		line-height: 1.55;
+		color: var(--text-2);
+	}
+
+	.more {
+		max-width: 52em;
+		margin-top: 56px;
+		padding-top: 22px;
+		border-top: 1px solid var(--line);
+		font-size: 16px;
+		line-height: 1.7;
+		color: var(--text-2);
+	}
+
+	.more b {
+		font-weight: 600;
+		color: var(--text-1);
+	}
+
+	@media (max-width: 1100px) {
+		.plates {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.key {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 640px) {
+		.plates,
+		.key {
+			grid-template-columns: 1fr;
+		}
+		.pin {
+			width: 18px;
+			height: 18px;
+			margin: -9px 0 0 -9px;
+			font-size: 10px;
+		}
+	}
+</style>

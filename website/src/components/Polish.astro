@@ -1,0 +1,588 @@
+---
+import { getImage } from "astro:assets";
+import Chapter from "./Chapter.astro";
+import rawPoster from "../assets/shots/raw-poster.jpg";
+import polishedPoster from "../assets/shots/polished-poster.jpg";
+
+const rawImage = await getImage({ src: rawPoster, width: 1200, format: "webp" });
+const polishedImage = await getImage({ src: polishedPoster, width: 1200, format: "webp" });
+
+/**
+ * The real Polish result for the Orbit demo recording (17.5 s → 10.3 s). Times are seconds of the
+ * recording. Scrolling plays the recording under a playhead; each edit is drawn as the playhead
+ * reaches it, then the cuts close and the sped-up clips shorten.
+ */
+const duration = 17.5;
+const rate = 2.5;
+const segments = [
+	{ start: 0, end: 0.917, kind: "cut" },
+	{ start: 0.917, end: 3.7, kind: "keep" },
+	{ start: 3.7, end: 5.93, kind: "speed" },
+	{ start: 5.93, end: 6.63, kind: "keep" },
+	{ start: 6.63, end: 8.525, kind: "cut" },
+	{ start: 8.525, end: 9.9, kind: "keep" },
+	{ start: 9.9, end: 14.036, kind: "speed" },
+	{ start: 14.036, end: 16.925, kind: "keep" },
+	{ start: 16.925, end: 17.5, kind: "cut" },
+];
+const zooms = [
+	{ start: 1.95, end: 4.17 },
+	{ start: 4.17, end: 7.53 },
+	{ start: 9.15, end: 15.636 },
+];
+const notes = [
+	{ title: "Cut 0.9 s", detail: "slow start", start: 0, end: 0.917 },
+	{ title: "Zoom 1.9×", detail: "on the click", start: 1.95, end: 3.7 },
+	{ title: "2.5× and frame", detail: "typing the name", start: 3.7, end: 5.93 },
+	{ title: "Cut 1.9 s", detail: "a pause", start: 6.63, end: 8.525 },
+	{ title: "2.5× and follow", detail: "typing the invites", start: 9.9, end: 14.036 },
+	{ title: "Cut 0.6 s", detail: "idle end", start: 16.925, end: 17.5 },
+];
+
+const percent = (seconds: number) => `${((seconds / duration) * 100).toFixed(3)}%`;
+const columns = segments.map((segment) => ({
+	...segment,
+	width: percent(segment.end - segment.start),
+	speedWidth: percent((segment.end - segment.start) / rate),
+	zooms: zooms
+		.map((zoom) => ({ zoom, start: Math.max(zoom.start, segment.start), end: Math.min(zoom.end, segment.end) }))
+		.filter((part) => part.end > part.start)
+		.map((part) => ({
+			from: part.zoom.start,
+			left: `${(((part.start - segment.start) / (segment.end - segment.start)) * 100).toFixed(3)}%`,
+			width: `${(((part.end - part.start) / (segment.end - segment.start)) * 100).toFixed(3)}%`,
+		})),
+}));
+const seconds = Array.from({ length: 18 }, (_, second) => second);
+---
+
+<section class="chapter-section polish" id="polish" data-polish data-duration={duration} data-rate={rate} data-segments={JSON.stringify(segments)} data-zooms={JSON.stringify(zooms)}>
+	<div class="container">
+		<Chapter number="02" name="Polish" note="17.5 s → 10.3 s" />
+		<div class="head">
+			<div>
+				<h2 data-reveal>One click, the whole edit.</h2>
+				<p class="lede" data-reveal>
+					Polish reads your clicks, typing, pauses and voice, then makes the edits you would have made.
+					Scroll through this 17.5-second recording and watch each one land.
+				</p>
+			</div>
+			<p class="margin-note" data-reveal><strong>One undo step</strong>Run it again with other settings, or take it all back with ⌘Z.</p>
+		</div>
+	</div>
+
+	<div class="pin" data-polish-pin>
+		<div class="container stage">
+			<div class="pair">
+				<figure>
+					<div class="pane raw">
+						<video data-polish-raw src="/video/raw-scrub.mp4" poster={rawImage.src} muted playsinline preload="auto" aria-label="The Orbit recording as it was captured"></video>
+					</div>
+					<figcaption class="caption"><span><span class="tc" data-raw-time>0:00.0</span>&ensp;The recording</span></figcaption>
+				</figure>
+				<figure>
+					<div class="pane polished" data-polished-pane>
+						<video data-polish-out src="/video/polished-scrub.mp4" poster={polishedImage.src} muted playsinline preload="auto" aria-label="The same recording after Polish"></video>
+						<span class="cut-label" aria-hidden="true">Cut. Not in the video.</span>
+						<span class="state" aria-hidden="true" data-polish-state></span>
+					</div>
+					<figcaption class="caption"><span><span class="tc" data-out-time>0:00.0</span>&ensp;After Polish, at the same moment</span></figcaption>
+				</figure>
+			</div>
+
+			<div class="diagram" aria-label="What Polish changed: three cuts, three zooms and two clips sped up 2.5 times, taking the recording from 17.5 to 10.3 seconds.">
+				<ol class="notes">
+					{notes.map((note, index) => (
+						<li
+							class:list={["note", `tier-${index % 2}`, { end: index === notes.length - 1 }]}
+							style={index === notes.length - 1 ? "right:0" : `left:${percent(note.start)}`}
+							data-note
+							data-start={note.start}
+							data-end={note.end}
+						>
+							<b>{note.title}</b><span>{note.detail}</span>
+						</li>
+					))}
+				</ol>
+				<p class="summary" data-polish-summary>
+					<b>7.2 seconds shorter.</b> Three cuts closed up and two clips play at 2.5×, while the zooms ride along with them.
+				</p>
+
+				<div class="track" data-polish-track>
+					{columns.map((column) => (
+						<div class:list={["column", column.kind]} style={`width:${column.width}`} data-column={column.kind} data-start={column.start} data-speed-width={column.speedWidth}>
+							<div class="clip">{column.kind === "speed" && <span class="rate">2.5×</span>}</div>
+							<div class="zoom-row">
+								{column.zooms.map((part) => <div class="zoom" style={`left:${part.left};width:${part.width}`} data-zoom={part.from}></div>)}
+							</div>
+						</div>
+					))}
+					<span class="original" aria-hidden="true" data-polish-original></span>
+				</div>
+
+				<div class="axis" aria-hidden="true" data-polish-axis>
+					{seconds.map((second) => (
+						<span class:list={["tick", { major: second % 5 === 0 }]} style={`left:${percent(second)}`}>{second % 5 === 0 && <i>{second} s</i>}</span>
+					))}
+				</div>
+
+				<span class="playhead" aria-hidden="true" data-polish-playhead></span>
+
+				<div class="readout">
+					<span class="legend"><i class="key key-cut"></i>Cut <i class="key key-speed"></i>Sped up <i class="key key-zoom"></i>Zoom</span>
+					<span class="length">Length <b data-polish-length>17.5 s</b></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container result">
+		<figure>
+			<div class="shot">
+				<video data-polish-result src="/video/polished.mp4" poster={polishedImage.src} muted loop playsinline preload="metadata" aria-label="The polished Orbit video"></video>
+			</div>
+			<figcaption class="caption"><span><span class="tc">0:00 – 0:10.3</span>&ensp;The polished video at real speed. Nothing here was edited by hand.</span></figcaption>
+		</figure>
+		<div class="result-text">
+			<p class="big" data-reveal>10.3 s<span>from 17.5 s</span></p>
+			<p class="lede" data-reveal>
+				Three zooms, three cuts and two speed-ups. Each one is an ordinary edit on the timeline, so
+				you can move it, stretch it or delete it.
+			</p>
+		</div>
+	</div>
+</section>
+
+<style>
+	/* MARK: Stage */
+
+	.pin {
+		margin-top: clamp(48px, 6vw, 80px);
+	}
+
+	.stage {
+		display: flex;
+		flex-direction: column;
+		gap: 40px;
+	}
+
+	.pair {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 24px;
+	}
+
+	.pane {
+		position: relative;
+		aspect-ratio: 1600 / 1034;
+		border-radius: var(--radius);
+		overflow: hidden;
+		background: var(--surface-1);
+		border: 1px solid var(--line-strong);
+	}
+
+	.pane video {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		transition: opacity 0.35s var(--ease);
+	}
+
+	.raw video {
+		object-fit: contain;
+		background: #000;
+	}
+
+	.cut-label {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		padding: 8px 14px;
+		border-radius: var(--radius);
+		background: var(--surface-2);
+		border: 1px solid var(--line-strong);
+		font-size: 14px;
+		font-weight: 600;
+		white-space: nowrap;
+		color: var(--text-1);
+		opacity: 0;
+		transition: opacity 0.35s var(--ease);
+	}
+
+	.polished.cut video {
+		opacity: 0.12;
+	}
+
+	.polished.cut .cut-label {
+		opacity: 1;
+	}
+
+	.state {
+		position: absolute;
+		left: 12px;
+		top: 12px;
+		padding: 4px 10px;
+		border-radius: 999px;
+		background: rgba(5, 5, 7, 0.78);
+		border: 1px solid var(--line-strong);
+		font-family: var(--mono);
+		font-size: 12px;
+		color: var(--text-1);
+		opacity: 0;
+		transition: opacity 0.25s;
+	}
+
+	.state.visible {
+		opacity: 1;
+	}
+
+	/* MARK: Diagram */
+
+	.diagram {
+		position: relative;
+		padding-top: 92px;
+	}
+
+	.notes {
+		position: absolute;
+		inset: 0 0 auto;
+		height: 92px;
+	}
+
+	.note {
+		position: absolute;
+		bottom: 6px;
+		display: flex;
+		flex-direction: column;
+		padding-left: 10px;
+		border-left: 1px solid var(--line-strong);
+		font-size: 13px;
+		line-height: 1.35;
+		color: var(--text-3);
+		white-space: nowrap;
+		transition:
+			color 0.3s,
+			border-color 0.3s;
+	}
+
+	.note.tier-0 {
+		top: 0;
+	}
+
+	.note.tier-1 {
+		top: 42px;
+	}
+
+	.note.end {
+		align-items: flex-end;
+		padding: 0 10px 0 0;
+		border-left: 0;
+		border-right: 1px solid var(--line-strong);
+	}
+
+	.note b {
+		font-weight: 600;
+		color: var(--text-2);
+		transition: color 0.3s;
+	}
+
+	.note span {
+		font-family: var(--mono);
+		font-size: 12px;
+	}
+
+	.note.reached b {
+		color: var(--text-1);
+	}
+
+	.note.active {
+		border-color: var(--violet);
+	}
+
+	.note.active b {
+		color: var(--lavender);
+	}
+
+	/* Takes the notes' place once the edits have closed up. */
+	.summary {
+		position: absolute;
+		left: 0;
+		top: 36px;
+		max-width: 40em;
+		font-size: 15px;
+		color: var(--text-2);
+		opacity: 0;
+	}
+
+	.summary b {
+		font-weight: 600;
+		color: var(--text-1);
+	}
+
+	.track {
+		position: relative;
+		display: flex;
+	}
+
+	.column {
+		flex: none;
+		padding-right: 3px;
+		overflow: hidden;
+	}
+
+	.clip {
+		position: relative;
+		height: 36px;
+		border-radius: 6px;
+		background: var(--surface-3);
+		border: 1px solid var(--line-strong);
+		transition:
+			background-color 0.35s,
+			border-color 0.35s;
+	}
+
+	.cut.on .clip {
+		background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.13) 0 4px, transparent 4px 9px);
+		border-color: rgba(255, 255, 255, 0.22);
+	}
+
+	.speed.on .clip {
+		background: var(--speed);
+		border-color: var(--speed-line);
+	}
+
+	.rate {
+		position: absolute;
+		left: 8px;
+		top: 50%;
+		transform: translateY(-50%);
+		font-family: var(--mono);
+		font-size: 12px;
+		color: var(--text-1);
+		opacity: 0;
+		transition: opacity 0.3s;
+	}
+
+	.speed.on .rate {
+		opacity: 1;
+	}
+
+	.zoom-row {
+		position: relative;
+		height: 12px;
+		margin-top: 5px;
+	}
+
+	.zoom {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		border-radius: 4px;
+		background: var(--zoom);
+		transform-origin: left;
+		transform: scaleX(0);
+		transition: transform 0.5s var(--ease);
+	}
+
+	.zoom.on {
+		transform: scaleX(1);
+	}
+
+	/* The recording's original length, shown once the edits have closed up. */
+	.original {
+		position: absolute;
+		inset: -4px 0 auto 0;
+		height: 44px;
+		border: 1px dashed rgba(255, 255, 255, 0.14);
+		border-radius: 8px;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.axis {
+		position: relative;
+		height: 26px;
+		margin-top: 8px;
+		border-top: 1px solid var(--line);
+	}
+
+	.tick {
+		position: absolute;
+		top: 0;
+		width: 1px;
+		height: 4px;
+		background: var(--tick);
+	}
+
+	.tick.major {
+		height: 8px;
+	}
+
+	.tick i {
+		position: absolute;
+		top: 10px;
+		left: 0;
+		font-style: normal;
+		font-family: var(--mono);
+		font-size: 11px;
+		color: var(--text-3);
+		white-space: nowrap;
+	}
+
+	.playhead {
+		position: absolute;
+		top: 0;
+		bottom: 40px;
+		left: 0;
+		width: 2px;
+		margin-left: -1px;
+		border-radius: 1px;
+		background: var(--violet);
+		opacity: 0;
+		will-change: transform;
+	}
+
+	.readout {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+		margin-top: 12px;
+		font-size: 13px;
+		color: var(--text-3);
+	}
+
+	.legend {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.key {
+		width: 14px;
+		height: 8px;
+		border-radius: 2px;
+		margin-left: 8px;
+	}
+
+	.key:first-child {
+		margin-left: 0;
+	}
+
+	.key-cut {
+		background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0 2px, transparent 2px 4px);
+	}
+
+	.key-speed {
+		background: var(--speed-line);
+	}
+
+	.key-zoom {
+		background: var(--violet);
+	}
+
+	.length b {
+		margin-left: 6px;
+		font-family: var(--mono);
+		font-size: 15px;
+		font-weight: 500;
+		color: var(--text-1);
+	}
+
+	/* MARK: Result */
+
+	.result {
+		display: grid;
+		grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+		gap: 56px;
+		align-items: end;
+		margin-top: clamp(96px, 10vw, 140px);
+	}
+
+	.big {
+		font-size: clamp(56px, 6.4vw, 92px);
+		font-weight: 600;
+		line-height: 0.98;
+		letter-spacing: -0.045em;
+	}
+
+	.big span {
+		display: block;
+		color: var(--text-3);
+	}
+
+	.result-text .lede {
+		margin-top: 24px;
+	}
+
+	/* While pinned, the pair shrinks on short windows so the whole figure stays in view. */
+	@media (min-width: 961px) {
+		.pair {
+			width: min(100%, calc((100svh - 410px) * 3.094 + 24px));
+		}
+	}
+
+	/* MARK: Small screens: no pin; the notes become a list under the figure. */
+
+	@media (max-width: 960px) {
+		.diagram {
+			padding-top: 0;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.notes {
+			position: static;
+			order: 5;
+			height: auto;
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 14px 20px;
+			margin-top: 24px;
+		}
+
+		.note,
+		.note.end {
+			position: static;
+			align-items: flex-start;
+			padding: 0 0 0 10px;
+			border-right: 0;
+			border-left: 1px solid var(--line-strong);
+			white-space: normal;
+		}
+
+		.note b {
+			color: var(--text-1);
+		}
+
+		.summary {
+			position: static;
+			order: -1;
+			margin-bottom: 20px;
+		}
+
+		.readout {
+			order: 4;
+			flex-wrap: wrap;
+		}
+
+		.playhead {
+			display: none;
+		}
+
+		.result {
+			grid-template-columns: 1fr;
+			gap: 40px;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.pair {
+			grid-template-columns: 1fr;
+		}
+		.legend {
+			display: none;
+		}
+	}
+</style>

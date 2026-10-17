@@ -1,0 +1,32 @@
+---
+/** The Nebula mark: the app icon's planet and ring, flat (no glow). */
+interface Props {
+	size?: number;
+	class?: string;
+}
+const { size = 28, class: className } = Astro.props;
+const id = `logo-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<svg class={className} width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+	<defs>
+		<linearGradient id={`${id}-bg`} x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#17131f" />
+			<stop offset="1" stop-color="#060608" />
+		</linearGradient>
+		<linearGradient id={`${id}-orb`} x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0" stop-color="#c45cff" />
+			<stop offset="0.5" stop-color="#8c28ff" />
+			<stop offset="1" stop-color="#4f1bc9" />
+		</linearGradient>
+	</defs>
+	<rect x="1" y="1" width="62" height="62" rx="15" fill={`url(#${id}-bg)`} stroke="rgba(255,255,255,0.1)" />
+	<g transform="rotate(-20 32 32)">
+		<path d="M10 32 A 22 7 0 0 1 54 32" fill="none" stroke="#b089f0" stroke-width="2.6" />
+	</g>
+	<circle cx="31" cy="32" r="14" fill={`url(#${id}-orb)`} />
+	<g transform="rotate(-20 32 32)">
+		<path d="M54 32 A 22 7 0 0 1 10 32" fill="none" stroke="#b089f0" stroke-width="2.6" />
+	</g>
+	<circle cx="52.5" cy="25" r="3.2" fill="#fff" />
+</svg>

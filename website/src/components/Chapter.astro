@@ -1,0 +1,72 @@
+---
+/** Opens a chapter: its number and name on a marker, then a timeline ruler to the edge. */
+interface Props {
+	number: string;
+	name: string;
+	note?: string;
+}
+const { number, name, note } = Astro.props;
+---
+
+<div class="chapter" data-chapter>
+	<span class="marker" aria-hidden="true"></span>
+	<span class="number">{number}</span>
+	<span class="name">{name}</span>
+	<span class="ruler" aria-hidden="true" data-ruler></span>
+	{note && <span class="note">{note}</span>}
+</div>
+
+<style>
+	.chapter {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		height: 28px;
+	}
+
+	.marker {
+		align-self: stretch;
+		width: 2px;
+		border-radius: 1px;
+		background: var(--violet);
+	}
+
+	.number {
+		font-family: var(--mono);
+		font-size: 13px;
+		color: var(--lavender);
+	}
+
+	.name {
+		font-size: 14px;
+		font-weight: 600;
+		letter-spacing: -0.005em;
+	}
+
+	/* Fine ticks every 8px with a taller one every 64px, sitting on a hairline. */
+	.ruler {
+		flex: 1;
+		align-self: flex-end;
+		height: 12px;
+		margin-left: 8px;
+		transform-origin: left;
+		background:
+			linear-gradient(var(--line-strong), var(--line-strong)) left bottom / 100% 1px no-repeat,
+			repeating-linear-gradient(90deg, var(--tick) 0 1px, transparent 1px 64px) left bottom / 100% 12px no-repeat,
+			repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 8px) left bottom / 100% 6px no-repeat;
+	}
+
+	.note {
+		font-family: var(--mono);
+		font-size: 12.5px;
+		color: var(--text-3);
+		white-space: nowrap;
+	}
+
+	@media (max-width: 600px) {
+		.note {
+			display: none;
+		}
+	}
+</style>

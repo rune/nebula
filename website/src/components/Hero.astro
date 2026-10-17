@@ -1,0 +1,114 @@
+---
+import { Picture, getImage } from "astro:assets";
+import Icon from "./Icon.astro";
+import { links, site } from "../site";
+import editor from "../assets/shots/editor.png";
+import poster from "../assets/shots/polished-poster.jpg";
+
+const posterImage = await getImage({ src: poster, width: 1600, format: "webp" });
+---
+
+<section class="hero" id="top">
+	<div class="container">
+		<h1 class="statement">
+			<span class="line" data-hero-line>Screen recordings that <span class="fill-mark" data-hero-fill>edit themselves.</span></span>{" "}
+			<span class="line rest" data-hero-line>Nebula records your Mac, then zooms in, cuts the pauses and smooths the cursor for you.</span>
+		</h1>
+		<div class="cta" data-hero-in>
+			<a class="button primary" href={links.dmg}><Icon name="download" size={17} />Download for Mac</a>
+			<a class="button ghost" href={links.github}><Icon name="github" size={17} />View on GitHub</a>
+			<span class="meta">Free and open source · v{site.version} · macOS 15+ · {site.dmgSize}</span>
+		</div>
+	</div>
+
+	<figure class="container figure" data-hero-product>
+		<div class="shot app">
+			<Picture
+				src={editor}
+				alt="The Nebula editor: a polished recording of the Orbit demo app on its desktop wallpaper, the inspector and the clip timeline."
+				formats={["avif", "webp"]}
+				widths={[960, 1440, 2160, 2880]}
+				sizes="(min-width: 1340px) 1240px, 92vw"
+				loading="eager"
+				fetchpriority="high"
+			/>
+			<video
+				class="stage-video"
+				src="/video/polished.mp4"
+				poster={posterImage.src}
+				autoplay
+				muted
+				loop
+				playsinline
+				preload="auto"
+				aria-label="The polished Orbit recording playing in Nebula's preview"></video>
+		</div>
+		<figcaption class="caption">
+			<span><span class="tc">0:00 – 0:10.3</span>&ensp;The editor playing a polished recording of Orbit, a made-up app. Every recording on this page was made with Nebula.</span>
+		</figcaption>
+	</figure>
+</section>
+
+<style>
+	.hero {
+		padding-top: clamp(132px, 15vw, 196px);
+	}
+
+	.statement {
+		font-size: clamp(36px, 4.9vw, 68px);
+		font-weight: 600;
+		line-height: 1.07;
+		letter-spacing: -0.036em;
+		max-width: 16.5em;
+		text-wrap: pretty;
+	}
+
+	.line {
+		display: inline;
+	}
+
+	.rest {
+		color: var(--text-3);
+	}
+
+	.cta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 12px;
+		margin-top: clamp(32px, 4vw, 48px);
+	}
+
+	.meta {
+		margin-left: 12px;
+		font-family: var(--mono);
+		font-size: 12.5px;
+		color: var(--text-3);
+	}
+
+	.figure {
+		margin-top: clamp(56px, 7vw, 96px);
+	}
+
+	.app {
+		box-shadow: 0 50px 100px -40px rgba(0, 0, 0, 0.9);
+	}
+
+	/* The video sits exactly over the preview area of the screenshot. */
+	.stage-video {
+		position: absolute;
+		left: 13.89%;
+		top: 8%;
+		width: 50.42%;
+		height: 52.1%;
+		object-fit: cover;
+		background: #0d0820;
+	}
+
+	@media (max-width: 640px) {
+		.meta {
+			margin-left: 0;
+			width: 100%;
+		}
+	}
+</style>
