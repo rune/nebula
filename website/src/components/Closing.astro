@@ -12,7 +12,7 @@ import { links, site } from "../site";
 		</h2>
 		<div class="cta" data-reveal>
 			<a class="button primary" href={links.dmg}><Icon name="download" size={17} />Download for Mac</a>
-			<a class="button ghost" href={links.releases}>All releases</a>
+			<a class="button ghost" href={links.releases} target="_blank" rel="noopener noreferrer">All releases</a>
 			<span class="meta">v{site.version} · {site.dmgSize} · {site.requirements}</span>
 		</div>
 	</div>
@@ -23,10 +23,10 @@ import { links, site } from "../site";
 		<a class="brand" href="#top"><Logo size={20} /><span>Nebula</span></a>
 		<nav aria-label="Footer">
 			<a href={links.dmg}>Download</a>
-			<a href={links.github}>GitHub</a>
-			<a href={links.releases}>Releases</a>
-			<a href={links.issues}>Issues</a>
-			<a href={links.license}>MIT License</a>
+			<a href={links.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+			<a href={links.releases} target="_blank" rel="noopener noreferrer">Releases</a>
+			<a href={links.issues} target="_blank" rel="noopener noreferrer">Issues</a>
+			<a href={links.license} target="_blank" rel="noopener noreferrer">MIT License</a>
 		</nav>
 		<p class="fine">© {new Date().getFullYear()} Nebula contributors</p>
 	</div>
