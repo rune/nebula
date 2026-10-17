@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+	/* A · Studio: centred, product-first, very little decoration. */
+	.center { text-align: center; }
+	h1 { font-size: 76px; line-height: 1.02; letter-spacing: -0.04em; font-weight: 680; }
+	h2 { font-size: 54px; line-height: 1.05; letter-spacing: -0.035em; font-weight: 660; }
+	.label { font-size: 15px; font-weight: 650; color: var(--lav); }
+	.sub { font-size: 20px; line-height: 1.55; color: var(--t2); max-width: 640px; margin: 22px auto 0; }
+	.sub b { color: var(--t1); font-weight: 650; }
+	.cta { display: flex; gap: 12px; justify-content: center; margin-top: 34px; }
+	.meta { margin-top: 16px; font-size: 13.5px; color: var(--t3); font-weight: 600; }
+
+	.hero-copy { position: absolute; top: 150px; left: 0; right: 0; }
+	.hero-shot { position: absolute; left: 100px; right: 100px; top: 520px; }
+
+	/* Polish: one stage, a wipe between the raw recording and Nebula's result. */
+	.p-head { position: absolute; top: 64px; left: 0; right: 0; }
+	.stage { position: absolute; left: 290px; width: 860px; top: 262px; height: 532px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line2); box-shadow: 0 40px 90px -30px #000; }
+	.stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+	.stage .raw-frame { background: #0d0820; }
+	.stage .raw-frame img { inset: 0; width: 100%; height: 100%; border-radius: 0; }
+	.wipe { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; }
+	.wipe::after { content: "‹ ›"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%; background: #fff; color: #0b0b0f; font: 700 15px/40px Manrope; text-align: center; letter-spacing: 2px; }
+	.corner { position: absolute; top: 16px; padding: 6px 11px; border-radius: 9px; background: rgba(4,4,6,0.72); border: 1px solid var(--line2); font-size: 13px; font-weight: 700; }
+	.seg { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; padding: 4px; border-radius: 12px; background: rgba(12,12,17,0.86); border: 1px solid var(--line2); backdrop-filter: blur(10px); }
+	.seg span { padding: 7px 16px; border-radius: 9px; font-size: 13.5px; font-weight: 650; color: var(--t2); }
+	.seg span.on { background: #f3f2f7; color: #0b0b0f; }
+
+	.stats { position: absolute; left: 290px; width: 860px; top: 818px; display: grid; grid-template-columns: repeat(4, 1fr); }
+	.stats div { padding: 0 22px; border-left: 1px solid var(--line); font-size: 15px; color: var(--t2); line-height: 1.5; }
+	.stats div:first-child { border-left: 0; padding-left: 0; }
+	.stats b { display: block; font-size: 22px; font-weight: 700; color: var(--t1); letter-spacing: -0.02em; margin-bottom: 2px; }
+
+	/* Feature */
+	.f-head { position: absolute; top: 96px; left: 0; right: 0; }
+	.look { position: absolute; left: 230px; width: 980px; top: 330px; height: 430px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line2); }
+	.look img { width: 100%; height: 100%; object-fit: cover; }
+	.cols { position: absolute; left: 230px; width: 980px; top: 790px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; font-size: 15px; line-height: 1.55; color: var(--t2); }
+	.cols b { color: var(--t1); font-weight: 680; }
+</style>
+</head>
+<body>
+
+<!-- 1 · Hero -->
+<section class="frame">
+	<nav class="nav"><span class="brand"><img src="assets/icon.png">Nebula</span><span class="right"><span>Features</span><span>Claude</span><span>FAQ</span><span>GitHub</span><span class="btn light">Download</span></span></nav>
+	<div class="hero-copy center">
+		<h1>Screen recordings<br>that edit themselves.</h1>
+		<p class="sub">Record your Mac. <b>Polish</b> adds the zooms, cuts the dead air and smooths the cursor in one click.</p>
+		<div class="cta"><span class="btn primary lg">Download for Mac</span><span class="btn lg">View on GitHub</span></div>
+		<p class="meta">Free and open source · macOS 15 or later</p>
+	</div>
+	<div class="hero-shot shot"><img src="assets/editor.png"></div>
+	<span class="frame-tag">A · STUDIO — HERO</span>
+</section>
+
+<!-- 2 · Polish, mid-scroll -->
+<section class="frame">
+	<div class="p-head center">
+		<div class="label">Polish</div>
+		<h2 style="margin-top:14px">One click. The edit you'd have done.</h2>
+		<p class="sub" style="margin-top:16px">Scroll to run it. <b>Clicks become zooms</b>, typing gets framed and sped up, and <b>the pauses disappear.</b></p>
+	</div>
+	<div class="stage">
+		<div class="raw-frame" style="position:absolute;inset:0"><img src="assets/raw-typing.jpg"></div>
+		<div style="position:absolute;inset:0;clip-path:inset(0 52% 0 0)"><img src="assets/polished-typing.jpg"></div>
+		<div class="wipe" style="left:48%"></div>
+		<span class="corner" style="left:16px;color:var(--lav)">Polished</span>
+		<span class="corner" style="right:16px;color:var(--t2)">Recording</span>
+	</div>
+	<div class="stats">
+		<div><b>17.5 s → 10.3 s</b>Same story, 41% shorter</div>
+		<div><b>3 zooms</b>On the click and both fields</div>
+		<div><b>3 cuts</b>Idle start, a pause, idle end</div>
+		<div><b>2.5×</b>On long typing</div>
+	</div>
+	<span class="frame-tag">A · STUDIO — POLISH, MID-SCROLL (WIPE FOLLOWS SCROLL)</span>
+</section>
+
+<!-- 3 · Polish, end -->
+<section class="frame">
+	<div class="p-head center">
+		<div class="label">Polish</div>
+		<h2 style="margin-top:14px">One click. The edit you'd have done.</h2>
+		<p class="sub" style="margin-top:16px">Scroll to run it. <b>Clicks become zooms</b>, typing gets framed and sped up, and <b>the pauses disappear.</b></p>
+	</div>
+	<div class="stage"><img src="assets/polished-follow.jpg">
+		<div class="seg"><span>Recording</span><span class="on">Polished</span></div>
+	</div>
+	<div class="stats">
+		<div><b>17.5 s → 10.3 s</b>Same story, 41% shorter</div>
+		<div><b>3 zooms</b>On the click and both fields</div>
+		<div><b>3 cuts</b>Idle start, a pause, idle end</div>
+		<div><b>2.5×</b>On long typing</div>
+	</div>
+	<span class="frame-tag">A · STUDIO — POLISH, DONE (PLAYS THE POLISHED VIDEO; TOGGLE TO COMPARE)</span>
+</section>
+
+<!-- 4 · Feature -->
+<section class="frame">
+	<div class="f-head center">
+		<div class="label">Looks right by default</div>
+		<h2 style="margin-top:14px">Your real desktop, not a template.</h2>
+		<p class="sub" style="margin-top:16px">Nebula keeps the wallpaper that was behind your window, and the window keeps its real size.</p>
+	</div>
+	<div class="look"><img src="assets/look-desktop.jpg">
+		<div class="seg"><span class="on">Your desktop</span><span>Gradient</span><span>Colour</span><span>9:16</span></div>
+	</div>
+	<div class="cols">
+		<p><b>As on screen.</b> Window recordings sit at their true size on a frame shaped like your display.</p>
+		<p><b>Fit with padding.</b> Or fill the frame, with rounded corners and a soft shadow.</p>
+		<p><b>Any shape.</b> 16:9, 9:16, 1:1 or 4:5. Zooms keep the action in frame.</p>
+	</div>
+	<span class="frame-tag">A · STUDIO — FEATURE SECTION</span>
+</section>
+
+</body>
+</html>

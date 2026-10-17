@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+	/* B · Editorial: left-aligned, numbered chapters, two-tone statements, figure captions. */
+	.wrap { position: absolute; left: 64px; right: 64px; }
+	.statement { font-size: 58px; line-height: 1.08; letter-spacing: -0.035em; font-weight: 600; max-width: 1080px; }
+	.statement span { color: var(--t3); }
+	.chapter { display: flex; align-items: center; gap: 14px; font: 600 12px/1 var(--mono); letter-spacing: 0.06em; color: var(--t3); text-transform: uppercase; }
+	.chapter::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+	.chapter b { color: var(--lav); font-weight: 600; }
+	.fig { margin-top: 12px; font: 500 11.5px/1 var(--mono); color: var(--t3); letter-spacing: 0.03em; }
+	.split { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: end; }
+	.split h2 { font-size: 46px; line-height: 1.06; letter-spacing: -0.035em; font-weight: 600; }
+	.split p { font-size: 18px; line-height: 1.6; color: var(--t2); max-width: 520px; }
+
+	/* Polish diagram */
+	.pair { display: grid; grid-template-columns: 520px 520px; gap: 24px; }
+	.pair .shot { border-radius: 12px; }
+	.pair .raw { background: #0d0820; aspect-ratio: 1.547; display: grid; place-items: center; }
+	.pair .raw img { width: 90%; border-radius: 6px; }
+	.diagram { position: relative; height: 150px; }
+	.bar { position: absolute; top: 58px; height: 34px; border-radius: 6px; background: var(--s3); border: 1px solid var(--line2); }
+	.bar.cut { background: repeating-linear-gradient(135deg, rgba(255,70,100,0.3) 0 5px, transparent 5px 10px); border-color: rgba(255,59,92,0.5); }
+	.bar.speed { background: rgba(110,123,255,0.25); border-color: rgba(110,123,255,0.7); }
+	.zoomb { position: absolute; top: 100px; height: 16px; border-radius: 4px; background: rgba(140,40,255,0.45); }
+	.note { position: absolute; top: 0; font: 500 11.5px/1.35 var(--mono); color: var(--t2); padding-left: 9px; border-left: 1px solid var(--line2); height: 52px; }
+	.note b { display: block; color: var(--t1); font-weight: 600; }
+	.big { font-size: 64px; font-weight: 640; letter-spacing: -0.04em; line-height: 1; }
+	.big span { color: var(--t3); }
+
+	.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+	.grid3 > div { padding: 28px 28px 30px; border-left: 1px solid var(--line); }
+	.grid3 > div:first-child { border-left: 0; padding-left: 0; }
+	.grid3 h3 { font-size: 19px; font-weight: 650; letter-spacing: -0.01em; }
+	.grid3 p { margin-top: 6px; font-size: 15px; line-height: 1.55; color: var(--t2); }
+	.grid3 .crop { margin-top: 22px; height: 300px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line2); background: var(--s1); }
+	.grid3 .crop img { width: 100%; }
+</style>
+</head>
+<body>
+
+<!-- 1 · Hero -->
+<section class="frame">
+	<nav class="nav"><span class="brand"><img src="assets/icon.png">Nebula</span><span class="right"><span>Record</span><span>Polish</span><span>Edit</span><span>Claude</span><span class="btn light">Download</span></span></nav>
+	<div class="wrap" style="top:150px">
+		<p class="statement">Screen recordings that edit themselves. <span>Nebula records your Mac, then zooms in, cuts the pauses and smooths the cursor for you.</span></p>
+		<div style="display:flex;gap:12px;align-items:center;margin-top:36px">
+			<span class="btn light lg">Download for Mac</span><span class="btn lg">GitHub</span>
+			<span class="mono faint" style="font-size:12px;margin-left:12px">v1.0 · macOS 15+ · MIT · 3.8 MB</span>
+		</div>
+	</div>
+	<div class="wrap" style="top:500px">
+		<div class="shot"><img src="assets/editor.png"></div>
+	</div>
+	<span class="frame-tag">B · EDITORIAL — HERO</span>
+</section>
+
+<!-- 2 · Polish, start -->
+<section class="frame">
+	<div class="wrap" style="top:72px"><div class="chapter"><b>02</b> Polish</div></div>
+	<div class="wrap split" style="top:118px">
+		<h2>One click,<br>the whole edit.</h2>
+		<p>Polish reads your clicks, typing, pauses and voice, then writes ordinary edits you can change. Here is what it did to a 17.5-second recording.</p>
+	</div>
+	<div class="wrap pair" style="top:270px">
+		<div><div class="shot raw"><img src="assets/raw-typing.jpg"></div><p class="fig">FIG 2A — THE RECORDING</p></div>
+		<div><div class="shot"><img src="assets/polished-typing.jpg"></div><p class="fig">FIG 2B — AFTER POLISH, SAME MOMENT</p></div>
+	</div>
+	<div class="wrap diagram" style="top:680px">
+		<!-- 17.5 s mapped to 1312 px -->
+		<div class="bar cut" style="left:0;width:66px"></div>
+		<div class="bar" style="left:70px;width:205px"></div>
+		<div class="bar speed" style="left:279px;width:163px"></div>
+		<div class="bar" style="left:446px;width:49px"></div>
+		<div class="bar cut" style="left:499px;width:138px"></div>
+		<div class="bar" style="left:641px;width:99px"></div>
+		<div class="bar speed" style="left:744px;width:306px"></div>
+		<div class="bar" style="left:1054px;width:213px"></div>
+		<div class="bar cut" style="left:1271px;width:41px"></div>
+		<div class="zoomb" style="left:146px;width:166px"></div>
+		<div class="zoomb" style="left:316px;width:250px"></div>
+		<div class="zoomb" style="left:688px;width:484px"></div>
+		<div class="note" style="left:0"><b>Cut 0.9 s</b>idle start</div>
+		<div class="note" style="left:146px"><b>Zoom</b>on the click</div>
+		<div class="note" style="left:316px"><b>2.5× + frame</b>typing the name</div>
+		<div class="note" style="left:499px"><b>Cut 1.9 s</b>a pause</div>
+		<div class="note" style="left:744px"><b>2.5× + follow</b>typing invites</div>
+		<div class="note" style="left:1150px"><b>Cut 0.6 s</b>idle end</div>
+	</div>
+	<span class="frame-tag">B · EDITORIAL — POLISH, START (DIAGRAM ANNOTATES EVERY EDIT)</span>
+</section>
+
+<!-- 3 · Polish, end -->
+<section class="frame">
+	<div class="wrap" style="top:72px"><div class="chapter"><b>02</b> Polish</div></div>
+	<div class="wrap split" style="top:118px">
+		<h2>One click,<br>the whole edit.</h2>
+		<p>Polish reads your clicks, typing, pauses and voice, then writes ordinary edits you can change. Here is what it did to a 17.5-second recording.</p>
+	</div>
+	<div class="wrap" style="top:270px;display:grid;grid-template-columns:690px 1fr;gap:56px;align-items:end">
+		<div><div class="shot"><img src="assets/polished-follow.jpg"></div><p class="fig">FIG 2C — THE POLISHED VIDEO, PLAYING</p></div>
+		<div>
+			<p class="big">10.3 s<br><span>from 17.5 s</span></p>
+			<p class="dim" style="font-size:16px;line-height:1.6;margin-top:22px">3 zooms, 3 cuts and 2 speed-ups. Every one is an edit on the timeline that you can move, stretch or delete.</p>
+		</div>
+	</div>
+	<div class="wrap diagram" style="top:756px;height:110px">
+		<!-- compressed: cuts gone, speeds shortened; 10.3 s on the same scale -->
+		<div class="bar" style="left:0;width:205px;top:20px"></div>
+		<div class="bar speed" style="left:209px;width:65px;top:20px"></div>
+		<div class="bar" style="left:278px;width:49px;top:20px"></div>
+		<div class="bar" style="left:331px;width:99px;top:20px"></div>
+		<div class="bar speed" style="left:434px;width:122px;top:20px"></div>
+		<div class="bar" style="left:560px;width:213px;top:20px"></div>
+		<div style="position:absolute;left:0;width:1312px;top:20px;height:34px;border:1px dashed rgba(255,255,255,0.1);border-radius:6px"></div>
+		<div class="fig" style="position:absolute;top:66px">FIG 2D — THE SAME TIMELINE AFTER POLISH; THE DASHED OUTLINE IS THE ORIGINAL LENGTH</div>
+	</div>
+	<span class="frame-tag">B · EDITORIAL — POLISH, END (BARS COLLAPSE AS YOU SCROLL)</span>
+</section>
+
+<!-- 4 · Feature -->
+<section class="frame">
+	<div class="wrap" style="top:72px"><div class="chapter"><b>03</b> Edit</div></div>
+	<div class="wrap split" style="top:118px">
+		<h2>Then make it yours.</h2>
+		<p>A timeline that works like a video editor's, and an inspector for everything Polish chose: camera, cursor, background, captions, audio.</p>
+	</div>
+	<div class="wrap grid3" style="top:290px">
+		<div><h3>A camera that eases</h3><p>Four spring presets, gentle motion blur.</p><div class="crop"><img src="assets/inspector-camera.png"></div></div>
+		<div><h3>⌘K for everything</h3><p>Every command, one searchable list.</p><div class="crop" style="display:grid;place-items:center"><img src="assets/palette.png" style="width:92%"></div></div>
+		<div><h3>Export anywhere</h3><p>MP4 up to 4K60, GIF, or the clipboard.</p><div class="crop"><img src="assets/export-sheet.png"></div></div>
+	</div>
+	<span class="frame-tag">B · EDITORIAL — FEATURE SECTION</span>
+</section>
+
+</body>
+</html>

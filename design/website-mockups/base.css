@@ -1,0 +1,157 @@
+/* Shared by the website mockups. Each .frame is one 1440×900 screen of the page. */
+@font-face {
+	font-family: Manrope;
+	src: url("../../website/node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2") format("woff2");
+	font-weight: 200 800;
+}
+
+:root {
+	--bg: #040406;
+	--s1: #0c0c11;
+	--s2: #121218;
+	--s3: #19191f;
+	--line: rgba(255, 255, 255, 0.07);
+	--line2: rgba(255, 255, 255, 0.11);
+	--t1: #f3f2f7;
+	--t2: #a09ead;
+	--t3: #65636f;
+	--violet: #8c28ff;
+	--lav: #b089f0;
+	--r: 12px;
+	--mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+}
+
+html,
+body {
+	background: var(--bg);
+	color: var(--t1);
+	font-family: Manrope, sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+
+body {
+	width: 1440px;
+}
+
+img {
+	display: block;
+	max-width: 100%;
+}
+
+.frame {
+	position: relative;
+	width: 1440px;
+	height: 900px;
+	overflow: hidden;
+	border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.frame-tag {
+	position: absolute;
+	right: 16px;
+	bottom: 12px;
+	font: 600 11px/1 var(--mono);
+	color: rgba(255, 255, 255, 0.28);
+	letter-spacing: 0.04em;
+	z-index: 20;
+}
+
+.nav {
+	position: absolute;
+	inset: 0 0 auto;
+	height: 64px;
+	display: flex;
+	align-items: center;
+	padding: 0 64px;
+	gap: 28px;
+	z-index: 10;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--t2);
+}
+
+.brand {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: var(--t1);
+	font-size: 16px;
+	font-weight: 720;
+}
+
+.brand img {
+	width: 24px;
+	height: 24px;
+}
+
+.nav .right {
+	margin-left: auto;
+	display: flex;
+	gap: 26px;
+	align-items: center;
+}
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 40px;
+	padding: 0 16px;
+	border-radius: var(--r);
+	font-size: 14px;
+	font-weight: 680;
+	color: var(--t1);
+	background: var(--s2);
+	border: 1px solid var(--line2);
+}
+
+.btn.primary {
+	background: var(--violet);
+	border-color: rgba(255, 255, 255, 0.12);
+	color: #fff;
+}
+
+.btn.light {
+	background: #f3f2f7;
+	color: #0b0b0f;
+	border-color: transparent;
+}
+
+.btn.lg {
+	height: 48px;
+	padding: 0 22px;
+	font-size: 15.5px;
+}
+
+.shot {
+	border-radius: 14px;
+	border: 1px solid var(--line2);
+	overflow: hidden;
+	box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9);
+}
+
+.shot img {
+	width: 100%;
+}
+
+.mono {
+	font-family: var(--mono);
+}
+
+.dim {
+	color: var(--t2);
+}
+
+.faint {
+	color: var(--t3);
+}
+
+.dl-icon {
+	width: 16px;
+	height: 16px;
+}
