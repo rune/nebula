@@ -101,7 +101,7 @@ struct EditorView: View {
 		.background(Theme.window)
 		.overlay(alignment: .bottom) {
 			ToastView(toasts: app.toasts) { app.activeStore?.undo() }
-				.padding(.bottom, 304)
+				.padding(.bottom, 286 + 52 + 14)
 		}
 		.overlay(alignment: .top) {
 			if app.exports.quickExportURL == store.bundle.url {

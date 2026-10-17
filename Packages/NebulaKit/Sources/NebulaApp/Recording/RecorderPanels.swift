@@ -340,7 +340,7 @@ private struct BarMenu<Content: View>: View {
 				}
 			}
 			.padding(.horizontal, 12)
-			.frame(width: 176, height: 52, alignment: .leading)
+			.frame(width: 206, height: 52, alignment: .leading)
 			.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.surface2))
 			.overlay(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).strokeBorder(Theme.hairline))
 			.contentShape(Rectangle())
