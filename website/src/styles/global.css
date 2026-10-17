@@ -74,7 +74,7 @@ body {
 	z-index: -1;
 	pointer-events: none;
 	background:
-		radial-gradient(115% 105% at 50% -8%, transparent 68%, rgba(104, 40, 255, 0.05) 79%, rgba(124, 40, 255, 0.12) 91%, rgba(150, 50, 255, 0.19) 104%),
+		radial-gradient(115% 105% at 50% 6%, transparent 72%, rgba(104, 40, 255, 0.06) 82%, rgba(124, 40, 255, 0.14) 92%, rgba(150, 50, 255, 0.19) 100%),
 		var(--bg);
 }
 
