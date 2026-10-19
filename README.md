@@ -21,7 +21,7 @@
 
 ## Install
 
-Download the DMG from [Releases](https://github.com/sazuyakun/nebula/releases), open it and drag Nebula to Applications. On first launch, macOS asks for Screen Recording permission. Microphone and Accessibility permissions are optional: Accessibility lets Polish see clicks and text fields.
+Download the DMG from [Releases](https://github.com/rune/nebula/releases), open it and drag Nebula to Applications. On first launch, macOS asks for Screen Recording permission. Microphone and Accessibility permissions are optional: Accessibility lets Polish see clicks and text fields.
 
 ## Connect Claude
 
@@ -53,6 +53,10 @@ swift test --package-path Packages/NebulaKit
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the modules fit together and [docs/SPEC.md](docs/SPEC.md) for the product spec.
 
+## Maintainer
+
+Nebula is made by [Rune](https://github.com/rune) and maintained by Soham Samal ([@sazuyakun](https://github.com/sazuyakun)). Open an [issue](https://github.com/rune/nebula/issues) for bugs and ideas; pull requests are reviewed by the maintainer.
+
 ## License
 
-MIT. The Manrope typeface is bundled under the SIL Open Font License.
+MIT © Rune. The Manrope typeface is bundled under the SIL Open Font License.
