@@ -7,7 +7,7 @@ export const site = {
 	tagline: "Screen recordings that edit themselves.",
 	description:
 		"Nebula is a free, open-source screen recorder for macOS. Record, then one click adds zooms, cuts dead air, speeds up typing and smooths the cursor. Claude can edit with you over MCP.",
-	repo: "sazuyakun/nebula",
+	repo: "rune/nebula",
 	version: "1.0.0",
 	dmgSize: "3.8 MB",
 	requirements: "macOS 15 or later · Apple silicon & Intel",

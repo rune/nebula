@@ -264,7 +264,7 @@ private struct AboutView: View {
 				.fixedSize(horizontal: false, vertical: true)
 			Text("Open source under the MIT license. Typeface: Manrope (SIL Open Font License).")
 				.font(.nebula(12, 550)).foregroundStyle(Theme.text3)
-			Link("github.com/sazuyakun/nebula", destination: URL(string: "https://github.com/sazuyakun/nebula")!)
+			Link("github.com/rune/nebula", destination: URL(string: "https://github.com/rune/nebula")!)
 				.font(.nebula(12.5, 650))
 				.foregroundStyle(Theme.lavender)
 		}
