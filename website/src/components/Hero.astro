@@ -1,8 +1,8 @@
 ---
 import { Picture, getImage } from "astro:assets";
 import Icon from "./Icon.astro";
-import Install from "./Install.astro";
-import { links, site } from "../site";
+import Command from "./Command.astro";
+import { installCommand, links, site } from "../site";
 import editor from "../assets/shots/editor.png";
 import poster from "../assets/shots/polished-poster.jpg";
 
@@ -16,7 +16,7 @@ const posterImage = await getImage({ src: poster, width: 1600, format: "webp" })
 			<span class="line rest" data-hero-line>Nebula records your Mac, then zooms in, cuts the pauses and smooths the cursor for you.</span>
 		</h1>
 		<div class="get" id="install" data-hero-in>
-			<Install />
+			<Command command={installCommand} />
 			<div class="cta">
 				<a class="button ghost small" href={links.github} target="_blank" rel="noopener noreferrer"><Icon name="github" size={16} />View on GitHub</a>
 				<span class="meta">Free and open source · v{site.version} · {site.requirements}</span>
@@ -75,7 +75,7 @@ const posterImage = await getImage({ src: poster, width: 1600, format: "webp" })
 	}
 
 	.get {
-		max-width: 840px;
+		max-width: 780px;
 		margin-top: clamp(36px, 4vw, 52px);
 		scroll-margin-top: 120px;
 	}

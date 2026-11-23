@@ -1,7 +1,7 @@
 ---
-import Install from "./Install.astro";
+import Command from "./Command.astro";
 import Logo from "./Logo.astro";
-import { links, site } from "../site";
+import { installCommand, links, site } from "../site";
 ---
 
 <section class="closing" data-closing>
@@ -11,7 +11,7 @@ import { links, site } from "../site";
 			Record something <span class="fill-mark" data-closing-fill>worth watching.</span>
 		</h2>
 		<div class="get" data-reveal>
-			<Install />
+			<Command command={installCommand} />
 			<div class="cta">
 				<a class="button ghost small" href={links.releases} target="_blank" rel="noopener noreferrer">All releases</a>
 				<span class="meta">v{site.version} · {site.requirements}</span>
@@ -60,7 +60,7 @@ import { links, site } from "../site";
 	}
 
 	.get {
-		max-width: 840px;
+		max-width: 780px;
 		margin-top: clamp(36px, 4vw, 52px);
 	}
 
