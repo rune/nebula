@@ -1,5 +1,6 @@
 ---
 import { Picture, getImage } from "astro:assets";
+import Icon from "./Icon.astro";
 import Install from "./Install.astro";
 import { links, site } from "../site";
 import editor from "../assets/shots/editor.png";
@@ -16,7 +17,8 @@ const posterImage = await getImage({ src: poster, width: 1600, format: "webp" })
 		</h1>
 		<div class="get" id="install" data-hero-in>
 			<Install>
-				Free and open source · v{site.version} · macOS 15+ · <a href={links.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+				<a class="button ghost small" href={links.github} target="_blank" rel="noopener noreferrer"><Icon name="github" size={16} />View on GitHub</a>
+				<span>Free and open source · v{site.version} · macOS 15+</span>
 			</Install>
 		</div>
 	</div>
