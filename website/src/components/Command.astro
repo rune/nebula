@@ -10,7 +10,7 @@ const { command } = Astro.props;
 
 <div class="command">
 	<code>{command}</code>
-	<button class="copy" type="button" data-copy={command} aria-label="Copy the command">
+	<button class="copy" type="button" data-copy={command} data-copied="Command copied" aria-label="Copy the command">
 		<span class="copy-icon"><Icon name="copy" size={17} /></span>
 		<span class="check-icon"><Icon name="check" size={17} /></span>
 	</button>

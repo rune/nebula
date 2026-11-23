@@ -1,0 +1,53 @@
+---
+import Icon from "./Icon.astro";
+---
+
+<!-- One toast for the page; motion.ts fills it in when something is copied. -->
+<div class="toast" role="status" aria-live="polite" data-toast>
+	<span class="check"><Icon name="check" size={16} /></span>
+	<span data-toast-text></span>
+</div>
+
+<style>
+	.toast {
+		position: fixed;
+		left: 50%;
+		bottom: 28px;
+		z-index: 60;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		height: 44px;
+		padding: 0 18px 0 14px;
+		border-radius: var(--radius);
+		background: var(--surface-2);
+		border: 1px solid var(--line-strong);
+		box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.9);
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--text-1);
+		white-space: nowrap;
+		opacity: 0;
+		transform: translate(-50%, 12px);
+		pointer-events: none;
+		transition:
+			opacity 0.25s var(--ease),
+			transform 0.35s var(--ease);
+	}
+
+	.toast:global(.shown) {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+
+	.check {
+		display: grid;
+		color: var(--lavender);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.toast {
+			transition: none;
+		}
+	}
+</style>

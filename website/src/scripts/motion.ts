@@ -56,16 +56,41 @@ function seeker(video: HTMLVideoElement) {
 }
 
 function setupCopy() {
+	const toast = $("[data-toast]")!;
+	let hideToast = 0;
 	for (const button of $$<HTMLButtonElement>("[data-copy]")) {
 		button.addEventListener("click", async () => {
 			try {
 				await navigator.clipboard.writeText(button.dataset.copy!);
 				button.classList.add("copied");
 				setTimeout(() => button.classList.remove("copied"), 1600);
+				$("[data-toast-text]", toast)!.textContent = button.dataset.copied!;
+				toast.classList.add("shown");
+				clearTimeout(hideToast);
+				hideToast = window.setTimeout(() => toast.classList.remove("shown"), 2000);
 			} catch {
 				/* Clipboard blocked: the command is still selectable. */
 			}
 		});
+	}
+}
+
+function setupInstall() {
+	for (const box of $$("[data-install]")) {
+		const tabs = $$<HTMLButtonElement>("[data-tab]", box);
+		for (const tab of tabs) {
+			tab.addEventListener("click", () => {
+				for (const other of tabs) other.setAttribute("aria-selected", String(other === tab));
+				for (const panel of $$("[data-panel]", box)) panel.hidden = panel.dataset.panel !== tab.dataset.tab;
+			});
+		}
+		// The whole line copies, not just its button.
+		for (const panel of $$("[data-panel]", box)) {
+			const button = $<HTMLButtonElement>("[data-copy]", panel)!;
+			panel.addEventListener("click", (event) => {
+				if (!button.contains(event.target as Node)) button.click();
+			});
+		}
 	}
 }
 
@@ -477,6 +502,7 @@ function init() {
 	setupNav();
 	setupAnchors();
 	setupCopy();
+	setupInstall();
 	setupFaq();
 }
 
