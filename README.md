@@ -27,7 +27,13 @@ Run this in Terminal. It installs the latest release into Applications and opens
 curl -fsSL https://raw.githubusercontent.com/rune/nebula/main/scripts/install.sh | zsh
 ```
 
-Nebula isn't notarized yet, so a DMG downloaded in a browser is blocked by macOS; the install command isn't. On first launch, macOS asks for Screen Recording permission. Microphone and Accessibility permissions are optional: Accessibility lets Polish see clicks and text fields.
+Or install it with [Homebrew](https://brew.sh) and update it with `brew upgrade --cask nebula`:
+
+```bash
+brew install --cask rune/nebula/nebula
+```
+
+Nebula isn't notarized yet, so a DMG downloaded in a browser is blocked by macOS. Neither install method is: the script downloads with curl, which doesn't quarantine the app, and the cask removes the quarantine flag after installing. On first launch, macOS asks for Screen Recording permission. Microphone and Accessibility permissions are optional: Accessibility lets Polish see clicks and text fields.
 
 ## Connect Claude
 

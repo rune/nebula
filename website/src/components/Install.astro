@@ -1,10 +1,11 @@
 ---
 import Icon from "./Icon.astro";
-import { installCommand, setupPrompt } from "../site";
+import { brewCommand, installCommand, setupPrompt } from "../site";
 
 const ways = [
 	{ id: "agent", label: "AI agent", copy: setupPrompt, copyLabel: "Copy the agent prompt", toast: "Prompt copied" },
 	{ id: "curl", label: "curl", copy: installCommand, copyLabel: "Copy the install command", toast: "Command copied" },
+	{ id: "brew", label: "Homebrew", copy: brewCommand, copyLabel: "Copy the Homebrew command", toast: "Command copied" },
 ];
 ---
 
