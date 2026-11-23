@@ -1,0 +1,115 @@
+---
+import Icon from "./Icon.astro";
+import { installCommand, setupPrompt } from "../site";
+
+const ways = [
+	{ number: "01", name: "With your AI agent", label: "Copy agent prompt", text: setupPrompt, primary: true },
+	{ number: "02", name: "Manually", label: "Copy install command", text: installCommand, primary: false },
+];
+---
+
+<div class="ways">
+	{ways.map((way) => (
+		<div class="way">
+			<p class="name"><span class="number">{way.number}</span>{way.name}</p>
+			<button class:list={["button", way.primary ? "primary" : "ghost", "copy"]} type="button" data-copy={way.text}>
+				<span class="label copy-label"><Icon name="copy" size={17} />{way.label}</span>
+				<span class="label done-label"><Icon name="check" size={17} />Copied</span>
+			</button>
+			{way.primary ? (
+				<p class="caption">For Claude Code, Codex, Cursor or any agent that can run commands. It installs Nebula, connects it and walks you through permissions.</p>
+			) : (
+				<p class="caption command"><code>{installCommand.split(/(?<=\/)/).map((part) => <>{part}<wbr /></>)}</code></p>
+			)}
+		</div>
+	))}
+</div>
+<div class="more"><slot /></div>
+
+<style>
+	.ways {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: 32px 64px;
+		max-width: 1080px;
+	}
+
+	.way {
+		padding-top: 18px;
+		border-top: 1px solid var(--line-strong);
+	}
+
+	.name {
+		display: flex;
+		align-items: baseline;
+		gap: 10px;
+		margin-bottom: 18px;
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.number {
+		font-family: var(--mono);
+		font-size: 13px;
+		font-weight: 400;
+		color: var(--lavender);
+	}
+
+	.copy {
+		display: inline-grid;
+		border: 0;
+		cursor: pointer;
+	}
+
+	.copy.ghost {
+		border: 1px solid var(--line-strong);
+		background: transparent;
+	}
+
+	.copy.ghost:hover {
+		background: var(--surface-2);
+	}
+
+	.label {
+		grid-area: 1 / 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		transition: opacity 0.2s;
+	}
+
+	.done-label,
+	.copy:global(.copied) .copy-label {
+		opacity: 0;
+	}
+
+	.copy:global(.copied) .done-label {
+		opacity: 1;
+	}
+
+	.caption {
+		margin-top: 16px;
+	}
+
+	.command code {
+		min-width: 0;
+		font-family: var(--mono);
+		font-size: 13px;
+		color: var(--text-2);
+	}
+
+	.more {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 12px;
+		margin-top: 32px;
+	}
+
+	@media (max-width: 860px) {
+		.ways {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

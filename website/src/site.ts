@@ -23,3 +23,13 @@ export const links = {
 };
 
 export const installCommand = `curl -fsSL https://raw.githubusercontent.com/${site.repo}/main/scripts/install.sh | zsh`;
+
+/** Pasted into a coding agent (Claude Code, Codex, Cursor…), it sets Nebula up end to end. */
+export const setupPrompt = `Set up Nebula, the open-source screen recorder for macOS (${github}), on my Mac. You may run the commands below; ask me before running anything else.
+
+1. Install Nebula by running: ${installCommand}
+   It downloads the latest release into /Applications and opens it.
+2. Connect Nebula to yourself as an MCP server while Nebula is open. It serves streamable HTTP at http://127.0.0.1:39351/mcp. In Claude Code, run: ${site.mcpCommand}
+   In any other agent, add that URL the way your MCP settings expect.
+3. Walk me through the macOS permissions. Screen Recording is required: when Nebula asks, open System Settings → Privacy & Security → Screen & System Audio Recording and turn Nebula on. Microphone is optional, for voiceover. Accessibility is optional and lets Polish see clicks and text fields.
+4. Check that the Nebula MCP server responds, then tell me I'm ready and that ⌥⌘↩ starts a recording.`;

@@ -58,9 +58,8 @@ function seeker(video: HTMLVideoElement) {
 function setupCopy() {
 	for (const button of $$<HTMLButtonElement>("[data-copy]")) {
 		button.addEventListener("click", async () => {
-			const text = $("[data-copy-source]", button.parentElement!)?.textContent ?? "";
 			try {
-				await navigator.clipboard.writeText(text.trim());
+				await navigator.clipboard.writeText(button.dataset.copy!);
 				button.classList.add("copied");
 				setTimeout(() => button.classList.remove("copied"), 1600);
 			} catch {

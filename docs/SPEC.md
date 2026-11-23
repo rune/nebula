@@ -3,7 +3,7 @@
 Nebula is a native macOS screen recorder and editor for polished product demos. It records crisp, native-resolution video. A one-click **Polish** adds smart zooms, cinematic camera motion, a smooth high-resolution cursor and speed-ups for slow parts. An editor lets you fine-tune all of it. A built-in MCP server lets an AI assistant do the same edits, live.
 
 - Platform: macOS 15 Sequoia and later, Apple silicon and Intel.
-- Distribution: signed DMG on GitHub Releases. Open source, MIT.
+- Distribution: ad-hoc signed DMG on GitHub Releases, installed with a one-line Terminal command (`scripts/install.sh`). Open source, MIT.
 - Interface: English, dark theme only (black surfaces, violet accent), Manrope typeface.
 
 ## 1. Recording
