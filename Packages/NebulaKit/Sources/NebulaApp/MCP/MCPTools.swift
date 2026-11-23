@@ -123,7 +123,7 @@ enum MCPTools {
 	}
 
 	static let importFile = MCPTool(
-		name: "import", title: "Import", description: "Imports a video file (.mp4/.mov) or an OpenScreen project (.openscreen) as a new Nebula project and opens it.",
+		name: "import", title: "Import", description: "Imports a video file (.mp4/.mov) as a new Nebula project and opens it.",
 		inputSchema: JSONSchema.object(["path": JSONSchema.string("File path")], required: ["path"])
 	) { args in
 		guard let path = args["path"]?.stringValue else { throw ToolError("Pass path.") }

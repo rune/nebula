@@ -169,34 +169,20 @@ public final class AppModel {
 		exports.showQuickExport(for: bundle.url)
 	}
 
-	/// Imports a video file (MP4/MOV) or an OpenScreen project as a new Nebula project.
+	/// Imports a video file (MP4/MOV) as a new Nebula project.
 	@discardableResult
 	public func importFile(_ url: URL) async -> URL? {
 		do {
 			let bundle = try library.newBundle(named: url.deletingPathExtension().lastPathComponent)
-			if url.pathExtension.lowercased() == "openscreen" {
-				let data = try Data(contentsOf: url)
-				let videoPath = try OpenScreenImporter.videoPath(inProjectData: data)
-				let source = URL(fileURLWithPath: videoPath)
-				let fileName = "recording.\(source.pathExtension.isEmpty ? "mp4" : source.pathExtension)"
-				try FileManager.default.copyItem(at: source, to: bundle.url.appending(path: fileName))
-				let media = try await MediaProbe.mediaInfo(video: bundle.url.appending(path: fileName), videoFileName: fileName, microphone: nil, microphoneFileName: nil)
-				let cursor = try? Data(contentsOf: URL(fileURLWithPath: videoPath + ".cursor.json"))
-				let result = try OpenScreenImporter.convert(projectData: data, cursorData: cursor, media: media, name: bundle.name)
-				try bundle.write(result.input)
-				try bundle.write(result.project)
-			} else {
-				let fileName = "recording.\(url.pathExtension.lowercased())"
-				try FileManager.default.copyItem(at: url, to: bundle.url.appending(path: fileName))
-				let media = try await MediaProbe.mediaInfo(video: bundle.url.appending(path: fileName), videoFileName: fileName, microphone: nil, microphoneFileName: nil)
-				var project = Project(name: bundle.name, media: media)
-				// Imported videos have no captured desktop; keep everything but that.
-				if let preset = presets.preset(id: settings.defaultPresetID) { preset.apply(to: &project) }
-				if project.style.background == Background.desktop { project.style.background = Style().background }
-				try bundle.write(InputTrack.empty)
-				try bundle.write(project)
-			}
-			let project = try bundle.readProject()
+			let fileName = "recording.\(url.pathExtension.lowercased())"
+			try FileManager.default.copyItem(at: url, to: bundle.url.appending(path: fileName))
+			let media = try await MediaProbe.mediaInfo(video: bundle.url.appending(path: fileName), videoFileName: fileName, microphone: nil, microphoneFileName: nil)
+			var project = Project(name: bundle.name, media: media)
+			// Imported videos have no captured desktop; keep everything but that.
+			if let preset = presets.preset(id: settings.defaultPresetID) { preset.apply(to: &project) }
+			if project.style.background == Background.desktop { project.style.background = Style().background }
+			try bundle.write(InputTrack.empty)
+			try bundle.write(project)
 			try? await Thumbnailer.writeThumbnail(video: bundle.videoURL(for: project), to: bundle.thumbnailURL, at: min(1, project.media.duration / 2))
 			refreshLibrary()
 			open(bundle.url)

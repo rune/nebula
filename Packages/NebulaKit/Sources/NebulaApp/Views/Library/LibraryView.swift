@@ -301,7 +301,7 @@ private struct NewRecordingTile: View {
 				.frame(width: 48, height: 48)
 				.background(RoundedRectangle(cornerRadius: Theme.radius, style: .continuous).fill(Theme.gradient))
 			Text("New recording").font(.nebula(13.5, 700)).foregroundStyle(Theme.text1)
-			Text("or drop a video / .openscreen project here").font(.nebula(12, 550)).foregroundStyle(Theme.text3)
+			Text("or drop a video here").font(.nebula(12, 550)).foregroundStyle(Theme.text3)
 		}
 		.frame(maxWidth: .infinity)
 		.frame(height: 240)
