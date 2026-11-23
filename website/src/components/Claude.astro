@@ -66,8 +66,8 @@ const tools = ["polish", "edit_clip", "add_zoom", "add_mask", "add_text", "set_s
 				<p data-reveal>Open Nebula, then run this once.</p>
 			</div>
 			<div class="command" data-reveal>
-				<code data-copy-source>{site.mcpCommand}</code>
-				<button class="copy" type="button" data-copy aria-label="Copy the command">
+				<code>{site.mcpCommand}</code>
+				<button class="copy" type="button" data-copy={site.mcpCommand} data-copied="Command copied" aria-label="Copy the command">
 					<span class="copy-icon"><Icon name="copy" size={17} /></span>
 					<span class="check-icon"><Icon name="check" size={17} /></span>
 				</button>

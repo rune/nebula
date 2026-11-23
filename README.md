@@ -21,7 +21,13 @@
 
 ## Install
 
-Download the DMG from [Releases](https://github.com/rune/nebula/releases), open it and drag Nebula to Applications. On first launch, macOS asks for Screen Recording permission. Microphone and Accessibility permissions are optional: Accessibility lets Polish see clicks and text fields.
+Run this in Terminal. It installs the latest release into Applications and opens it; run it again to update.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rune/nebula/main/scripts/install.sh | zsh
+```
+
+Nebula isn't notarized yet, so a DMG downloaded in a browser is blocked by macOS; the install command isn't. On first launch, macOS asks for Screen Recording permission. Microphone and Accessibility permissions are optional: Accessibility lets Polish see clicks and text fields.
 
 ## Connect Claude
 
