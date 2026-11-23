@@ -76,13 +76,13 @@ const seconds = Array.from({ length: 18 }, (_, second) => second);
 			<div class="pair">
 				<figure>
 					<div class="pane raw">
-						<video data-polish-raw src="/video/raw-scrub.mp4" poster={rawImage.src} muted playsinline preload="auto" aria-label="The Orbit recording as it was captured"></video>
+						<video data-polish-raw src={`${import.meta.env.BASE_URL}video/raw-scrub.mp4`} poster={rawImage.src} muted playsinline preload="auto" aria-label="The Orbit recording as it was captured"></video>
 					</div>
 					<figcaption class="caption"><span><span class="tc" data-raw-time>0:00.0</span>&ensp;The recording</span></figcaption>
 				</figure>
 				<figure>
 					<div class="pane polished" data-polished-pane>
-						<video data-polish-out src="/video/polished-scrub.mp4" poster={polishedImage.src} muted playsinline preload="auto" aria-label="The same recording after Polish"></video>
+						<video data-polish-out src={`${import.meta.env.BASE_URL}video/polished-scrub.mp4`} poster={polishedImage.src} muted playsinline preload="auto" aria-label="The same recording after Polish"></video>
 						<span class="cut-label" aria-hidden="true">Cut. Not in the video.</span>
 						<span class="state" aria-hidden="true" data-polish-state></span>
 					</div>
@@ -139,7 +139,7 @@ const seconds = Array.from({ length: 18 }, (_, second) => second);
 	<div class="container result">
 		<figure>
 			<div class="shot">
-				<video data-polish-result src="/video/polished.mp4" poster={polishedImage.src} muted loop playsinline preload="metadata" aria-label="The polished Orbit video"></video>
+				<video data-polish-result src={`${import.meta.env.BASE_URL}video/polished.mp4`} poster={polishedImage.src} muted loop playsinline preload="metadata" aria-label="The polished Orbit video"></video>
 			</div>
 			<figcaption class="caption"><span><span class="tc">0:00 – 0:10.3</span>&ensp;The polished video at real speed. Nothing here was edited by hand.</span></figcaption>
 		</figure>
