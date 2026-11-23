@@ -37,7 +37,7 @@ const posterImage = await getImage({ src: poster, width: 1600, format: "webp" })
 			/>
 			<video
 				class="stage-video"
-				src="/video/polished.mp4"
+				src={`${import.meta.env.BASE_URL}video/polished.mp4`}
 				poster={posterImage.src}
 				autoplay
 				muted

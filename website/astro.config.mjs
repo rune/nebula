@@ -2,8 +2,9 @@ import { defineConfig } from "astro/config";
 
 // A static site: plain HTML and CSS, plus one small script for the scroll animations.
 export default defineConfig({
-	// Set to the real domain when the site is deployed (used for canonical and social links).
-	site: "https://nebula.example",
+	// Served by GitHub Pages at rune.github.io/nebula/ (used for canonical and social links).
+	site: "https://rune.github.io",
+	base: "/nebula/",
 	build: { inlineStylesheets: "auto" },
 	devToolbar: { enabled: false },
 	image: { layout: "constrained" },
