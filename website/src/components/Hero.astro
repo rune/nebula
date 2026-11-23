@@ -1,8 +1,8 @@
 ---
 import { Picture, getImage } from "astro:assets";
-import Command from "./Command.astro";
 import Icon from "./Icon.astro";
-import { installCommand, links, site } from "../site";
+import Install from "./Install.astro";
+import { links, site } from "../site";
 import editor from "../assets/shots/editor.png";
 import poster from "../assets/shots/polished-poster.jpg";
 
@@ -15,14 +15,12 @@ const posterImage = await getImage({ src: poster, width: 1600, format: "webp" })
 			<span class="line" data-hero-line>Screen recordings that <span class="fill-mark" data-hero-fill>edit themselves.</span></span>{" "}
 			<span class="line rest" data-hero-line>Nebula records your Mac, then zooms in, cuts the pauses and smooths the cursor for you.</span>
 		</h1>
-		<div class="cta" data-hero-in>
-			<a class="button primary" href={links.dmg}><Icon name="download" size={17} />Download for Mac</a>
-			<a class="button ghost" href={links.github} target="_blank" rel="noopener noreferrer"><Icon name="github" size={17} />View on GitHub</a>
-			<span class="meta">Free and open source · v{site.version} · macOS 15+ · {site.dmgSize}</span>
-		</div>
-		<div class="install" data-hero-in>
-			<p>Or install from Terminal, without the macOS warning</p>
-			<Command command={installCommand} />
+		<div class="get" id="install" data-hero-in>
+			<Install />
+			<div class="cta">
+				<a class="button ghost small" href={links.github} target="_blank" rel="noopener noreferrer"><Icon name="github" size={16} />View on GitHub</a>
+				<span class="meta">Free and open source · v{site.version} · {site.requirements}</span>
+			</div>
 		</div>
 	</div>
 
@@ -76,28 +74,22 @@ const posterImage = await getImage({ src: poster, width: 1600, format: "webp" })
 		color: var(--text-3);
 	}
 
+	.get {
+		max-width: 840px;
+		margin-top: clamp(36px, 4vw, 52px);
+		scroll-margin-top: 120px;
+	}
+
 	.cta {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 12px;
-		margin-top: clamp(32px, 4vw, 48px);
+		margin-top: 24px;
 	}
 
 	.meta {
-		margin-left: 12px;
-		font-family: var(--mono);
-		font-size: 12.5px;
-		color: var(--text-3);
-	}
-
-	.install {
-		max-width: 640px;
-		margin-top: 20px;
-	}
-
-	.install p {
-		margin-bottom: 8px;
+		margin-left: 8px;
 		font-family: var(--mono);
 		font-size: 12.5px;
 		color: var(--text-3);

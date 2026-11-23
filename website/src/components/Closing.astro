@@ -1,5 +1,5 @@
 ---
-import Icon from "./Icon.astro";
+import Install from "./Install.astro";
 import Logo from "./Logo.astro";
 import { links, site } from "../site";
 ---
@@ -10,10 +10,12 @@ import { links, site } from "../site";
 		<h2 class="statement" data-reveal>
 			Record something <span class="fill-mark" data-closing-fill>worth watching.</span>
 		</h2>
-		<div class="cta" data-reveal>
-			<a class="button primary" href={links.dmg}><Icon name="download" size={17} />Download for Mac</a>
-			<a class="button ghost" href={links.releases} target="_blank" rel="noopener noreferrer">All releases</a>
-			<span class="meta">v{site.version} · {site.dmgSize} · {site.requirements}</span>
+		<div class="get" data-reveal>
+			<Install />
+			<div class="cta">
+				<a class="button ghost small" href={links.releases} target="_blank" rel="noopener noreferrer">All releases</a>
+				<span class="meta">v{site.version} · {site.requirements}</span>
+			</div>
 		</div>
 	</div>
 </section>
@@ -22,7 +24,7 @@ import { links, site } from "../site";
 	<div class="container foot">
 		<a class="brand" href="#top"><Logo size={20} /><span>Nebula</span></a>
 		<nav aria-label="Footer">
-			<a href={links.dmg}>Download</a>
+			<a href="#install">Install</a>
 			<a href={links.github} target="_blank" rel="noopener noreferrer">GitHub</a>
 			<a href={links.releases} target="_blank" rel="noopener noreferrer">Releases</a>
 			<a href={links.issues} target="_blank" rel="noopener noreferrer">Issues</a>
@@ -57,16 +59,21 @@ import { links, site } from "../site";
 		max-width: 11em;
 	}
 
+	.get {
+		max-width: 840px;
+		margin-top: clamp(36px, 4vw, 52px);
+	}
+
 	.cta {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 12px;
-		margin-top: clamp(36px, 4vw, 52px);
+		margin-top: 24px;
 	}
 
 	.meta {
-		margin-left: 12px;
+		margin-left: 8px;
 		font-family: var(--mono);
 		font-size: 12.5px;
 		color: var(--text-3);
