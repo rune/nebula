@@ -61,7 +61,6 @@ Everything Polish adds is undoable as one step, and every setting it uses is con
   - ⌘K command palette and single-key editing shortcuts (Space, Z, C, S, M, T, A, ←/→)
   - style presets
   - project library
-  - import `.openscreen` projects
 
 ## 4. Export
 

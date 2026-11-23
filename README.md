@@ -16,7 +16,7 @@
 - **Looks right by default.** A window recording keeps its real on-screen size over the wallpaper that was behind it, on a frame shaped like your screen. Full-screen recordings fill the frame.
 - **Edits** on a timeline: cuts, speed, zooms, blur/pixelate/spotlight masks, text and arrows, per-section volume, music that ducks under your voice, noise reduction, and on-device captions (WhisperKit).
 - **Exports** MP4 (H.264 or HEVC, up to 4K60) or GIF. You can also copy the video or a single frame to the clipboard.
-- **⌘K** opens every command, style presets save a look, and `.openscreen` projects can be imported.
+- **⌘K** opens every command, and style presets save a look.
 - **MCP server** built in: Claude can read the timeline, run Polish, add zooms and cuts, change the look, record and export. Each edit appears live in the editor and can be undone with ⌘Z.
 
 ## Install

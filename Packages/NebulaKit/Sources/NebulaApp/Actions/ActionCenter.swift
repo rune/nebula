@@ -36,7 +36,7 @@ public enum ActionCenter {
 			AppAction(id: "record", title: app.recorder.isRecording ? "Finish recording" : "New recording", group: .record, symbol: "record.circle", shortcut: "⌥⌘↩", keywords: ["capture", "screen"], isEnabled: true) {
 				if app.recorder.isRecording { Task { await app.recorder.finish() } } else { app.recorder.showPicker() }
 			},
-			AppAction(id: "import", title: "Import video or OpenScreen project…", group: .record, symbol: "square.and.arrow.down", shortcut: "⌘I", keywords: ["open", "mp4", "mov"], isEnabled: true) {
+			AppAction(id: "import", title: "Import video…", group: .record, symbol: "square.and.arrow.down", shortcut: "⌘I", keywords: ["open", "mp4", "mov"], isEnabled: true) {
 				ImportPanel.run(app: app)
 			},
 			AppAction(id: "library", title: "Show library", group: .app, symbol: "square.grid.2x2", shortcut: "⇧⌘L", keywords: ["projects", "home"], isEnabled: true) {
@@ -120,9 +120,9 @@ public enum ActionCenter {
 enum ImportPanel {
 	static func run(app: AppModel) {
 		let panel = NSOpenPanel()
-		panel.allowedContentTypes = [.movie, .mpeg4Movie, .quickTimeMovie, .init(filenameExtension: "openscreen") ?? .json]
+		panel.allowedContentTypes = [.movie, .mpeg4Movie, .quickTimeMovie]
 		panel.allowsMultipleSelection = false
-		panel.message = "Choose a video or an OpenScreen project to import."
+		panel.message = "Choose a video to import."
 		guard panel.runModal() == .OK, let url = panel.url else { return }
 		Task { await app.importFile(url) }
 	}

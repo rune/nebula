@@ -12,7 +12,7 @@
 ## Modules (`Packages/NebulaKit`)
 
 ```
-NebulaCore      models, timeline maths, time mapping, project coding, OpenScreen import   (no UI, no AV)
+NebulaCore      models, timeline maths, time mapping, project coding   (no UI, no AV)
 NebulaDesign    design tokens + reusable SwiftUI components                               (SwiftUI)
 NebulaPolish    Polish planner, spring camera path, cursor smoothing, activity analysis  → Core
 NebulaCapture   ScreenCaptureKit recorder, input monitor, permissions                    → Core

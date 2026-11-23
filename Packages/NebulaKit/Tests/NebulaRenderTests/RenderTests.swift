@@ -169,7 +169,7 @@ struct RenderTests {
 	}
 
 	/// Renders frames of a real recording for visual review. Set NEBULA_SNAPSHOT_VIDEO (a video
-	/// path, optionally with `<video>.cursor.json` from OpenScreen) and NEBULA_SNAPSHOT_OUT (a folder).
+	/// path) and NEBULA_SNAPSHOT_OUT (a folder).
 	@Test(.enabled(if: ProcessInfo.processInfo.environment["NEBULA_SNAPSHOT_VIDEO"] != nil))
 	func snapshotRealRecording() async throws {
 		let env = ProcessInfo.processInfo.environment
@@ -178,11 +178,7 @@ struct RenderTests {
 		try FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
 		let media = try await MediaProbe.mediaInfo(video: video, videoFileName: video.lastPathComponent, microphone: nil, microphoneFileName: nil)
 		var project = Project(name: "Snapshot", media: media)
-		let cursorData = try? Data(contentsOf: URL(fileURLWithPath: video.path + ".cursor.json"))
-		let input = try OpenScreenImporter.convert(
-			projectData: Data(#"{"version":2,"media":{"screenVideoPath":"x"},"editor":{}}"#.utf8),
-			cursorData: cursorData, media: media, name: "Snapshot"
-		).input
+		let input = InputTrack.empty
 		let activity = try await FrameActivityAnalyzer.analyze(video: video)
 		let plan = PolishPlanner.plan(project: project, input: input, signals: PolishSignals(frameActivity: activity), options: PolishOptions())
 		PolishPlanner.apply(plan, to: &project, options: PolishOptions())
