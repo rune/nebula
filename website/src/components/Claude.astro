@@ -1,7 +1,7 @@
 ---
 import { Picture } from "astro:assets";
 import Chapter from "./Chapter.astro";
-import Command from "./Command.astro";
+import Icon from "./Icon.astro";
 import editor from "../assets/shots/editor.png";
 import { site } from "../site";
 
@@ -65,7 +65,13 @@ const tools = ["polish", "edit_clip", "add_zoom", "add_mask", "add_text", "set_s
 				<h3 data-reveal>Connect Claude Code in one line</h3>
 				<p data-reveal>Open Nebula, then run this once.</p>
 			</div>
-			<div data-reveal><Command command={site.mcpCommand} /></div>
+			<div class="command" data-reveal>
+				<code>{site.mcpCommand}</code>
+				<button class="copy" type="button" data-copy={site.mcpCommand} data-copied="Command copied" aria-label="Copy the command">
+					<span class="copy-icon"><Icon name="copy" size={17} /></span>
+					<span class="check-icon"><Icon name="check" size={17} /></span>
+				</button>
+			</div>
 		</div>
 
 		<p class="tools" data-reveal>
@@ -235,6 +241,60 @@ const tools = ["polish", "edit_clip", "add_zoom", "add_mask", "add_text", "set_s
 		margin-top: 4px;
 		font-size: 15px;
 		color: var(--text-2);
+	}
+
+	.command {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		min-width: 0;
+		padding: 8px 8px 8px 18px;
+		border-radius: var(--radius);
+		background: var(--surface-1);
+		border: 1px solid var(--line-strong);
+	}
+
+	.command code {
+		flex: 1;
+		min-width: 0;
+		overflow-x: auto;
+		white-space: nowrap;
+		font-family: var(--mono);
+		font-size: 13px;
+		color: var(--text-1);
+		scrollbar-width: none;
+	}
+
+	.copy {
+		flex: none;
+		display: grid;
+		place-items: center;
+		width: 36px;
+		height: 36px;
+		border: 0;
+		border-radius: 8px;
+		background: var(--surface-3);
+		color: var(--text-2);
+		cursor: pointer;
+	}
+
+	.copy:hover {
+		color: var(--text-1);
+	}
+
+	.copy > span {
+		grid-area: 1 / 1;
+		transition: opacity 0.2s;
+	}
+
+	.check-icon,
+	.copy:global(.copied) .copy-icon {
+		opacity: 0;
+	}
+
+	.copy:global(.copied) .check-icon {
+		opacity: 1;
+		color: var(--lavender);
 	}
 
 	.tools {

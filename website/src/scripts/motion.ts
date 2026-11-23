@@ -57,6 +57,7 @@ function seeker(video: HTMLVideoElement) {
 
 function setupCopy() {
 	const toast = $("[data-toast]")!;
+	const toastText = $("[data-toast-text]", toast)!;
 	let hideToast = 0;
 	for (const button of $$<HTMLButtonElement>("[data-copy]")) {
 		button.addEventListener("click", async () => {
@@ -64,12 +65,12 @@ function setupCopy() {
 				await navigator.clipboard.writeText(button.dataset.copy!);
 				button.classList.add("copied");
 				setTimeout(() => button.classList.remove("copied"), 1600);
-				$("[data-toast-text]", toast)!.textContent = button.dataset.copied!;
+				toastText.textContent = button.dataset.copied!;
 				toast.classList.add("shown");
 				clearTimeout(hideToast);
 				hideToast = window.setTimeout(() => toast.classList.remove("shown"), 2000);
 			} catch {
-				/* Clipboard blocked: the command is still selectable. */
+				/* Clipboard blocked: nothing was copied, so nothing to confirm. */
 			}
 		});
 	}

@@ -11,10 +11,11 @@ import { links, site } from "../site";
 			Record something <span class="fill-mark" data-closing-fill>worth watching.</span>
 		</h2>
 		<div class="get" data-reveal>
-			<Install>
+			<Install />
+			<div class="cta">
 				<a class="button ghost small" href={links.releases} target="_blank" rel="noopener noreferrer">All releases</a>
-				<span>v{site.version} · {site.requirements}</span>
-			</Install>
+				<span class="meta">v{site.version} · {site.requirements}</span>
+			</div>
 		</div>
 	</div>
 </section>
@@ -62,6 +63,21 @@ import { links, site } from "../site";
 		margin-top: clamp(36px, 4vw, 52px);
 	}
 
+	.cta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 12px;
+		margin-top: 20px;
+	}
+
+	.meta {
+		margin-left: 12px;
+		font-family: var(--mono);
+		font-size: 12.5px;
+		color: var(--text-3);
+	}
+
 	.footer {
 		border-top: 1px solid var(--line);
 	}
@@ -99,6 +115,10 @@ import { links, site } from "../site";
 	}
 
 	@media (max-width: 640px) {
+		.meta {
+			margin-left: 0;
+			width: 100%;
+		}
 		.fine {
 			margin-left: 0;
 		}

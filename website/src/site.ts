@@ -2,6 +2,8 @@
  * Everything that changes between releases or when the repository moves lives here.
  * After a release: bump `version`. After moving the repo: change `repo`.
  */
+const mcpUrl = "http://127.0.0.1:39351/mcp";
+
 export const site = {
 	name: "Nebula",
 	tagline: "Screen recordings that edit themselves.",
@@ -10,7 +12,7 @@ export const site = {
 	repo: "rune/nebula",
 	version: "1.0.0",
 	requirements: "macOS 15 or later · Apple silicon & Intel",
-	mcpCommand: "claude mcp add --transport http --scope user nebula http://127.0.0.1:39351/mcp",
+	mcpCommand: `claude mcp add --transport http --scope user nebula ${mcpUrl}`,
 };
 
 const github = `https://github.com/${site.repo}`;
@@ -29,7 +31,7 @@ export const setupPrompt = `Set up Nebula, the open-source screen recorder for m
 
 1. Install Nebula by running: ${installCommand}
    It downloads the latest release into /Applications and opens it.
-2. Connect Nebula to yourself as an MCP server while Nebula is open. It serves streamable HTTP at http://127.0.0.1:39351/mcp. In Claude Code, run: ${site.mcpCommand}
+2. Connect Nebula to yourself as an MCP server while Nebula is open. It serves streamable HTTP at ${mcpUrl}. In Claude Code, run: ${site.mcpCommand}
    In any other agent, add that URL the way your MCP settings expect.
 3. Walk me through the macOS permissions. Screen Recording is required: when Nebula asks, open System Settings → Privacy & Security → Screen & System Audio Recording and turn Nebula on. Microphone is optional, for voiceover. Accessibility is optional and lets Polish see clicks and text fields.
 4. Check that the Nebula MCP server responds, then tell me I'm ready and that ⌥⌘↩ starts a recording.`;

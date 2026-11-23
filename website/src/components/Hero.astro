@@ -16,10 +16,11 @@ const posterImage = await getImage({ src: poster, width: 1600, format: "webp" })
 			<span class="line rest" data-hero-line>Nebula records your Mac, then zooms in, cuts the pauses and smooths the cursor for you.</span>
 		</h1>
 		<div class="get" id="install" data-hero-in>
-			<Install>
+			<Install />
+			<div class="cta">
 				<a class="button ghost small" href={links.github} target="_blank" rel="noopener noreferrer"><Icon name="github" size={16} />View on GitHub</a>
-				<span>Free and open source · v{site.version} · macOS 15+</span>
-			</Install>
+				<span class="meta">Free and open source · v{site.version} · macOS 15+</span>
+			</div>
 		</div>
 	</div>
 
@@ -75,7 +76,21 @@ const posterImage = await getImage({ src: poster, width: 1600, format: "webp" })
 
 	.get {
 		margin-top: clamp(32px, 4vw, 48px);
-		scroll-margin-top: 120px;
+	}
+
+	.cta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 12px;
+		margin-top: 20px;
+	}
+
+	.meta {
+		margin-left: 12px;
+		font-family: var(--mono);
+		font-size: 12.5px;
+		color: var(--text-3);
 	}
 
 	.figure {
@@ -95,5 +110,12 @@ const posterImage = await getImage({ src: poster, width: 1600, format: "webp" })
 		height: 52.1%;
 		object-fit: cover;
 		background: #0d0820;
+	}
+
+	@media (max-width: 640px) {
+		.meta {
+			margin-left: 0;
+			width: 100%;
+		}
 	}
 </style>
